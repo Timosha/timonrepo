@@ -140,11 +140,6 @@ make install DESTDIR=$RPM_BUILD_ROOT PERL_MAKE_OPTIONS="%perl_make_options"
 #mkdir -p $RPM_BUILD_ROOT/usr/share/icons $RPM_BUILD_ROOT/etc/X11/applnk/Graphics
 #cp %{SOURCE1} $RPM_BUILD_ROOT/usr/share/icons
 
-# Add files make install constantly forgets
-mkdir -p $RPM_BUILD_ROOT/%{_libdir}/ImageMagick-%{VER}/config
-install -c -m 644 config/*.mgk $RPM_BUILD_ROOT/%{_libdir}/ImageMagick-%{VER}/config/
-mv -f $RPM_BUILD_ROOT/%{_datadir}/ImageMagick-%{VER}/config/* $RPM_BUILD_ROOT/%{_libdir}/ImageMagick-%{VER}/config/
-
 #cat >$RPM_BUILD_ROOT/etc/X11/applnk/Graphics/ImageMagick.desktop <<EOF
 #[Desktop Entry]
 #Name=ImageMagick
@@ -197,10 +192,11 @@ sed -e s,$RPM_BUILD_ROOT,, perl-pkg-files.orig > perl-pkg-files
 # remove files we aren't shipping 
 rm -f `find $RPM_BUILD_ROOT%{_libdir}/perl$perlmajor/ -name perllocal.pod -type f`
 rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
-rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
+rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}/{images,www,ChangeLog,LICENSE,NEWS,index.html}
+rm -rf $RPM_BUILD_ROOT%{_libdir}/libltdl.*
 
 %clean
-#rm -rf $RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_ROOT
 
 %post -p /sbin/ldconfig
 
@@ -213,11 +209,11 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 %files
 %defattr(-,root,root)
 %doc index.html www images QuickStart.txt
-%doc README.txt
+%doc README.txt LICENSE NOTICE AUTHORS NEWS
 %attr(755,root,root) %{_libdir}/libMagick.so.*
 %attr(755,root,root) %{_libdir}/libWand.so.*
 %{_libdir}/ImageMagick-*
-%{_bindir}/[a-zW]*
+%{_bindir}/[a-z]*
 %{_mandir}/*/*
 #/etc/X11/applnk/Graphics/ImageMagick.desktop
 #/usr/share/icons/magick_small.png
@@ -225,6 +221,7 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 %files devel
 %defattr(-,root,root)
 %{_bindir}/Magick-config
+%{_bindir}/Wand-config
 %{_libdir}/libMagick.a
 %{_libdir}/libMagick.la
 %{_libdir}/libMagick.so
