@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 4
+Release: 5
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -260,6 +260,9 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 #%{_libdir}/perl*/site_perl/*/*/Image
 
 %changelog
+* Wed Mar  2 2005 Matthias Clasen <mclasen@redhat.com> 6.0.7.1-5
+- rebuild with gcc4
+
 * Mon Oct 11 2004 Tim Waugh <twaugh@redhat.com> 6.0.7.1-4
 - The devel subpackage requires XFree86-devel (bug #126509).
 - Fixed build requirements (bug #120776).  From Robert Scheck.
