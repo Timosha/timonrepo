@@ -67,7 +67,7 @@ Version: 7.4.6
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 2
+Release: 3
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -80,7 +80,7 @@ Source10: http://jdbc.postgresql.org/download/pg74.215.jdbc2ee.jar
 Source11: http://jdbc.postgresql.org/download/pg74.215.jdbc3.jar
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
-Source18: ftp://ftp.druid.net/pub/distrib/PyGreSQL-3.5.tgz
+Source18: ftp://ftp.druid.net/pub/distrib/PyGreSQL-3.6.tgz
 Patch1: rpm-pgsql-7.4.patch
 Patch2: rpm-multilib-%{version}.patch
 Patch3: postgresql-7.4-tighten.patch
@@ -353,9 +353,11 @@ popd
    tar xzf %{SOURCE18}
    PYGRESQLDIR=`basename %{SOURCE18} .tgz`
    mv $PYGRESQLDIR PyGreSQL
-   # Some versions of PyGreSQL.tgz contain wrong permissions for docs files
+   # Some versions of PyGreSQL.tgz contain wrong file permissions
    chmod 644 PyGreSQL/Announce PyGreSQL/ChangeLog PyGreSQL/README
-   chmod 755 PyGreSQL/tutorial PyGreSQL/tutorial/*.py
+   chmod 755 PyGreSQL/tutorial
+   chmod 644 PyGreSQL/tutorial/*.py
+   chmod 755 PyGreSQL/tutorial/advanced.py PyGreSQL/tutorial/basics.py
 %endif
 
 %build
@@ -443,7 +445,7 @@ make -C contrib DESTDIR=$RPM_BUILD_ROOT install
 make DESTDIR=$RPM_BUILD_ROOT install-all-headers
 
 # copy over Makefile.global to the include dir....
-install -m755 src/Makefile.global $RPM_BUILD_ROOT/usr/include/pgsql
+install -m 644 src/Makefile.global $RPM_BUILD_ROOT/usr/include/pgsql
 
 %if %jdbc
 	# Java/JDBC
@@ -451,10 +453,10 @@ install -m755 src/Makefile.global $RPM_BUILD_ROOT/usr/include/pgsql
 
 	# JDBC jars 
 	install -d $RPM_BUILD_ROOT/usr/share/java
-	install -m 755 %{SOURCE8} $RPM_BUILD_ROOT/usr/share/java
-	install -m 755 %{SOURCE9} $RPM_BUILD_ROOT/usr/share/java
-	install -m 755 %{SOURCE10} $RPM_BUILD_ROOT/usr/share/java
-	install -m 755 %{SOURCE11} $RPM_BUILD_ROOT/usr/share/java
+	install -m 644 %{SOURCE8} $RPM_BUILD_ROOT/usr/share/java
+	install -m 644 %{SOURCE9} $RPM_BUILD_ROOT/usr/share/java
+	install -m 644 %{SOURCE10} $RPM_BUILD_ROOT/usr/share/java
+	install -m 644 %{SOURCE11} $RPM_BUILD_ROOT/usr/share/java
 
 %endif
 
@@ -509,8 +511,8 @@ rm -rf $RPM_BUILD_ROOT%{_mandir}/man1/pgtksh.*
    pushd PyGreSQL
    install -m 0755 -d $RPM_BUILD_ROOT%{_libdir}/python%{pyver}/site-packages
    install -m 0755 _pgmodule.so $RPM_BUILD_ROOT%{_libdir}/python%{pyver}/site-packages
-   install -m 0755 pg.py $RPM_BUILD_ROOT%{_libdir}/python%{pyver}/site-packages
-   install -m 0755 pgdb.py $RPM_BUILD_ROOT%{_libdir}/python%{pyver}/site-packages
+   install -m 0644 pg.py $RPM_BUILD_ROOT%{_libdir}/python%{pyver}/site-packages
+   install -m 0644 pgdb.py $RPM_BUILD_ROOT%{_libdir}/python%{pyver}/site-packages
    popd
 %endif
 
@@ -607,6 +609,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/psql.*
 %{_mandir}/man1/vacuumdb.*
 %{_mandir}/man7/*
+%dir %{_libdir}/pgsql
 
 %files docs
 %defattr(-,root,root)
@@ -701,7 +704,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/pgsql/postgres.description
 %{_datadir}/pgsql/*.sample
 %{_libdir}/pgsql/plpgsql.so
-%dir %{_libdir}/pgsql
 %dir %{_datadir}/pgsql
 %attr(700,postgres,postgres) %dir /var/lib/pgsql
 %attr(700,postgres,postgres) %dir /var/lib/pgsql/data
@@ -788,6 +790,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Dec 16 2004 Tom Lane <tgl@redhat.com> 7.4.6-3
+- Update to PyGreSQL 3.6 (to fix bug #142711)
+- Adjust a few file permissions (bug #142431)
+- Assign %%{_libdir}/pgsql to base package instead of -server (bug #74003)
+
 * Mon Nov 15 2004 Tom Lane <tgl@redhat.com> 7.4.6-2
 - Rebuild so python components play with python 2.4 (bug 139160)
 
