@@ -67,7 +67,7 @@ Version: 7.4.5
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 1
+Release: 2
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -80,7 +80,7 @@ Source10: http://jdbc.postgresql.org/download/pg74.215.jdbc2ee.jar
 Source11: http://jdbc.postgresql.org/download/pg74.215.jdbc3.jar
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
-Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.4.tgz
+Source18: ftp://ftp.druid.net/pub/distrib/PyGreSQL-3.5.tgz
 Patch1: rpm-pgsql-7.4.patch
 Patch2: rpm-multilib-%{version}.patch
 Patch3: postgresql-7.4-tighten.patch
@@ -353,7 +353,7 @@ popd
    PYGRESQLDIR=`basename %{SOURCE18} .tgz`
    mv $PYGRESQLDIR PyGreSQL
    # Some versions of PyGreSQL.tgz contain wrong permissions for docs files
-   chmod 644 PyGreSQL/Announce PyGreSQL/ChangeLog
+   chmod 644 PyGreSQL/Announce PyGreSQL/ChangeLog PyGreSQL/README
    chmod 755 PyGreSQL/tutorial PyGreSQL/tutorial/*.py
 %endif
 
@@ -762,7 +762,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %python
 %files python
 %defattr(-,root,root)
-%doc PyGreSQL/tutorial PyGreSQL/Announce PyGreSQL/ChangeLog
+%doc PyGreSQL/tutorial PyGreSQL/Announce PyGreSQL/ChangeLog PyGreSQL/README
 %{_libdir}/python%{pyver}/site-packages/_pgmodule.so
 %{_libdir}/python%{pyver}/site-packages/*.py
 %endif
@@ -784,6 +784,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Aug 30 2004 Tom Lane <tgl@redhat.com> 7.4.5-2
+- Update to PyGreSQL 3.5.
+
 * Wed Aug 24 2004 Tom Lane <tgl@redhat.com> 7.4.5-1
 - Update to PostgreSQL 7.4.5.
 - Update JDBC jars to driver build 215.
