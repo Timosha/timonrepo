@@ -212,7 +212,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc README.txt LICENSE NOTICE AUTHORS NEWS
 %attr(755,root,root) %{_libdir}/libMagick.so.*
 %attr(755,root,root) %{_libdir}/libWand.so.*
-%{_libdir}/ImageMagick-*
+%{_libdir}/ImageMagick-%{VER}
+%{_datadir}/ImageMagick-%{VER}/config
 %{_bindir}/[a-z]*
 %{_mandir}/*/*
 #/etc/X11/applnk/Graphics/ImageMagick.desktop
