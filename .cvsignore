@@ -1,2 +1,8 @@
-postgresql-7.4.6.tar.bz2
-PyGreSQL-3.6.tgz
+postgresql-8.0.0.tar.bz2
+PyGreSQL-3.6.1.tgz
+pgtcl1.5.2.tar.gz
+pgtcldocs-20041108.zip
+postgresql-8.0.309.jdbc2.jar
+postgresql-8.0.309.jdbc2ee.jar
+postgresql-8.0.309.jdbc3.jar
+postgresql-8.0-US.pdf

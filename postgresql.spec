@@ -10,14 +10,11 @@
 #build7x, build8, and build9 similar
 %{?build8:%define build89 1}
 %{?build9:%define build89 1}
-%{?build7x:%define kerbdir /usr/kerberos}
 %{?build7x:%define tcldevel 0}
-%{?build89:%define kerbdir /usr/kerberos}
 %{?build8:%define tcldevel 0}
 %{?build7x:%define aconfver autoconf-2.53}
 
 %{!?tcldevel:%define tcldevel 1}
-%{!?kerbdir:%define kerbdir /usr}
 %{!?aconfver:%define aconfver autoconf}
 
 %define beta 0
@@ -25,7 +22,6 @@
 %{?beta:%define __os_install_post /usr/lib/rpm/brp-compress}
 
 %{!?tcl:%define tcl 1}
-%{!?tkpkg:%define tkpkg 0}
 %{!?jdbc:%define jdbc 1}
 %{!?test:%define test 1}
 %{!?python:%define python 1}
@@ -37,6 +33,7 @@
 %{!?nls:%define nls 1}
 %{!?pam:%define pam 1}
 %{!?pgfts:%define pgfts 1}
+%{!?runselftest:%define runselftest 1}
 
 # Python major version.
 %{expand: %%define pyver %(python -c 'import sys;print(sys.version[0:3])')}
@@ -45,7 +42,7 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 7.4.6
+Version: 8.0.0
 
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
@@ -67,41 +64,36 @@ Version: 7.4.6
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 5
+Release: 1
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
 Source3: postgresql.init
-Source5: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2.md5
+Source4: Makefile.regress
 Source6: README.rpm-dist
-Source8: http://jdbc.postgresql.org/download/pg74.215.jdbc1.jar
-Source9: http://jdbc.postgresql.org/download/pg74.215.jdbc2.jar
-Source10: http://jdbc.postgresql.org/download/pg74.215.jdbc2ee.jar
-Source11: http://jdbc.postgresql.org/download/pg74.215.jdbc3.jar
+Source8: http://jdbc.postgresql.org/download/postgresql-8.0.309.jdbc2.jar
+Source9: http://jdbc.postgresql.org/download/postgresql-8.0.309.jdbc2ee.jar
+Source10: http://jdbc.postgresql.org/download/postgresql-8.0.309.jdbc3.jar
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
-Source18: ftp://ftp.druid.net/pub/distrib/PyGreSQL-3.6.tgz
-Patch1: rpm-pgsql-7.4.patch
-Patch2: rpm-multilib-%{version}.patch
-Patch3: postgresql-7.4-tighten.patch
-Patch4: postgresql-7.4-getppid.patch
-Patch5: postgresql-plperl.patch
-Patch6: postgresql-7.4-src-tutorial.patch
-Patch7: postgresql-7.3.4-s390-pic.patch
-Patch8: postgresql-7.4-com_err.patch
+Source17: postgresql-8.0-US.pdf
+Source18: ftp://ftp.druid.net/pub/distrib/PyGreSQL-3.6.1.tgz
+Source19: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcl1.5.2.tar.gz
+Source20: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcldocs-20041108.zip
+Patch1: rpm-pgsql.patch
+Patch2: postgresql-src-tutorial.patch
+Patch3: postgresql-logging.patch
+Patch4: postgresql-test.patch
 Buildrequires: perl glibc-devel bison flex
 Prereq: /sbin/ldconfig initscripts
 %if %python
 BuildPrereq: python-devel
 %endif
-%if %tcl
+%if %tcl || %pltcl
 BuildPrereq: tcl
 %if %tcldevel
 Buildrequires: tcl-devel
 %endif
-%endif
-%if %tkpkg
-BuildPrereq: tk
 %endif
 BuildPrereq: readline-devel
 BuildPrereq: zlib-devel >= 1.0.4
@@ -205,7 +197,7 @@ PostgreSQL server.
 Summary: The programs needed to create and run a PostgreSQL server.
 Group: Applications/Databases
 Prereq: /usr/sbin/useradd /sbin/chkconfig 
-Requires: postgresql = %{version} libpq.so
+Prereq: postgresql = %{version} libpq.so
 Conflicts: postgresql < 7.4
 
 %description server
@@ -223,16 +215,16 @@ to install the postgresql package.
 %package docs
 Summary: Extra documentation for PostgreSQL
 Group: Applications/Databases
+Prereq: postgresql = %{version}
 %description docs
-The postgresql-docs package includes the SGML source for the documentation
-as well as the documentation in PDF format and some extra documentation.
-Install this package if you want to help with the PostgreSQL documentation
-project, or if you want to generate printed documentation.
+The postgresql-docs package includes some additional documentation for
+PostgreSQL.  Currently, this includes the main documentation in PDF format,
+the FAQ, and source files for the PostgreSQL tutorial.
 
 %package contrib
 Summary: Contributed source and binaries distributed with PostgreSQL
 Group: Applications/Databases
-Requires: postgresql = %{version}
+Prereq: postgresql = %{version}
 %description contrib
 The postgresql-contrib package contains contributed packages that are
 included in the PostgreSQL distribution.
@@ -241,6 +233,7 @@ included in the PostgreSQL distribution.
 %package devel
 Summary: PostgreSQL development header files and libraries.
 Group: Development/Libraries
+Prereq: postgresql = %{version}
 Requires: postgresql-libs = %{version}
 
 %description devel
@@ -257,7 +250,7 @@ package.
 %package pl
 Summary: The PL procedural languages for PostgreSQL.
 Group: Applications/Databases
-Requires: postgresql = %{version}
+PreReq: postgresql = %{version}
 PreReq: postgresql-server = %{version}
 
 %description pl
@@ -271,12 +264,13 @@ procedural languages for the backend.  PL/Pgsql is part of the core server packa
 %package tcl
 Summary: A Tcl client library for PostgreSQL.
 Group: Applications/Databases
-Requires: tcl >= 8.0
+Requires: libpq.so
+Requires: tcl >= 8.3
 
 %description tcl
 PostgreSQL is an advanced Object-Relational database management
-system.  The postgresql-tcl package contains the libpgtcl client library,
-the pg-enhanced pgtclsh,and the pg-enhanced tksh, if so configured at buildtime.
+system.  The postgresql-tcl package contains the Pgtcl client library
+and its documentation.
 %endif
 
 #------------
@@ -284,9 +278,9 @@ the pg-enhanced pgtclsh,and the pg-enhanced tksh, if so configured at buildtime.
 %package python
 Summary: Development module for Python code to access a PostgreSQL DB.
 Group: Applications/Databases
+Requires: libpq.so
 Requires: python mx
 Conflicts: python < %pyver, python >= %pynextver
-
 
 %description python
 PostgreSQL is an advanced Object-Relational database management
@@ -303,7 +297,7 @@ Group: Applications/Databases
 
 %description jdbc
 PostgreSQL is an advanced Object-Relational database management
-system. The postgresql-jdbc package includes the .jar file needed for
+system. The postgresql-jdbc package includes the .jar files needed for
 Java programs to access a PostgreSQL database.
 %endif
 
@@ -312,7 +306,7 @@ Java programs to access a PostgreSQL database.
 %package test
 Summary: The test suite distributed with PostgreSQL.
 Group: Applications/Databases
-Requires: postgresql = %{version}
+PreReq: postgresql = %{version}
 PreReq: postgresql-server = %{version}
 
 %description test
@@ -333,10 +327,6 @@ popd
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
 
 #call autoconf 2.53 or greater
 %aconfver
@@ -346,8 +336,7 @@ tar -zcf postgres.tar.gz *.html stylesheet.css
 rm -f *.html stylesheet.css
 popd
 
-#cp -p %{SOURCE17} .
-#tar zxf %{SOURCE17}
+cp -p %{SOURCE17} .
 
 %if %python
    tar xzf %{SOURCE18}
@@ -360,19 +349,23 @@ popd
    chmod 755 PyGreSQL/tutorial/advanced.py PyGreSQL/tutorial/basics.py
 %endif
 
+%if %tcl
+   tar xzf %{SOURCE19}
+   PGTCLDIR=`basename %{SOURCE19} .tar.gz`
+   mv $PGTCLDIR Pgtcl
+   unzip %{SOURCE20}
+   PGTCLDOCDIR=`basename %{SOURCE20} .zip`
+   mv $PGTCLDOCDIR Pgtcl-docs
+%endif
+
 %build
 
 CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS
 CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS
-%if %kerberos
-CPPFLAGS="${CPPFLAGS} -I%{_includedir}/et" ; export CPPFLAGS
-CFLAGS="${CFLAGS} -I%{_includedir}/et" ; export CFLAGS
-%endif
 
 # Strip out -ffast-math from CFLAGS....
-
 CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
-export LIBNAME=%{_lib}
+
 %configure --disable-rpath \
 %if %beta
 	--enable-debug \
@@ -381,14 +374,9 @@ export LIBNAME=%{_lib}
 %if %plperl
 	--with-perl \
 %endif
-%if %tcl
+%if %pltcl
 	--with-tcl \
 	--with-tclconfig=%{_libdir} \
-%endif
-%if %tkpkg
-	--with-tkconfig=%{_libdir} \
-%else
-	--without-tk \
 %endif
 %if %python
 	--with-python \
@@ -400,7 +388,7 @@ export LIBNAME=%{_lib}
 	--with-pam \
 %endif
 %if %kerberos
-	--with-krb5=%kerbdir \
+	--with-krb5 \
 %endif
 %if %nls
 	--enable-nls \
@@ -415,9 +403,22 @@ export LIBNAME=%{_lib}
 make %{?_smp_mflags} all
 make %{?_smp_mflags} -C contrib all
 
-%if %test
-	pushd src/test
+# Have to hack makefile to put correct path into tutorial scripts
+sed "s|C=\`pwd\`;|C=%{_libdir}/pgsql/tutorial;|" < src/tutorial/Makefile > src/tutorial/GNUmakefile
+make %{?_smp_mflags} -C src/tutorial NO_PGXS=1 all
+rm -f src/tutorial/GNUmakefile
+
+%if %runselftest
+	pushd src/test/regress
 	make all
+	make MAX_CONNECTIONS=5 check
+	make clean
+	popd
+%endif
+
+%if %test
+	pushd src/test/regress
+	make RPMTESTING=1 all
 	popd
 %endif
 
@@ -429,8 +430,21 @@ make %{?_smp_mflags} -C contrib all
 
    pushd PyGreSQL
 
-   gcc $CFLAGS -fpic -shared -o _pgmodule.so ${python_includespec} -I../src/interfaces/libpq -I../src/include -I%{kerbdir}/include -L../src/interfaces/libpq -lpq pgmodule.c
+   gcc $CFLAGS -fpic -shared -o _pgmodule.so ${python_includespec} -I../src/interfaces/libpq -I../src/include -L../src/interfaces/libpq -lpq pgmodule.c
 
+   popd
+%endif
+
+%if %tcl
+   pushd Pgtcl
+   # pgtcl's configure only handles one include directory :-(
+   ./configure --prefix=/usr \
+     --libdir=%{_libdir} \
+     --with-tcl=%{_libdir} \
+     --with-postgres-include="../src/interfaces/libpq -I../src/include" \
+     --with-postgres-lib=../src/interfaces/libpq
+   # note: as of pgtcl 1.5.2, its makefile is not parallel-safe
+   make all
    popd
 %endif
 
@@ -440,12 +454,8 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
 make -C contrib DESTDIR=$RPM_BUILD_ROOT install
 
-# install dev headers.
-
-make DESTDIR=$RPM_BUILD_ROOT install-all-headers
-
-# copy over Makefile.global to the include dir....
-install -m 644 src/Makefile.global $RPM_BUILD_ROOT/usr/include/pgsql
+install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
+cp src/tutorial/* $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
 
 %if %jdbc
 	# Java/JDBC
@@ -456,8 +466,12 @@ install -m 644 src/Makefile.global $RPM_BUILD_ROOT/usr/include/pgsql
 	install -m 644 %{SOURCE8} $RPM_BUILD_ROOT/usr/share/java
 	install -m 644 %{SOURCE9} $RPM_BUILD_ROOT/usr/share/java
 	install -m 644 %{SOURCE10} $RPM_BUILD_ROOT/usr/share/java
-	install -m 644 %{SOURCE11} $RPM_BUILD_ROOT/usr/share/java
+%endif
 
+%if %tcl
+	install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/Pgtcl
+	cp Pgtcl/pkgIndex.tcl $RPM_BUILD_ROOT%{_libdir}/Pgtcl
+	cp Pgtcl/libpgtcl*.so $RPM_BUILD_ROOT%{_libdir}/Pgtcl
 %endif
 
 if [ -d /etc/rc.d/init.d ]
@@ -469,7 +483,7 @@ fi
 # Remove stuff we don't want to ship.
 rm -f $RPM_BUILD_ROOT%{_bindir}/findoidjoins
 rm -f $RPM_BUILD_ROOT%{_bindir}/make_oidjoins_check
-rm -f $RPM_BUILD_ROOT%{_docdir}/postgresql/contrib/README.findoidjoins
+rm -f $RPM_BUILD_ROOT%{_docdir}/pgsql/contrib/README.findoidjoins
 rm -f contrib/findoidjoins/README.findoidjoins
 
 # PGDATA needs removal of group and world permissions due to pg_pwd hole.
@@ -486,26 +500,26 @@ install -d -m 700 $RPM_BUILD_ROOT/etc/sysconfig/pgsql
 
 
 %if %test
-	# tests. There are many files included here that are unnecessary, but include
-	# them anyway for completeness.
-	mkdir -p $RPM_BUILD_ROOT/usr/lib/pgsql/test
-	cp -a src/test/regress $RPM_BUILD_ROOT/usr/lib/pgsql/test
-	install -m 0755 contrib/spi/refint.so $RPM_BUILD_ROOT/usr/lib/pgsql/test/regress
-	install -m 0755 contrib/spi/autoinc.so $RPM_BUILD_ROOT/usr/lib/pgsql/test/regress
-	pushd  $RPM_BUILD_ROOT/usr/lib/pgsql/test/regress/
+	# tests. There are many files included here that are unnecessary,
+	# but include them anyway for completeness.  We replace the original
+	# Makefiles, however.
+	mkdir -p $RPM_BUILD_ROOT%{_libdir}/pgsql/test
+	cp -a src/test/regress $RPM_BUILD_ROOT%{_libdir}/pgsql/test
+	install -m 0755 contrib/spi/refint.so $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress
+	install -m 0755 contrib/spi/autoinc.so $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress
+	pushd  $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress/
 	strip *.so
+	rm -f GNUmakefile Makefile
 	popd
+	cp %{SOURCE4} $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress/Makefile
+	chmod 0644 $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress/Makefile
 %endif
 
 # Fix some more documentation
 # gzip doc/internals.ps
 cp %{SOURCE6} README.rpm-dist
-mv $RPM_BUILD_ROOT%{_docdir}/postgresql/html doc
-rm -rf $RPM_BUILD_ROOT%{_docdir}/postgresql
-%if %tkpkg
-%else
-rm -rf $RPM_BUILD_ROOT%{_mandir}/man1/pgtksh.*
-%endif
+mv $RPM_BUILD_ROOT%{_docdir}/pgsql/html doc
+rm -rf $RPM_BUILD_ROOT%{_docdir}/pgsql
 
 %if %python
    pushd PyGreSQL
@@ -517,6 +531,9 @@ rm -rf $RPM_BUILD_ROOT%{_mandir}/man1/pgtksh.*
 %endif
 
 %find_lang libpq
+%find_lang initdb
+%find_lang pg_config
+%find_lang pg_ctl
 %find_lang pg_dump
 %find_lang postgres
 %find_lang psql
@@ -525,7 +542,8 @@ rm -rf $RPM_BUILD_ROOT%{_mandir}/man1/pgtksh.*
 %find_lang pgscripts
 
 cat libpq.lang > libpq.lst
-cat psql.lang pg_dump.lang pgscripts.lang > main.lst
+cat pg_config.lang > pg_config.lst
+cat initdb.lang pg_ctl.lang psql.lang pg_dump.lang pgscripts.lang > main.lst
 cat postgres.lang pg_resetxlog.lang pg_controldata.lang > server.lst
 
 %post libs -p /sbin/ldconfig 
@@ -535,9 +553,6 @@ cat postgres.lang pg_resetxlog.lang pg_controldata.lang > server.lst
 groupadd -g 26 -o -r postgres >/dev/null 2>&1 || :
 useradd -M -n -g postgres -o -r -d /var/lib/pgsql -s /bin/bash \
 	-c "PostgreSQL Server" -u 26 postgres >/dev/null 2>&1 || :
-touch /var/log/pgsql
-chown postgres:postgres /var/log/pgsql
-chmod 0700 /var/log/pgsql
 
 %post server
 chkconfig --add postgresql
@@ -555,11 +570,6 @@ if [ $1 = 0 ] ; then
 	userdel postgres >/dev/null 2>&1 || :
 	groupdel postgres >/dev/null 2>&1 || : 
 fi
-
-%if %tcl
-%post -p /sbin/ldconfig   tcl
-%postun -p /sbin/ldconfig   tcl
-%endif
 
 %if %pls
 %post -p /sbin/ldconfig   pl
@@ -591,8 +601,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/dropuser
 %{_bindir}/pg_dump
 %{_bindir}/pg_dumpall
-%{_bindir}/pg_encoding
-%{_bindir}/pg_id
 %{_bindir}/pg_restore
 %{_bindir}/psql
 %{_bindir}/vacuumdb
@@ -613,9 +621,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %files docs
 %defattr(-,root,root)
-%doc doc/src/*
-#doc *-US.pdf
-%doc src/tutorial
+%doc doc/src/FAQ
+%doc *-US.pdf
+%{_libdir}/pgsql/tutorial/
 
 %files contrib
 %defattr(-,root,root)
@@ -640,8 +648,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pgsql/pending.so
 %{_libdir}/pgsql/pgcrypto.so
 %{_libdir}/pgsql/pgstattuple.so
+%{_libdir}/pgsql/pg_trgm.so
 %{_libdir}/pgsql/refint.so
-%{_libdir}/pgsql/rserv.so
 %{_libdir}/pgsql/rtree_gist.so
 %{_libdir}/pgsql/seg.so
 %{_libdir}/pgsql/string_io.so
@@ -651,24 +659,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pgsql/tsearch2.so
 %{_libdir}/pgsql/user_locks.so
 %{_datadir}/pgsql/contrib/
+%{_bindir}/DBMirror.pl
+%{_bindir}/clean_pending.pl
+%{_bindir}/my2pg.pl
+%{_bindir}/mysql2pgsql
 %{_bindir}/dbf2pg
 %{_bindir}/fti.pl
 %{_bindir}/oid2name
 %{_bindir}/pg_dumplo
-%{_bindir}/pg_logger
 %{_bindir}/pgbench
-%{_bindir}/RservTest
-%{_bindir}/MasterInit
-%{_bindir}/MasterAddTable
-%{_bindir}/Replicate
-%{_bindir}/MasterSync
-%{_bindir}/CleanLog
-%{_bindir}/SlaveInit
-%{_bindir}/SlaveAddTable
-%{_bindir}/GetSyncID
-%{_bindir}/PrepareSnapshot
-%{_bindir}/ApplySnapshot
-%{_bindir}/InitRservTest
 %{_bindir}/vacuumlo
 %{_bindir}/pg_autovacuum
 %doc contrib/*/README.* contrib/spi/*.example
@@ -685,7 +684,6 @@ rm -rf $RPM_BUILD_ROOT
 /etc/rc.d/init.d/postgresql
 %attr (755,root,root) %dir /etc/sysconfig/pgsql
 %{_bindir}/initdb
-%{_bindir}/initlocation
 %{_bindir}/ipcclean
 %{_bindir}/pg_controldata
 %{_bindir}/pg_ctl
@@ -693,7 +691,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/postgres
 %{_bindir}/postmaster
 %{_mandir}/man1/initdb.*
-%{_mandir}/man1/initlocation.*
 %{_mandir}/man1/ipcclean.*
 %{_mandir}/man1/pg_controldata.*
 %{_mandir}/man1/pg_ctl.*
@@ -702,7 +699,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/postmaster.*
 %{_datadir}/pgsql/postgres.bki
 %{_datadir}/pgsql/postgres.description
+%{_datadir}/pgsql/system_views.sql
 %{_datadir}/pgsql/*.sample
+%{_datadir}/pgsql/timezone/
 %{_libdir}/pgsql/plpgsql.so
 %dir %{_datadir}/pgsql
 %attr(700,postgres,postgres) %dir /var/lib/pgsql
@@ -714,7 +713,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/pgsql/information_schema.sql
 %{_datadir}/pgsql/sql_features.txt
 
-%files devel
+%files devel -f pg_config.lst
 %defattr(-,root,root)
 /usr/include/*
 %{_bindir}/ecpg
@@ -723,28 +722,20 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libecpg.so
 %{_libdir}/libpq.a
 %{_libdir}/libecpg.a
-%if %tcl
-%{_libdir}/libpgtcl.a
-%endif
 %{_libdir}/libecpg_compat.so
 %{_libdir}/libecpg_compat.a
+%{_libdir}/libpgport.a
 %{_libdir}/libpgtypes.so
 %{_libdir}/libpgtypes.a
+%{_libdir}/pgsql/pgxs/
 %{_mandir}/man1/ecpg.*
 %{_mandir}/man1/pg_config.*
 
 %if %tcl
 %files tcl
 %defattr(-,root,root)
-%attr(755,root,root) %{_libdir}/libpgtcl.so.*
-# libpgtcl.so is not in devel because Tcl scripts may load it by that name.
-%{_libdir}/libpgtcl.so
-%{_bindir}/pgtclsh
-%{_mandir}/man1/pgtclsh.*
-%if %tkpkg
-%{_bindir}/pgtksh
-%{_mandir}/man1/pgtksh.*
-%endif
+%{_libdir}/Pgtcl/
+%doc Pgtcl-docs/*
 %endif
 
 %if %pls
@@ -776,20 +767,31 @@ rm -rf $RPM_BUILD_ROOT
 %if %jdbc
 %files jdbc
 %defattr(-,root,root)
-%{_datadir}/java/pg74.215.jdbc1.jar
-%{_datadir}/java/pg74.215.jdbc2.jar
-%{_datadir}/java/pg74.215.jdbc2ee.jar
-%{_datadir}/java/pg74.215.jdbc3.jar
+%{_datadir}/java/*
 %endif
 
 %if %test
 %files test
 %defattr(-,postgres,postgres)
-%attr(-,postgres,postgres) /usr/lib/pgsql/test/*
-%attr(-,postgres,postgres) %dir /usr/lib/pgsql/test
+%attr(-,postgres,postgres) %{_libdir}/pgsql/test/*
+%attr(-,postgres,postgres) %dir %{_libdir}/pgsql/test
 %endif
 
 %changelog
+* Wed Jan 19 2005 Tom Lane <tgl@redhat.com> 8.0.0-1
+- Update to PostgreSQL 8.0.0, PyGreSQL 3.6.1, pgtcl 1.5.2,
+  and jdbc driver build 309.
+- Extensive cleanout of obsolete cruft in patch set.
+- Regression tests are run during RPM build (NOTE: cannot build as root when
+  this is enabled).
+- Postmaster stderr goes someplace useful, not /dev/null (bz#76503, #103767)
+- Make init script return a useful exit status (bz#80782)
+- Move docs' tutorial directory to %%{_libdir}/pgsql/tutorial, since it
+  includes .so files that surely do not belong under /usr/share.
+- Remove useless .sgml files from docs RPM (bz#134450)
+- Put regression tests under /usr/lib64 on 64-bit archs, since .so files
+  are not architecture-independent.
+
 * Wed Jan 12 2005 Tim Waugh <twaugh@redhat.com> 7.4.6-5
 - Rebuilt for new readline.
 
