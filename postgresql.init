@@ -166,7 +166,7 @@ start(){
 			mkdir -p $PGDATA || exit 1
 			chown postgres:postgres $PGDATA
 			chmod go-rwx $PGDATA
-			[ -x /sbin/restorecon ] && restorecon $PGDATADIR 
+			[ -x /sbin/restorecon ] && restorecon -R $PGDATADIR 
 		fi
 		# Make sure the locale from the initdb is preserved for later startups...
 		[ -f /etc/sysconfig/i18n ] && cp /etc/sysconfig/i18n $PGDATA/../initdb.i18n
