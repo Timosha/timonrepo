@@ -15,6 +15,7 @@
 %{!?ssl:%define ssl 1}
 %{!?kerberos:%define kerberos 1}
 %{!?nls:%define nls 1}
+%{!?pam:%define pam 1}
 
 # Utility feature defines.
 %{!?enable_mb:%define enable_mb 1}
@@ -26,7 +27,7 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 7.2
+Version: 7.2.1
 
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
@@ -48,7 +49,7 @@ Version: 7.2
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 2.7
+Release: 4
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz
@@ -64,7 +65,6 @@ Source11: http://jdbc.postgresql.org/download/jdbc7.1-1.2.jar
 Source12: postgresql-dump.1.gz
 Source15: postgresql-bashprofile
 Patch1: rpm-pgsql-7.2.patch
-Patch2: postgresql-7.2-contribfixes.patch
 Patch3: postgresql-7.2rc2-betterquote.patch
 Patch4: postgresql-7.2-tighten.patch
 Buildrequires: perl glibc-devel
@@ -73,6 +73,7 @@ BuildPrereq: perl
 BuildPrereq: readline-devel >= 4.0
 BuildPrereq: zlib-devel >= 1.0.4
 BuildPrereq: patch >= 2.5.4
+Requires: postgresql-libs = %{version}
 %if %ssl
 BuildPrereq: openssl-devel
 %endif
@@ -112,8 +113,9 @@ Obsoletes: postgresql-jdbc
 %if ! %{test}
 Obsoletes: postgresql-test
 %endif
-
-
+%if ! %{pam}
+BuildRequires: pam-devel
+%endif
 
 # This is the PostgreSQL Global Development Group Official RPMset spec file,
 # or a derivative thereof.
@@ -174,6 +176,7 @@ Summary: The programs needed to create and run a PostgreSQL server.
 Group: Applications/Databases
 Prereq: /usr/sbin/useradd /sbin/chkconfig 
 Requires: postgresql = %{version} libpq.so
+Requires: postgresql-libs = %{version}
 
 %package docs
 Summary: Extra documentation for PostgreSQL
@@ -329,8 +332,8 @@ system, including regression tests and benchmarks.
 %setup -q 
 
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1
+#patch2 -p1
+#patch3 -p1
 %patch4 -p1
 
 %build
@@ -380,6 +383,9 @@ CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
 %if %ssl
 	--with-openssl \
 %endif
+%if %pam
+	--with-pam \
+%endif
 %if %kerberos
 	--with-krb5=/usr/kerberos \
 %endif
@@ -390,7 +396,7 @@ CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
 	--mandir=%{_mandir} \
 	--docdir=%{_docdir} \
 	--includedir=%{_includedir} \
-	--datadir=/usr/share/pgsql
+	--datadir=/usr/share/pgsql 
 
 make all
 
@@ -613,6 +619,8 @@ popd
 # pgcrypto
 pushd pgcrypto
 perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/pgcrypto|" *.sql
+perl -pi -e "s|/usr/lib/pgsql/contrib/pgcrypto/pgcrypto|/usr/lib/pgsql/contrib/pgcrypto/libpgcrypto|" *.sql
+rm -f *.in *.o 
 popd
 
 # pgstattuple
@@ -673,6 +681,12 @@ pushd $RPM_BUILD_ROOT/usr/lib
 ln -s libpq.so.2 libpq.so.2.0
 popd
 
+# arch backups should go in /usr/lib, not /usr/share
+pushd $RPM_BUILD_ROOT
+mkdir -p usr/lib/pgsql/backup
+mv usr/share/pgsql/backup/pg_dumpall_new usr/lib/pgsql/backup/pg_dumpall_new 
+popd
+
 
 %find_lang libpq
 %find_lang pg_dump
@@ -691,10 +705,10 @@ if [ $1 -gt 1 ]
 then
    mkdir -p /usr/lib/pgsql/backup > /dev/null
    pushd /usr/bin > /dev/null
-   cp -fp postmaster postgres pg_dump pg_dumpall psql /usr/share/pgsql/backup > /dev/null 2>&1  || :
+   cp -fp postmaster postgres pg_dump pg_dumpall psql /usr/lib/pgsql/backup > /dev/null 2>&1  || :
    popd > /dev/null
    pushd /usr/lib > /dev/null
-   cp -fp libpq.* /usr/share/pgsql/backup > /dev/null 2>&1 || :
+   cp -fp libpq.* /usr/lib/pgsql/backup > /dev/null 2>&1 || :
    popd > /dev/null
 fi
 
@@ -814,7 +828,6 @@ rm -f perlfiles.list
 /usr/bin/pg_ctl
 /usr/bin/pg_passwd
 /usr/bin/postgres
-/usr/bin/postgresql-dump
 /usr/bin/postmaster
 %{_mandir}/man1/initdb.1*
 %{_mandir}/man1/initlocation.1*
@@ -823,15 +836,14 @@ rm -f perlfiles.list
 %{_mandir}/man1/pg_passwd.1*
 %{_mandir}/man1/postgres.1*
 %{_mandir}/man1/postmaster.1*
-%{_mandir}/man1/postgresql-dump.1*
 /usr/share/pgsql/postgres.bki
 /usr/share/pgsql/postgres.description
 /usr/share/pgsql/*.sample
 /usr/lib/pgsql/plpgsql.so
 %dir /usr/lib/pgsql
 %dir /usr/share/pgsql
-%attr(700,postgres,postgres) %dir /usr/share/pgsql/backup
-/usr/share/pgsql/backup/pg_dumpall_new
+%attr(700,postgres,postgres) %dir /usr/lib/pgsql/backup
+/usr/lib/pgsql/backup/pg_dumpall_new
 %attr(700,postgres,postgres) %dir /var/lib/pgsql
 %attr(700,postgres,postgres) %dir /var/lib/pgsql/data
 %attr(700,postgres,postgres) %dir /var/lib/pgsql/backups
@@ -851,7 +863,6 @@ rm -f perlfiles.list
 /usr/lib/libpq++.a
 /usr/lib/libpgeasy.a
 %if tcl
-/usr/lib/libpgtcl.so
 /usr/lib/libpgtcl.a
 %endif
 %{_mandir}/man1/ecpg.1*
@@ -861,6 +872,7 @@ rm -f perlfiles.list
 %files tcl
 %defattr(-,root,root)
 %attr(755,root,root) /usr/lib/libpgtcl.so.*
+/usr/lib/libpgtcl.so
 /usr/bin/pgtclsh
 %{_mandir}/man1/pgtclsh.1*
 /usr/lib/pgsql/pltcl.so
@@ -883,7 +895,7 @@ rm -f perlfiles.list
 %if %odbc
 %files odbc
 %defattr(-,root,root)
-%attr(755,root,root) /usr/lib/libpsqlodbc.so
+%attr(755,root,root) /usr/lib/libpsqlodbc.so*
 /usr/share/pgsql/odbc.sql
 %endif
 
@@ -926,6 +938,29 @@ rm -f perlfiles.list
 %endif
 
 %changelog
+* Wed Apr 10 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-4
+- Fix pgcrypto (#63073)
+- Remove postgresql-dump. Dump before upgrade, as we've documented many times
+
+* Wed Apr  3 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-3
+- make postgresql-server and postgresql depend on postgresql-libs
+- store backups of old binaries in /usr/lib/pgsql/backup instead of /usr/share
+
+* Wed Apr  3 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-2
+- 7.2.1 again, but this time based on the newest 7.2 specfile 
+  and not an older one. oops. 
+
+* Thu Mar 21 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-6
+- Move the libpgtcl.so symlink into the tcl subpackage from -devel (#61042)
+- Enable pam support (#59617)
+- Include the odbc plugin, not just the symlink to it (#61522)
+
+* Thu Feb 28 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-5
+- Disable python quote patch... it broke kerberos 
+
+* Thu Feb 21 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-4
+- Rebuild
+
 * Mon Feb 18 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-3
 - Don't require tcl-devel, it's just tcl
 - Fix contrib. A lot. Again (last time in 7.1)
