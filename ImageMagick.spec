@@ -1,7 +1,7 @@
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
 Version: 5.2.7
-Release: 2
+Release: 4
 Copyright: freeware
 Group: Applications/Multimedia
 Source: ftp://ftp.cdrom.com/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
@@ -90,9 +90,13 @@ TARGET_PLATFORM=%{_target_platform}
 RPM_OPT_FLAGS=""
 %endif
 
+%ifarch ia64
+CFLAGS="-g -D_GNU_SOURCE $RPM_OPT_FLAGS"; export CFLAGS
+%else
 CFLAGS="-g $RPM_OPT_FLAGS"; export CFLAGS
+%endif
 mv configure.in configure.in.dontuse # HACK: Don't run libtoolize in %%configure
-%configure --prefix=/usr/X11R6 --enable-shared --with-perl --with-x --with-threads --with-magick_plus_plus
+%configure --prefix=/usr/X11R6 --enable-shared --with-perl --with-x --with-threads --with-magick_plus_plus --without-wmf
 mv configure.in.dontuse configure.in
 make
 make -C Magick++
@@ -149,6 +153,11 @@ install -m755 utilities/.libs/* $RPM_BUILD_ROOT%{_bindir}/
 %{_libdir}/libMagick++.so
 
 %changelog
+* Sun Apr 29 2001 Bill Nottingham <notting@redhat.com>
+- rebuild for C++ exception handling on ia64
+- fix build (need -D_GNU_SOURCE at least on ia64...)
+- explicitly disable libwmf support
+
 * Mon Jan 08 2001 Florian La Roche <Florian.LaRoche@redhat.de>
 - remove patch for s390, it is not necessary
 
