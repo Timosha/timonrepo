@@ -1,7 +1,7 @@
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
-Version: 5.3.7
-Release: 3
+Version: 5.3.8
+Release: 2
 License: freeware
 Group: Applications/Multimedia
 Source: ftp://ftp.cdrom.com/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
@@ -165,7 +165,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libMagick.a
 %{_libdir}/libMagick.la
 %{_libdir}/libMagick.so
-%{_includedir}
+%{_includedir}/magick
 
 %files c++
 %defattr(-,root,root)
@@ -185,13 +185,21 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/perl*/site_perl/*/*/Image
 
 %changelog
-* Sun Aug 12 2001 Than Ngo <than@redhat.com> 5.3.7-3
+* Mon Aug 20 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.8-2
+- Remove Magick++ includes from -devel, they're already in -c++-devel
+  (#51590)
+
+* Sun Jul 28 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.8-1
+- 5.3.8 (bugfix release)
+
+* Sat Jul 27 2001 Than Ngo <than@redhat.com> 5.3.7-3
 - fix to build Perlmagic on s390 s390x
 
 * Thu Jul 26 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.7-2
 - Add delegates.mgk to the package (#50725)
 
 * Tue Jul 24 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.7-1
+- 5.3.7
 - Fix build without previously installed ImageMagick-devel (#49816)
 - Move perl bindings to a separate package.
 
