@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 1
+Release: 3
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -146,7 +146,9 @@ make install DESTDIR=$RPM_BUILD_ROOT PERL_MAKE_OPTIONS="%perl_make_options"
 #cp %{SOURCE1} $RPM_BUILD_ROOT/usr/share/icons
 
 # Add files make install constantly forgets
-install -c -m 644 config/*.mgk $RPM_BUILD_ROOT/usr/share/ImageMagick
+mkdir -p $RPM_BUILD_ROOT/usr/lib/ImageMagick-%{VER}/config
+install -c -m 644 config/*.mgk $RPM_BUILD_ROOT/usr/lib/ImageMagick-%{VER}/config/
+mv -f $RPM_BUILD_ROOT/usr/share/ImageMagick-%{VER}/config/* $RPM_BUILD_ROOT/usr/lib/ImageMagick-%{VER}/config/
 
 #cat >$RPM_BUILD_ROOT/etc/X11/applnk/Graphics/ImageMagick.desktop <<EOF
 #[Desktop Entry]
@@ -258,6 +260,9 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 #%{_libdir}/perl*/site_perl/*/*/Image
 
 %changelog
+* Tue Sep 14 2004 Karsten Hopp <karsten@redhat.de> 6.0.7.1-3 
+- move *.mgk files (#132007, #131708, #132397)
+
 * Sun Sep 12 2004 Karsten Hopp <karsten@redhat.de> 6.0.7.1-1 
 - update to 6.0.7 Patchlevel 1, fixes #132106
 
