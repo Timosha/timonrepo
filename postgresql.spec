@@ -1,3 +1,4 @@
+# [for (x)emacs] -*- coding: utf-8 -*-
 %define beta 0
 
 %{?beta:%define __os_install_post /usr/lib/rpm/brp-compress}
@@ -51,7 +52,7 @@ Version: 7.2.1
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 16
+Release: 17
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz
@@ -70,7 +71,7 @@ Patch1: rpm-pgsql-7.2.patch
 Patch3: postgresql-7.2rc2-betterquote.patch
 Patch4: postgresql-7.2-tighten.patch
 Patch5: postgresql-7.2.1-mktime.patch
-Buildrequires: perl glibc-devel
+Buildrequires: perl glibc-devel bison flex
 Prereq: /sbin/ldconfig initscripts
 BuildPrereq: perl
 BuildPrereq: readline-devel >= 4.0
@@ -137,7 +138,7 @@ BuildRequires: pam-devel
 # Major Contributors:
 # ---------------
 # Lamar Owen
-# Trond Eivind Glomsrød <teg@redhat.com>
+# Trond Eivind GlomsrÃ¸d <teg@redhat.com>
 # Thomas Lockhart
 # Reinhard Max
 # Karl DeBisschop
@@ -960,22 +961,25 @@ rm -f perlfiles.list
 %endif
 
 %changelog
+* Wed Aug 28 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2.1-17
+- Add bison and flex to buildprereq (#71590)
+
 * Sat Aug 10 2002 Elliot Lee <sopwith@redhat.com>
 - rebuilt with gcc-3.2 (we hope)
 
-* Fri Aug  9 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-15
+* Fri Aug  9 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2.1-15
 - Minor initscript tweak ( #71027)
 
 * Tue Jul 23 2002 Tim Powers <timp@redhat.com> 7.2.1-14
 - build using gcc-3.2-0.1
 
-* Thu Jul 11 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-13
+* Thu Jul 11 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2.1-13
 - Rebuild with new readline
 
-* Mon Jul  8 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-12
+* Mon Jul  8 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2.1-12
 - Update the jarfiles from jdbc.postgresql.org
 
-* Wed Jul  3 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-11
+* Wed Jul  3 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2.1-11
 - Make postgresql-docs conditional
 - don't ship it - it's just sgml sources for docs in the main package
   (#67818)
@@ -983,10 +987,10 @@ rm -f perlfiles.list
 * Fri Jun 21 2002 Tim Powers <timp@redhat.com>
 - automated rebuild
 
-* Tue Jun 18 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-10
+* Tue Jun 18 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2.1-10
 - step1.e was distributed as a binary... make sure it's rebuilt (#66870)
 
-* Wed Jun 12 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-9
+* Wed Jun 12 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2.1-9
 - Make the perl parts build with new perl
 - Fix mktime() usage - don't use it before the epoch
 - Disable tk/pgaccess
@@ -994,47 +998,47 @@ rm -f perlfiles.list
 * Thu May 23 2002 Tim Powers <timp@redhat.com>
 - automated rebuild
 
-* Tue May  7 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-7
+* Tue May  7 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2.1-7
 - Rebuild
 
-* Mon Apr 22 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-6
+* Mon Apr 22 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2.1-6
 - Add a missing percent in a conditional (tcl, devel package)
 
-* Fri Apr 12 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-5
+* Fri Apr 12 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2.1-5
 - Fix conditional build dependencies... it required tcl
   and python-devel only when you didn't build the modules,
   not if you needed them
 
-* Wed Apr 10 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-4
+* Wed Apr 10 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2.1-4
 - Fix pgcrypto (#63073)
 - Remove postgresql-dump. Dump before upgrade, as we've documented many times
 
-* Wed Apr  3 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-3
+* Wed Apr  3 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2.1-3
 - make postgresql-server and postgresql depend on postgresql-libs
 - store backups of old binaries in /usr/lib/pgsql/backup instead of /usr/share
 
-* Wed Apr  3 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-2
+* Wed Apr  3 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2.1-2
 - 7.2.1 again, but this time based on the newest 7.2 specfile 
   and not an older one. oops. 
 
-* Thu Mar 21 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-6
+* Thu Mar 21 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2-6
 - Move the libpgtcl.so symlink into the tcl subpackage from -devel (#61042)
 - Enable pam support (#59617)
 - Include the odbc plugin, not just the symlink to it (#61522)
 
-* Thu Feb 28 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-5
+* Thu Feb 28 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2-5
 - Disable python quote patch... it broke kerberos 
 
-* Thu Feb 21 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-4
+* Thu Feb 21 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2-4
 - Rebuild
 
-* Mon Feb 18 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-3
+* Mon Feb 18 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2-3
 - Don't require tcl-devel, it's just tcl
 - Fix contrib. A lot. Again (last time in 7.1)
 - Add buildprereq of recent patch (#59910)
 - make the initscript 0755
 
-* Fri Feb  8 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-2
+* Fri Feb  8 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 7.2-2
 - Sync
 - Fix output of backslash-ns from upgrade detection
 - Make the default config use socket credentials, not trust
@@ -1062,7 +1066,7 @@ rm -f perlfiles.list
 - 7.2b3-0.3PGDG
 - beta conditionals for debugging, assertion checking, and no strip.
 
-* Tue Nov 27 2001 Trond Eivind Glomsrød <teg@redhat.com>
+* Tue Nov 27 2001 Trond Eivind GlomsrÃ¸d <teg@redhat.com>
 - Improve python version handling
 
 * Fri Nov 23 2001 Lamar Owen <lamar.owen@wgcr.org>
