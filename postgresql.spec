@@ -2,16 +2,22 @@
 %{?build6x:%define kerberos 0}
 %{?build6x:%define nls 0}
 %{?build6x:%define ssl 0}
+%{?build6x:%define tcldevel 0}
 %{?build6x:%define aconfver /bin/true}
 #work around the undefined or defined to 1 build 6x interaction with the pam stuff
 %{!?build6x:%define non6xpamdeps 1}
 %{?build6x:%define non6xpamdeps 0}
-#build7x and build89 similar
-%{?build7x:%define kerbdir --with-krb5=/usr/kerberos}
-%{?build89:%define kerbdir --with-krb5=/usr/kerberos}
+#build7x, build8, and build9 similar
+%{?build8:%define build89 1}
+%{?build9:%define build89 1}
+%{?build7x:%define kerbdir /usr/kerberos}
+%{?build7x:%define tcldevel 0}
+%{?build89:%define kerbdir /usr/kerberos}
+%{?build8:%define tcldevel 0}
 %{?build7x:%define aconfver autoconf-2.53}
 
-%{!?kerbdir:%define kerbdir --with-krb5}
+%{!?tcldevel:%define tcldevel 1}
+%{!?kerbdir:%define kerbdir /usr}
 %{!?aconfver:%define aconfver autoconf}
 
 %define beta 0
@@ -39,7 +45,7 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 7.4
+Version: 7.4.2
 
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
@@ -61,33 +67,27 @@ Version: 7.4
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 5
+Release: 1
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
 Source3: postgresql.init
 Source5: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2.md5
 Source6: README.rpm-dist
-Source8: http://jdbc.postgresql.org/download/pg73jdbc1.jar
-Source9: http://jdbc.postgresql.org/download/pg73jdbc2.jar
-Source10: http://jdbc.postgresql.org/download/pg73jdbc3.jar
-Source11: http://jdbc.postgresql.org/download/devpgjdbc1.jar
-Source12: http://jdbc.postgresql.org/download/devpgjdbc2.jar
-Source13: http://jdbc.postgresql.org/download/devpgjdbc3.jar
+Source8: http://jdbc.postgresql.org/download/pg74.1jdbc1.jar
+Source9: http://jdbc.postgresql.org/download/pg74.1jdbc2.jar
+Source10: http://jdbc.postgresql.org/download/pg74.1jdbc2ee.jar
+Source11: http://jdbc.postgresql.org/download/pg74.1jdbc3.jar
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
-#Source17: postgresql-7.3.4-USpdfdocs.tar.gz
-Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.4-pre021201.tgz
+Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.4.tgz
 Patch1: rpm-pgsql-%{version}.patch
 Patch2: rpm-multilib-%{version}.patch
-Patch3: postgresql-%{version}-tighten.patch
-Patch4: postgresql-ppc64.patch
+Patch3: postgresql-7.4-tighten.patch
 Patch5: postgresql-plperl.patch
 Patch6: postgresql-7.4-src-tutorial.patch
 Patch7: postgresql-7.3.4-s390-pic.patch
 Patch8: postgresql-7.4-com_err.patch
-Patch9: PyGreSQL-3.4-pre021201-bugfix.patch
-Patch10: postgresql-7.4-headers.patch
 Buildrequires: perl glibc-devel bison flex
 Prereq: /sbin/ldconfig initscripts
 %if %python
@@ -95,7 +95,9 @@ BuildPrereq: python-devel
 %endif
 %if %tcl
 BuildPrereq: tcl
+%if %tcldevel
 Buildrequires: tcl-devel
+%endif
 %endif
 %if %tkpkg
 BuildPrereq: tk
@@ -142,6 +144,8 @@ Buildroot: %{_tmppath}/%{name}-%{version}-root
 # Andrew Overholt
 # David Jee
 # Kaj J. Niemi
+# Sander Steffann
+# Tom Lane
 # and others in the Changelog....
 
 # This spec file and ancilliary files are licensed in accordance with 
@@ -188,7 +192,7 @@ Summary: The programs needed to create and run a PostgreSQL server.
 Group: Applications/Databases
 Prereq: /usr/sbin/useradd /sbin/chkconfig 
 Requires: postgresql = %{version} libpq.so
-Conflicts: postgresql < 7.3
+Conflicts: postgresql < 7.4
 
 %description server
 The postgresql-server package includes the programs needed to create
@@ -319,7 +323,6 @@ popd
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
-%patch10 -p1
 
 #call autoconf 2.53 or greater
 %aconfver
@@ -334,7 +337,6 @@ popd
 
 %if %python
    tar xzf %{SOURCE18}
-   patch -p0 < %{PATCH9}
    PYGRESQLDIR=`basename %{SOURCE18} .tgz`
    mv $PYGRESQLDIR PyGreSQL
 %endif
@@ -379,7 +381,7 @@ export LIBNAME=%{_lib}
 	--with-pam \
 %endif
 %if %kerberos
-	%kerbdir \
+	--with-krb5=%kerbdir \
 %endif
 %if %nls
 	--enable-nls \
@@ -408,7 +410,7 @@ make -C contrib all
 
    pushd PyGreSQL
 
-   gcc $CFLAGS -fpic -shared -o _pgmodule.so ${python_includespec} -I../src/interfaces/libpq -I../src/include -L../src/interfaces/libpq -lpq pgmodule.c
+   gcc $CFLAGS -fpic -shared -o _pgmodule.so ${python_includespec} -I../src/interfaces/libpq -I../src/include -I%{kerbdir}/include -L../src/interfaces/libpq -lpq pgmodule.c
 
    popd
 %endif
@@ -436,8 +438,6 @@ install -m755 src/Makefile.global $RPM_BUILD_ROOT/usr/include/pgsql
 	install -m 755 %{SOURCE9} $RPM_BUILD_ROOT/usr/share/java
 	install -m 755 %{SOURCE10} $RPM_BUILD_ROOT/usr/share/java
 	install -m 755 %{SOURCE11} $RPM_BUILD_ROOT/usr/share/java
-	install -m 755 %{SOURCE12} $RPM_BUILD_ROOT/usr/share/java
-	install -m 755 %{SOURCE13} $RPM_BUILD_ROOT/usr/share/java
 
 %endif
 
@@ -512,7 +512,7 @@ groupadd -g 26 -o -r postgres >/dev/null 2>&1 || :
 useradd -M -n -g postgres -o -r -d /var/lib/pgsql -s /bin/bash \
 	-c "PostgreSQL Server" -u 26 postgres >/dev/null 2>&1 || :
 touch /var/log/pgsql
-chown postgres.postgres /var/log/pgsql
+chown postgres:postgres /var/log/pgsql
 chmod 0700 /var/log/pgsql
 
 %post server
@@ -546,7 +546,7 @@ fi
 
 %if %test
 %post test
-chown -R postgres.postgres /usr/share/pgsql/test >/dev/null 2>&1 || :
+chown -R postgres:postgres /usr/share/pgsql/test >/dev/null 2>&1 || :
 %endif
 
 %clean
@@ -662,7 +662,7 @@ rm -rf $RPM_BUILD_ROOT
 %files server -f server.lst
 %defattr(-,root,root)
 /etc/rc.d/init.d/postgresql
-%dir /etc/sysconfig/pgsql
+%attr (755,root,root) %dir /etc/sysconfig/pgsql
 %{_bindir}/initdb
 %{_bindir}/initlocation
 %{_bindir}/ipcclean
@@ -740,13 +740,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/pltcl_loadmod
 %{_datadir}/pgsql/unknown.pltcl
 %endif
+%if %python
 %{_libdir}/pgsql/plpython.so
+%endif
 %endif
 
 %if %python
 %files python
 %defattr(-,root,root)
-%doc PyGreSQL/README PyGreSQL/tutorial PyGreSQL/Announce PyGreSQL/ChangeLog
+%doc PyGreSQL/tutorial PyGreSQL/Announce PyGreSQL/ChangeLog
 %{_libdir}/python%{pyver}/site-packages/_pgmodule.so
 %{_libdir}/python%{pyver}/site-packages/*.py
 %endif
@@ -754,12 +756,10 @@ rm -rf $RPM_BUILD_ROOT
 %if %jdbc
 %files jdbc
 %defattr(-,root,root)
-%{_datadir}/java/pg73jdbc1.jar
-%{_datadir}/java/pg73jdbc2.jar
-%{_datadir}/java/pg73jdbc3.jar
-%{_datadir}/java/devpgjdbc1.jar
-%{_datadir}/java/devpgjdbc2.jar
-%{_datadir}/java/devpgjdbc3.jar
+%{_datadir}/java/pg74.1jdbc1.jar
+%{_datadir}/java/pg74.1jdbc2.jar
+%{_datadir}/java/pg74.1jdbc2ee.jar
+%{_datadir}/java/pg74.1jdbc3.jar
 %endif
 
 %if %test
@@ -770,6 +770,36 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Mar 10 2004 Tom Lane <tgl@redhat.com> 7.4.2-1
+- Update to PostgreSQL 7.4.2; sync with community SRPM as much as possible.
+- Support PGOPTS from /etc/sysconfig/pgsql, per bug 111504.
+- Fix permissions on /etc/sysconfig/pgsql, per bug 115278.
+- SELinux patch in init file: always su </dev/null, per bug 117901.
+- Rebuilt
+
+* Tue Mar 02 2004 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
+* Wed Feb 25 2004 Tom Lane <tgl@redhat.com>
+- Update to PostgreSQL 7.4.1.
+- Rebuilt
+
+* Tue Feb 24 2004 Tom Lane <tgl@redhat.com>
+- Fix chown syntax in postgresql.init also.
+- Rebuilt
+
+* Mon Feb 23 2004 Tim Waugh <twaugh@redhat.com>
+- Use ':' instead of '.' as separator for chown.
+
+* Fri Feb 13 2004 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
+* Fri Jan 9 2004 Lamar Owen <lowen@pari.edu>
+- 7.4.1-1PGDG
+- Merge Sander Steffann's changes up to 7.4-0.5PGDG
+- Proper 7.4.1 JDBC jars this time.
+- Patch for no pl/python from Alvaro
+
 * Fri Dec 05 2003 David Jee <djee@redhat.com> 7.4-5
 - Rebuild for Perl 5.8.2.
 

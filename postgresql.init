@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 # postgresql	This is the init script for starting up the PostgreSQL
 #		server
 #
@@ -88,6 +88,7 @@ fi
 [ -f /etc/sysconfig/pgsql/${NAME} ] && . /etc/sysconfig/pgsql/${NAME}
 export PGDATA
 export PGPORT
+export PGOPTS
 
 # Check that networking is up.
 # Pretty much need it for postmaster.
@@ -143,7 +144,7 @@ start(){
                 if [ ! -d $PGDATA ]
 		then
 			mkdir -p $PGDATA
-			chown postgres.postgres $PGDATA
+			chown postgres:postgres $PGDATA
 			chmod go-rwx $PGDATA
 		fi
 		# Make sure the locale from the initdb is preserved for later startups...
@@ -153,7 +154,7 @@ start(){
 		# Is expanded this early to be used in the command su runs
 		echo "export LANG LC_ALL LC_CTYPE LC_COLLATE LC_NUMERIC LC_CTYPE LC_TIME" >> $PGDATA/../initdb.i18n
 		# Initialize the database
-		su -l postgres -s /bin/sh -c "/usr/bin/initdb --pgdata=$PGDATA > /dev/null 2>&1" < /dev/null
+		su -l postgres -c "/usr/bin/initdb --pgdata=$PGDATA > /dev/null 2>&1" < /dev/null
 		[ -f $PGDATA/PG_VERSION ] && echo_success
 		[ ! -f $PGDATA/PG_VERSION ] && echo_failure
 		echo
@@ -170,7 +171,7 @@ start(){
 		#all systems go -- remove any stale lock files
 		rm -f /tmp/.s.PGSQL.${PGPORT} > /dev/null
 		echo -n "$PSQL_START"
-		su -l postgres -s /bin/sh -c "/usr/bin/pg_ctl  -D $PGDATA -p /usr/bin/postmaster -o '-p ${PGPORT}' start  > /dev/null 2>&1" < /dev/null
+		su -l postgres -c "/usr/bin/pg_ctl  -D $PGDATA -p /usr/bin/postmaster -o '-p ${PGPORT} ${PGOPTS}' start  > /dev/null 2>&1" < /dev/null
  		sleep 1
  		pid=`pidof -s /usr/bin/postmaster`
  		if [ $pid ]
@@ -188,7 +189,7 @@ start(){
 
 stop(){
 	echo -n $"Stopping ${NAME} service: "
-	su -l postgres -s /bin/sh -c "/usr/bin/pg_ctl stop -D $PGDATA -s -m fast" > /dev/null 2>&1
+	su -l postgres -c "/usr/bin/pg_ctl stop -D $PGDATA -s -m fast" > /dev/null 2>&1 < /dev/null
 	ret=$? 
 	if [ $ret -eq 0 ]
 	then
@@ -211,7 +212,7 @@ condrestart(){
 }
 
 reload(){
-    su -l postgres -s /bin/sh -c "/usr/bin/pg_ctl reload -D $PGDATA -s" > /dev/null 2>&1
+    su -l postgres -c "/usr/bin/pg_ctl reload -D $PGDATA -s" > /dev/null 2>&1 < /dev/null
 }
 
 # This script is slightly unusual in that the name of the daemon (postmaster)
