@@ -1,13 +1,20 @@
-# [for (x)emacs] -*- coding: utf-8 -*-
+# build6x usage: define to 1 to build for RHL6.x.  Don't define at all for others.
+%{?build6x:%define kerberos 0}
+%{?build6x:%define nls 0}
+%{?build6x:%define ssl 0}
+#work around the undefined or defined to 1 build 6x interaction with the pam stuff
+%{!?build6x:%define non6xpamdeps 1}
+%{?build6x:%define non6xpamdeps 0}
+
 %define beta 0
 
 %{?beta:%define __os_install_post /usr/lib/rpm/brp-compress}
 %{!?perl:%define perl 1}
 %{!?tcl:%define tcl 1}
-%{!?tkpkg:%define tkpkg 0}
+%{!?tkpkg:%define tkpkg 1}
 %{!?odbc:%define odbc 1}
 %{!?jdbc:%define jdbc 1}
-%{!?test:%define test 0}
+%{!?test:%define test 1}
 %{!?python:%define python 1}
 %{!?pltcl:%define pltcl 1}
 %{?forceplperl:%define plperl %{expand:forceplperl}}
@@ -17,20 +24,19 @@
 %{!?kerberos:%define kerberos 1}
 %{!?nls:%define nls 1}
 %{!?pam:%define pam 1}
-%{!?sgmldocs:%define sgmldocs 0}
-
 
 # Utility feature defines.
 %{!?enable_mb:%define enable_mb 1}
-%{!?pgaccess:%define pgaccess 0}
+%{!?pgaccess:%define pgaccess 1}
 
 # Python major version.
-%{expand: %%define pyver %(python -c 'import sys;print(sys.version[0:3])')%{nil}}
-%{expand: %%define pynextver %(python -c 'import sys;print(float(sys.version[0:3])+0.1)')%{nil}}
+%{expand: %%define pyver %(python -c 'import sys;print(sys.version[0:3])')}
+%{expand: %%define pynextver %(python -c 'import sys;print(float(sys.version[0:3])+0.1)')}
+
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 7.2.2
+Version: 7.2.3
 
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
@@ -52,31 +58,42 @@ Version: 7.2.2
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 1
+Release: 5.80
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz
+Source2: redhat-style-files.lst
 Source3: postgresql.init
-Source4: file-lists.tar.gz
+Source4: suse-style-files.lst
+Source5: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz.md5
 Source6: README.rpm-dist
 Source7: migration-scripts.tar.gz
-Source8: http://jdbc.postgresql.org/download/devpgjdbc1.jar
-Source9: http://jdbc.postgresql.org/download/devpgjdbc2.jar
-Source10: http://jdbc.postgresql.org/download/pgjdbc1.jar
-Source11: http://jdbc.postgresql.org/download/pgjdbc2.jar
+Source8: http://jdbc.postgresql.org/download/jdbc7.2dev-1.1.jar
+Source9: http://jdbc.postgresql.org/download/jdbc7.2dev-1.2.jar
+Source10: http://jdbc.postgresql.org/download/jdbc7.1-1.1.jar
+Source11: http://jdbc.postgresql.org/download/jdbc7.1-1.2.jar
+Source12: postgresql-dump.1.gz
+Source14: rh-pgdump.sh
 Source15: postgresql-bashprofile
-Patch1: rpm-pgsql-7.2.patch
-Patch3: postgresql-7.2rc2-betterquote.patch
-Patch4: postgresql-7.2-tighten.patch
-Patch5: postgresql-7.2.1-mktime.patch
-Buildrequires: perl glibc-devel bison flex
+Patch1: rpm-pgsql-%{version}.patch
+Patch2: postgresql-%{version}-geo_ops.patch
+Patch3: postgresql-%{version}-tighten.patch
+Buildrequires: perl glibc-devel
 Prereq: /sbin/ldconfig initscripts
+%if %python
+BuildPrereq: python-devel
+%endif
+%if %perl
 BuildPrereq: perl
-BuildPrereq: readline-devel >= 4.0
+%endif
+%if %tcl
+BuildPrereq: tcl
+%endif
+%if %tkpkg
+BuildPrereq: tk
+%endif
+BuildPrereq: readline-devel
 BuildPrereq: zlib-devel >= 1.0.4
-BuildPrereq: patch >= 2.5.4
-Url: http://www.postgresql.org/ 
-Requires: postgresql-libs = %{version}
 %if %ssl
 BuildPrereq: openssl-devel
 %endif
@@ -84,16 +101,21 @@ BuildPrereq: openssl-devel
 BuildPrereq: krb5-devel
 %endif
 %if %nls
-BuildPrereq: gettext >= 0.10.36
+BuildPrereq: gettext >= 0.10.35
 %endif
+
+%if %pam
+%if %non6xpamdeps
+BuildPrereq: pam-devel
+%endif
+%endif
+
+Url: http://www.postgresql.org/ 
 Obsoletes: postgresql-clients
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 # Obsolete the packages we are not building...
 %if ! %{plperl}
 Obsoletes: postgresql-plperl
-%endif
-%if %{tcl}
-Buildrequires: tcl
 %endif
 %if ! %{tcl}
 Obsoletes: postgresql-tcl
@@ -107,9 +129,6 @@ Obsoletes: postgresql-odbc
 %if ! %{perl}
 Obsoletes: postgresql-perl
 %endif
-%if %{python}
-BuildRequires: python-devel
-%endif
 %if ! %{python}
 Obsoletes: postgresql-python
 %endif
@@ -118,12 +137,6 @@ Obsoletes: postgresql-jdbc
 %endif
 %if ! %{test}
 Obsoletes: postgresql-test
-%endif
-%if ! %{sgmldocs}
-Obsoletes: postgresql-docs
-%endif
-%if %{pam}
-BuildRequires: pam-devel
 %endif
 
 
@@ -136,7 +149,7 @@ BuildRequires: pam-devel
 # Major Contributors:
 # ---------------
 # Lamar Owen
-# Trond Eivind Glomsrød <teg@redhat.com>
+# Trond Eivind Glomsr�d <teg@redhat.com>
 # Thomas Lockhart
 # Reinhard Max
 # Karl DeBisschop
@@ -187,28 +200,7 @@ Summary: The programs needed to create and run a PostgreSQL server.
 Group: Applications/Databases
 Prereq: /usr/sbin/useradd /sbin/chkconfig 
 Requires: postgresql = %{version} libpq.so
-Requires: postgresql-libs = %{version}
-
-#------------
-%if %sgmldocs
-%package docs
-Summary: Extra documentation for PostgreSQL
-Group: Applications/Databases
-%description docs
-The postgresql-docs package includes the SGML source for the documentation
-as well as the documentation in other formats, and some extra documentation.
-Install this package if you want to help with the PostgreSQL documentation
-project, or if you want to generate printed documentation.
-%endif
-
-
-%package contrib
-Summary: Contributed source and binaries distributed with PostgreSQL
-Group: Applications/Databases
-Requires: libpq.so postgresql = %{version}
-%description contrib
-The postgresql-contrib package includes the contrib tree distributed with
-the PostgreSQL tarball.  Selected contrib modules are prebuilt.
+Conflicts: postgresql-server <= 7.1.3
 
 %description server
 The postgresql-server package includes the programs needed to create
@@ -220,6 +212,25 @@ user-defined types and functions). You should install
 postgresql-server if you want to create and maintain your own
 PostgreSQL databases and/or your own PostgreSQL server. You also need
 to install the postgresql package.
+
+
+%package docs
+Summary: Extra documentation for PostgreSQL
+Group: Applications/Databases
+%description docs
+The postgresql-docs package includes the SGML source for the documentation
+as well as the documentation in other formats, and some extra documentation.
+Install this package if you want to help with the PostgreSQL documentation
+project, or if you want to generate printed documentation.
+
+%package contrib
+Summary: Contributed source and binaries distributed with PostgreSQL
+Group: Applications/Databases
+Requires: postgresql = %{version} postgresql-perl postgresql-tcl tk
+%description contrib
+The postgresql-contrib package contains contributed packages that are
+included in the PostgreSQL distribution.
+
 
 %package devel
 Summary: PostgreSQL development header files and libraries.
@@ -347,25 +358,16 @@ system, including regression tests and benchmarks.
 %setup -q 
 
 %patch1 -p1
-#patch2 -p1
-#patch3 -p1
-%patch4 -p1
-%patch5 -p1
+%patch2 -p1
+%patch3 -p1
 
-#binary
-rm contrib/spi/preprocessor/step1.e
 
 %build
 
 # Get file lists....
-tar xzf %{SOURCE4}
-
-#Commented out for testing on other platforms for now.
-# If libtool installed, copy some files....
-#if [ -d /usr/share/libtool ]
-#then
-#	cp /usr/share/libtool/config.* .
-#fi
+#tar xzf %{SOURCE4}
+# Moved out of tarball.
+cp %{SOURCE2} %{SOURCE4} .
 
 CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS
 CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS
@@ -415,11 +417,10 @@ CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
 	--mandir=%{_mandir} \
 	--docdir=%{_docdir} \
 	--includedir=%{_includedir} \
-	--datadir=/usr/share/pgsql 
-
+	--datadir=/usr/share/pgsql
 
 make all
-
+make -C contrib all
 
 %if %test
 	pushd src/test
@@ -431,6 +432,7 @@ make all
 rm -rf $RPM_BUILD_ROOT
 
 make DESTDIR=$RPM_BUILD_ROOT install
+make -C contrib DESTDIR=$RPM_BUILD_ROOT install
 
 %if %perl
 	make DESTDIR=$RPM_BUILD_ROOT -C src/interfaces/perl5 -f Makefile install
@@ -462,6 +464,16 @@ make DESTDIR=$RPM_BUILD_ROOT install
 
 %endif
 
+
+# man pages....
+# the postgresql-dump manpage.....
+pushd $RPM_BUILD_ROOT%{_mandir}
+cp %{SOURCE12} man1
+popd
+
+# install the dump script
+
+install -m755 %SOURCE14 $RPM_BUILD_ROOT/usr/bin/
 
 # install dev headers.
 
@@ -550,156 +562,10 @@ popd
 cp %{SOURCE6} README.rpm-dist
 mv $RPM_BUILD_ROOT%{_docdir}/postgresql/html doc
 
-# Build contrib stuff....
-pushd contrib
-make clean
-make all
-popd 
-# move the contrib tree to the right place after building....
-cp -r contrib $RPM_BUILD_ROOT/usr/lib/pgsql
-# We'll do more prep work in a later release.....
-
-#more massaging
-
-pushd $RPM_BUILD_ROOT/usr/lib/pgsql/contrib
-
-# Get rid of useless makefiles
-rm -f Makefile */Makefile
-
-# array
-pushd array
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/array|" *
-popd
-
-#  btree_gist
-pushd btree_gist
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/btree_gist|" *.sql
-popd
-
-# chkpass
-pushd chkpass
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/chkpass|" *.sql
-popd
-
-# cube
-pushd cube
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/cube|" cube.sql
-popd
-
-# dblink
-pushd dblink
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/dblink|" dblink.sql
-popd
-
-# earthdistance
-pushd earthdistance
-perl -pi -e "s|/usr/share/pgsql/contrib|/usr/lib/pgsql/contrib/earthdistance|" *.sql
-popd
-
-# fulltext
-pushd fulltextindex
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/fulltextindex|" *.sql
-popd
-
-# fuzzystrmatch
-pushd fuzzystrmatch
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/fuzzystrmatch|" *.sql
-popd
-
-# intarray
-pushd intarray
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/intarray|" *.sql
-popd
-
-# isbn_issn
-pushd isbn_issn
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/isbn_issn|" *.sql
-popd
-
-# lo
-pushd lo
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/lo|" *.sql
-popd
-
-# miscutil
-pushd miscutil
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/miscutil|" *.sql
-popd
-
-# noupdate
-pushd noupdate
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/noupdate|" *.sql
-popd
-
-# pgcrypto
-pushd pgcrypto
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/pgcrypto|" *.sql
-perl -pi -e "s|/usr/lib/pgsql/contrib/pgcrypto/pgcrypto|/usr/lib/pgsql/contrib/pgcrypto/libpgcrypto|" *.sql
-rm -f *.in *.o 
-popd
-
-# pgstattuple
-pushd pgstattuple
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/pgstattuple|" *.sql
-popd
-
-# rserv
-pushd rserv
-perl -pi -e "s|/usr/share/|/usr/lib/|" *
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib|" *
-perl -pi -e "s|/usr/bin|/usr/lib/pgsql/contrib/rserv|" *
-popd
-
-# rtree_gist
-pushd pgstattuple
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib|" *.sql
-popd
-
-# seg 
-pushd seg
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib|" *.sql
-popd
-
-# spi
-pushd spi
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/spi|" *.sql
-popd
-
-# Don"t need these
-rm -fr startscripts
-
-# string
-pushd string
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/string|" *.sql
-popd
-
-# tsearch
-pushd tsearch
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/tsearch|" *.sql
-popd
-
-# userlock
-pushd userlock
-perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/userlock|" *.sql
-popd
-
-popd
-
-#more broken symlinks
-rm -f $RPM_BUILD_ROOT/usr/lib/pgsql/contrib/pg_resetxlog/pg_crc.c $RPM_BUILD_ROOT/usr/lib/pgsql/contrib/pg_controldata/pg_crc.c
-cp src/backend/utils/hash/pg_crc.c $RPM_BUILD_ROOT/usr/lib/pgsql/contrib/pg_resetxlog/pg_crc.c
-ln $RPM_BUILD_ROOT/usr/lib/pgsql/contrib/pg_resetxlog/pg_crc.c $RPM_BUILD_ROOT/usr/lib/pgsql/contrib/pg_controldata/pg_crc.c
-
 # Symlink libpq.so.2.0 to libpq.so.2 for backwards compatibility, until 
 # -soname patches are the norm.
 pushd $RPM_BUILD_ROOT/usr/lib
 ln -s libpq.so.2 libpq.so.2.0
-popd
-
-# arch backups should go in /usr/lib, not /usr/share
-pushd $RPM_BUILD_ROOT
-mkdir -p usr/lib/pgsql/backup
-mv usr/share/pgsql/backup/pg_dumpall_new usr/lib/pgsql/backup/pg_dumpall_new 
 popd
 
 
@@ -720,10 +586,10 @@ if [ $1 -gt 1 ]
 then
    mkdir -p /usr/lib/pgsql/backup > /dev/null
    pushd /usr/bin > /dev/null
-   cp -fp postmaster postgres pg_dump pg_dumpall psql /usr/lib/pgsql/backup > /dev/null 2>&1  || :
+   cp -fp postmaster postgres pg_dump pg_dumpall psql /usr/share/pgsql/backup > /dev/null 2>&1  || :
    popd > /dev/null
    pushd /usr/lib > /dev/null
-   cp -fp libpq.* /usr/lib/pgsql/backup > /dev/null 2>&1 || :
+   cp -fp libpq.* /usr/share/pgsql/backup > /dev/null 2>&1 || :
    popd > /dev/null
 fi
 
@@ -817,19 +683,63 @@ rm -f perlfiles.list
 %{_mandir}/man1/pg_dumpall.1*
 %{_mandir}/man1/psql.1*
 %{_mandir}/man1/vacuumdb.1*
-%{_mandir}/man1/pg_restore.1*
 %{_mandir}/man7/*
 
-%if %sgmldocs
 %files docs
 %defattr(-,root,root)
 %doc doc/src/*
-%endif
 
 %files contrib
 %defattr(-,root,root)
-%dir /usr/lib/pgsql/contrib/
-/usr/lib/pgsql/contrib/*
+/usr/lib/pgsql/_int.so
+/usr/lib/pgsql/array_iterator.so
+/usr/lib/pgsql/autoinc.so
+/usr/lib/pgsql/btree_gist.so
+/usr/lib/pgsql/chkpass.so
+/usr/lib/pgsql/cube.so
+/usr/lib/pgsql/dblink.so
+/usr/lib/pgsql/earthdistance.so
+/usr/lib/pgsql/fti.so
+/usr/lib/pgsql/fuzzystrmatch.so
+/usr/lib/pgsql/insert_username.so
+/usr/lib/pgsql/isbn_issn.so
+/usr/lib/pgsql/lo.so
+/usr/lib/pgsql/misc_utils.so
+/usr/lib/pgsql/moddatetime.so
+/usr/lib/pgsql/noup.so
+/usr/lib/pgsql/pgcrypto.so
+/usr/lib/pgsql/refint.so
+/usr/lib/pgsql/rserv.so
+/usr/lib/pgsql/rtree_gist.so
+/usr/lib/pgsql/seg.so
+/usr/lib/pgsql/string_io.so
+/usr/lib/pgsql/timetravel.so
+/usr/lib/pgsql/user_locks.so
+/usr/share/pgsql/contrib/
+/usr/bin/dbf2pg
+/usr/bin/findoidjoins
+/usr/bin/make_oidjoins_check
+/usr/bin/fti.pl
+/usr/bin/oid2name
+/usr/bin/pg_controldata
+/usr/bin/pg_dumplo
+/usr/bin/pg_logger
+/usr/bin/pg_resetxlog
+/usr/bin/pgbench
+/usr/bin/RservTest
+/usr/bin/MasterInit
+/usr/bin/MasterAddTable
+/usr/bin/Replicate
+/usr/bin/MasterSync
+/usr/bin/CleanLog
+/usr/bin/SlaveInit
+/usr/bin/SlaveAddTable
+/usr/bin/GetSyncID
+/usr/bin/PrepareSnapshot
+/usr/bin/ApplySnapshot
+/usr/bin/InitRservTest
+/usr/bin/vacuumlo
+%doc contrib/*/README.* contrib/spi/*.example
 
 %files libs -f libpq.lang
 %defattr(-,root,root)
@@ -846,7 +756,9 @@ rm -f perlfiles.list
 /usr/bin/pg_ctl
 /usr/bin/pg_passwd
 /usr/bin/postgres
+/usr/bin/postgresql-dump
 /usr/bin/postmaster
+/usr/bin/rh-pgdump.sh
 %{_mandir}/man1/initdb.1*
 %{_mandir}/man1/initlocation.1*
 %{_mandir}/man1/ipcclean.1*
@@ -854,14 +766,15 @@ rm -f perlfiles.list
 %{_mandir}/man1/pg_passwd.1*
 %{_mandir}/man1/postgres.1*
 %{_mandir}/man1/postmaster.1*
+%{_mandir}/man1/postgresql-dump.1*
 /usr/share/pgsql/postgres.bki
 /usr/share/pgsql/postgres.description
 /usr/share/pgsql/*.sample
 /usr/lib/pgsql/plpgsql.so
 %dir /usr/lib/pgsql
 %dir /usr/share/pgsql
-%attr(700,postgres,postgres) %dir /usr/lib/pgsql/backup
-/usr/lib/pgsql/backup/pg_dumpall_new
+%attr(700,postgres,postgres) %dir /usr/share/pgsql/backup
+/usr/share/pgsql/backup/pg_dumpall_new
 %attr(700,postgres,postgres) %dir /var/lib/pgsql
 %attr(700,postgres,postgres) %dir /var/lib/pgsql/data
 %attr(700,postgres,postgres) %dir /var/lib/pgsql/backups
@@ -890,14 +803,11 @@ rm -f perlfiles.list
 %files tcl
 %defattr(-,root,root)
 %attr(755,root,root) /usr/lib/libpgtcl.so.*
+# libpgtcl.so is not in devel because Tcl scripts may load it by that name.
 /usr/lib/libpgtcl.so
 /usr/bin/pgtclsh
-/usr/bin/pltcl_delmod
-/usr/bin/pltcl_listmod
-/usr/bin/pltcl_loadmod
 %{_mandir}/man1/pgtclsh.1*
 /usr/lib/pgsql/pltcl.so
-/usr/share/pgsql/unknown.pltcl
 %endif
 
 %if %tkpkg
@@ -927,7 +837,6 @@ rm -f perlfiles.list
 %dir /usr/lib/perl5/site_perl/%{_arch}-linux/auto
 /usr/share/pgsql/perl5
 %{_mandir}/man3/Pg.*
-/usr/lib/pgsql/plperl.so
 %endif
 
 %if %plperl
@@ -942,13 +851,15 @@ rm -f perlfiles.list
 %doc src/interfaces/python/README src/interfaces/python/tutorial
 /usr/lib/python%{pyver}/site-packages/_pgmodule.so
 /usr/lib/python%{pyver}/site-packages/*.py
-/usr/lib/pgsql/plpython.so
 %endif
 
 %if %jdbc
 %files jdbc
 %defattr(-,root,root)
-/usr/share/pgsql/*jar
+/usr/share/pgsql/jdbc7.1-1.1.jar
+/usr/share/pgsql/jdbc7.1-1.2.jar
+/usr/share/pgsql/jdbc7.2dev-1.1.jar
+/usr/share/pgsql/jdbc7.2dev-1.2.jar
 %endif
 
 %if %test
@@ -959,96 +870,57 @@ rm -f perlfiles.list
 %endif
 
 %changelog
-* Wed Sep  4 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.2-1
-- 7.2.2 - security update
+* Wed Dec 20 2002 Andrew Overholt <overholt@redhat.com>
+- 7.2.3-4.(73,80) - add buffer overrun patch for geo_ops
+- 7.2.3-5.(73,80) - add pg_hba.conf tightening patch
 
-* Wed Aug 28 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-17
-- Add bison and flex to buildprereq (#71590)
+* Thu Dec 19 2002 Andrew Overholt <overholt@redhat.com>
+- 7.2.3-3.(73,80) - correct init script success/failure messages.
 
-* Sat Aug 10 2002 Elliot Lee <sopwith@redhat.com>
-- rebuilt with gcc-3.2 (we hope)
+* Tue Dec 17 2002 Andrew Overholt <overholt@redhat.com>
+- 7.2.3-1 - initial Red Hat build.
+- 7.2.3-2.(73,80) - distribution-specific release tags to avoid upgrading
+  issues.
 
-* Fri Aug  9 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-15
-- Minor initscript tweak ( #71027)
+* Wed Oct 02 2002 Lamar Owen <lamar.owen@ramifordistat.net>
+- 7.2.3-1PGDG
 
-* Tue Jul 23 2002 Tim Powers <timp@redhat.com> 7.2.1-14
-- build using gcc-3.2-0.1
+* Mon Aug 26 2002 Lamar Owen <lamar.owen@ramifordistat.net>
+- 7.2.2-1PGDG
+- Applied PeterE's contrib patch -- contrib is now completely restructured.
+- server conflicts with less than 7.2, as a warning to the upcoming
+-- yank of the broken partial upgrade.
 
-* Thu Jul 11 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-13
-- Rebuild with new readline
+* Thu Aug 22 2002 Lamar Owen <lamar.owen@ramifordistat.net>
+- 7.2.2 security fix.
+- deprecate postgresql-dump system.
+- 7.2.2-0.1PGDG PRERELEASE!
 
-* Mon Jul  8 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-12
-- Update the jarfiles from jdbc.postgresql.org
+* Fri Apr 12 2002 Lamar Owen <lamar.owen@ramifordistat.net>
+- Correct tcl conditionals -- especially for the devel package.
+- Corrected BuildPrereq conditionals.
+- Added a build6x conditional -- define it to build for RHL 6.x
+- Integrate a few of Trond's fixes from RawHide.
+- Pulled file-lists out of tarball for better maintainability.
+- Updated README.rpm-dist.
+- 6.x build can't buildprereq pam-devel, as 6.x has no pam-devel.
 
-* Wed Jul  3 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-11
-- Make postgresql-docs conditional
-- don't ship it - it's just sgml sources for docs in the main package
-  (#67818)
+* Tue Apr 09 2002 Lamar Owen <lamar.owen@ramifordistat.net>
+- Integrate DP's patch and stuff.
 
-* Fri Jun 21 2002 Tim Powers <timp@redhat.com>
-- automated rebuild
+* Fri Apr 05 2002 David B. Peterson <dave@toppledwagon.com>
+- hacked for 7.2.1 (made rpm-pgsql-7.2.1.patch from rpm-pgsql-7.2.patch)
+- changed gettext version to 0.10.35 (from 0.10.36, for RH62)
+- added BuildPrereq for tk
 
-* Tue Jun 18 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-10
-- step1.e was distributed as a binary... make sure it's rebuilt (#66870)
-
-* Wed Jun 12 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-9
-- Make the perl parts build with new perl
-- Fix mktime() usage - don't use it before the epoch
-- Disable tk/pgaccess
-
-* Thu May 23 2002 Tim Powers <timp@redhat.com>
-- automated rebuild
-
-* Tue May  7 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-7
-- Rebuild
-
-* Mon Apr 22 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-6
-- Add a missing percent in a conditional (tcl, devel package)
-
-* Fri Apr 12 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-5
-- Fix conditional build dependencies... it required tcl
-  and python-devel only when you didn't build the modules,
-  not if you needed them
-
-* Wed Apr 10 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-4
-- Fix pgcrypto (#63073)
-- Remove postgresql-dump. Dump before upgrade, as we've documented many times
-
-* Wed Apr  3 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-3
+* Wed Apr  3 2002 Trond Eivind Glomsr�d <teg@redhat.com> 7.2.1-3
 - make postgresql-server and postgresql depend on postgresql-libs
 - store backups of old binaries in /usr/lib/pgsql/backup instead of /usr/share
 
-* Wed Apr  3 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-2
-- 7.2.1 again, but this time based on the newest 7.2 specfile 
-  and not an older one. oops. 
-
-* Thu Mar 21 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-6
-- Move the libpgtcl.so symlink into the tcl subpackage from -devel (#61042)
-- Enable pam support (#59617)
-- Include the odbc plugin, not just the symlink to it (#61522)
-
-* Thu Feb 28 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-5
-- Disable python quote patch... it broke kerberos 
-
-* Thu Feb 21 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-4
-- Rebuild
-
-* Mon Feb 18 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-3
-- Don't require tcl-devel, it's just tcl
-- Fix contrib. A lot. Again (last time in 7.1)
-- Add buildprereq of recent patch (#59910)
-- make the initscript 0755
-
-* Fri Feb  8 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-2
-- Sync
-- Fix output of backslash-ns from upgrade detection
-- Make the default config use socket credentials, not trust
-- Add patches for tsearch/gist from Oleg Bartunov <oleg@sai.msu.su>
-- Deprecate rh-pgdump script. Dump before upgrading, restore afterwards. 
-  And ask the developers to fix it.
-- Dependency and file inclusion enhancements for conditionals
-- escape previous changelog entry which didn't escape a macro
-- python quote enhancement patch added
+* Thu Mar 21 2002 Trond Eivind Glomsr�d <teg@redhat.com> 7.2-6
+- Move the libpgtcl.so symlink into the tcl subpackage from -devel
+- Enable pam support
+- Include the odbc plugin, not just the symlink to it
 
 * Tue Feb 04 2002 Lamar Owen <lamar.owen@wgcr.org>
 - 7.2 final.
@@ -1057,7 +929,7 @@ rm -f perlfiles.list
 - Clean up a few things; undef beta for final build.
 - Newer JDBC -- point to correct website and 7.2 dev.
 - postgresql.init changes.
-- NLS build does funky %%defattr things; redhat-style-files.lst changed
+- NLS build does funky %defattr things; redhat-style-files.lst changed
 -- for execute permission on /etc/rc.d/init.d/postgresql
 
 * Sun Jan 27 2002 Lamar Owen <lamar.owen@wgcr.org>
@@ -1067,7 +939,7 @@ rm -f perlfiles.list
 - 7.2b3-0.3PGDG
 - beta conditionals for debugging, assertion checking, and no strip.
 
-* Tue Nov 27 2001 Trond Eivind Glomsrød <teg@redhat.com>
+* Tue Nov 27 2001 Trond Eivind Glomsr�d <teg@redhat.com>
 - Improve python version handling
 
 * Fri Nov 23 2001 Lamar Owen <lamar.owen@wgcr.org>
@@ -1092,3 +964,18 @@ rm -f perlfiles.list
 - Merged some changes from Peter Eisentraut for7.2.
 - Cleaned up some legacy junk.
 - Prepare for 7.2 beta cycle.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

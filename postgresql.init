@@ -48,7 +48,7 @@
 # Tested the $? return for the stop script -- it does in fact propagate.
 # TODO: multiple postmasters.
 
-# PGVERSION is:
+# PGVERSION is:  (note that PGVERSION is the major: 7.2.1 -> PGVERSION 7.2)
 PGVERSION=7.2
 
 # Source function library.
@@ -104,7 +104,7 @@ start(){
 				SYSDOCDIR=/usr/share/doc/packages
 			fi
 			echo
-			echo -e $"An old version of the database format was found.\nYou need to upgrade the data format before using PostgreSQL.\nSee $SYSDOCDIR/postgresql-$PGVERSION/README.rpm-dist for more information."
+			echo $"An old version of the database format was found.\nYou need to upgrade the data format before using PostgreSQL.\nSee $SYSDOCDIR/postgresql-$PGVERSION/README.rpm-dist for more information."
 			exit 1
 #                       This doesn't seem to do anything useful...
 #		else
@@ -153,12 +153,13 @@ start(){
  		pid=`pidof -s postmaster`
  		if [ $pid ]
 		then
-		    success "$PSQL_START"
-		    touch /var/lock/subsys/postgresql
-		    echo $pid > /var/run/postmaster.pid
-		    echo
+			success "$PSQL_START"
+			touch /var/lock/subsys/postgresql
+			echo $pid > /var/run/postmaster.pid
+			echo
 		else
-		    failure "$PSQL_START"
+			failure "$PSQL_START"
+			echo
 		fi
 	fi
 }
