@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 5
+Release: 10
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -30,9 +30,7 @@ BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
 BuildPrereq: libtiff-devel, libungif-devel, zlib-devel, perl
 Requires: bzip2, freetype, libjpeg, libpng, libtiff, libungif, zlib
 BuildRequires: freetype-devel >= 2.0.1
-%define _prefix /usr/X11R6
-%define _mandir %{_prefix}/man
-%define _includedir %{_prefix}/include/X11/magick
+
 
 %description
 ImageMagick(TM) is an image display and manipulation tool for the X
@@ -107,7 +105,7 @@ however.
 %setup -q -n %{name}-%{VER}
 %patch1 -p1 -b .lpr
 #%patch2 -p1 -b .nonroot
-%patch3 -p1 -b .config
+#%patch3 -p1 -b .config
 %patch4 -p1 -b .hp2xx
 %patch5 -p1 -b .ImageMagick
 %patch6 -p1 -b .stdin
@@ -117,9 +115,11 @@ libtoolize --force
 aclocal
 automake || :
 autoconf || :
-%configure --prefix=%{_prefix} --enable-shared \
-           --with-perl --with-x \
-           --with-threads --with-magick_plus_plus
+%configure --enable-shared \
+           --with-perl \
+	   --with-x \
+           --with-threads \
+           --with-magick_plus_plus
 make
 
 %install
@@ -132,28 +132,28 @@ cat >>PerlMagick/Makefile <<EOF
 Makefile:
 	touch Makefile
 EOF
-perl -pi -e 's,^includedir = \${prefix}/include/magick,includedir = \${prefix}/include/X11/magick,g' magick/Makefile
+#perl -pi -e 's,^includedir = \${prefix}/include/magick,includedir = \${prefix}/include/magick,g' magick/Makefile
 perl -pi -e 's,^install-exec-perl:.*,install-exec-perl:,g' Makefile
 rm -f PerlMagick/Makefile.*
 make install DESTDIR=$RPM_BUILD_ROOT
 
 # Generate desktop file
-mkdir -p $RPM_BUILD_ROOT/usr/share/icons $RPM_BUILD_ROOT/etc/X11/applnk/Graphics
-cp %{SOURCE1} $RPM_BUILD_ROOT/usr/share/icons
+#mkdir -p $RPM_BUILD_ROOT/usr/share/icons $RPM_BUILD_ROOT/etc/X11/applnk/Graphics
+#cp %{SOURCE1} $RPM_BUILD_ROOT/usr/share/icons
 
 # Add files make install constantly forgets
-install -c -m 644 coders/*.mgk $RPM_BUILD_ROOT/usr/X11R6/share/ImageMagick
+install -c -m 644 coders/*.mgk $RPM_BUILD_ROOT/usr/share/ImageMagick
 
-cat >$RPM_BUILD_ROOT/etc/X11/applnk/Graphics/ImageMagick.desktop <<EOF
-[Desktop Entry]
-Name=ImageMagick
-Comment=The ImageMagick picture viewer and editor
-Comment[de]=Der ImageMagick-Bilderbetrachter und -editor
-Exec=%{_prefix}/bin/display
-Icon=magick_small.png
-Terminal=0
-Type=Application
-EOF
+#cat >$RPM_BUILD_ROOT/etc/X11/applnk/Graphics/ImageMagick.desktop <<EOF
+#[Desktop Entry]
+#Name=ImageMagick
+#Comment=The ImageMagick picture viewer and editor
+#Comment[de]=Der ImageMagick-Bilderbetrachter und -editor
+#Exec=%{_prefix}/bin/display
+#Icon=magick_small.png
+#Terminal=0
+#Type=Application
+#EOF
 
 find $RPM_BUILD_ROOT -name "*.bs" |xargs rm -f
 find $RPM_BUILD_ROOT -name ".packlist" |xargs rm -f
@@ -161,30 +161,40 @@ find $RPM_BUILD_ROOT -name ".packlist" |xargs rm -f
 # Grr... Broken makefiles!!
 perlver=`perl -v |grep built |sed -e "s,.*v,,;s, .*,,"`
 perlmajor=`echo $perlver |sed -e "s,\..*,,"`
-if [ -d $RPM_BUILD_ROOT/usr/lib/$perlver ]; then
-	mkdir -p $RPM_BUILD_ROOT/usr/lib/perl$perlmajor/site_perl/$perlver
-	mv $RPM_BUILD_ROOT/usr/lib/$perlver/* $RPM_BUILD_ROOT/usr/lib/perl$perlmajor/site_perl/$perlver/
-	rm -rf $RPM_BUILD_ROOT/usr/lib/$perlver
+if [ -d $RPM_BUILD_ROOT%{_libdir}/$perlver ]; then
+	mkdir -p $RPM_BUILD_ROOT%{_libdir}/perl$perlmajor/site_perl/$perlver
+	mv $RPM_BUILD_ROOT%{_libdir}/$perlver/* $RPM_BUILD_ROOT%{_libdir}/perl$perlmajor/site_perl/$perlver/
+	rm -rf $RPM_BUILD_ROOT%{_libdir}/$perlver
 fi
-if [ -d $RPM_BUILD_ROOT/usr/lib/site_perl ]; then
-	for i in `find $RPM_BUILD_ROOT/usr/lib/site_perl/ -type d`; do
+if [ -d $RPM_BUILD_ROOT%{_libdir}/site_perl ]; then
+	for i in `find $RPM_BUILD_ROOT%{_libdir}/site_perl/ -type d`; do
 		mkdir -p `echo $i |sed -e "s,site_perl,perl$perlmajor/site_perl,g"` || :
 	done
-	for i in `find $RPM_BUILD_ROOT/usr/lib/site_perl/ -type f`; do
+	for i in `find $RPM_BUILD_ROOT%{_libdir}/site_perl/ -type f`; do
 		mv -f `echo $i |sed -e "s,site_perl,perl$perlmajor/site_perl,g"` || :
 	done
 fi
 
-cd $RPM_BUILD_ROOT/%{_bindir}
+pushd $RPM_BUILD_ROOT/%{_bindir}
 for i in %{_arch}-redhat-linux-*; do
 	[ -f $i ] && mv $i `echo $i |sed -e "s/^%{_arch}-redhat-linux-//"`
 done
+popd
 
-cd $RPM_BUILD_ROOT/%{_mandir}
+pushd $RPM_BUILD_ROOT/%{_mandir}
 for i in */%{_arch}-redhat-linux-*; do
 	[ -f $i ] && mv $i `echo $i |sed -e "s,/%{_arch}-redhat-linux-,/,"`
 done
+popd
 
+# get the perl file list. We know what we need, so this is easy
+echo "%defattr(-,root,root)" > perl-pkg-files
+find $RPM_BUILD_ROOT%{_libdir}/perl$perlmajor/site_perl/$perlver -type d -name Image >> perl-pkg-files.orig
+sed -e s,$RPM_BUILD_ROOT,, perl-pkg-files.orig > perl-pkg-files
+
+# remove files we aren't shipping 
+rm -f `find $RPM_BUILD_ROOT%{_libdir}/perl$perlmajor/ -name perllocal.pod -type f`
+rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
 
 %clean
 #rm -rf $RPM_BUILD_ROOT
@@ -204,9 +214,9 @@ done
 %attr(755,root,root) %{_libdir}/libMagick.so.*
 %{_bindir}/[a-z]*
 %{_mandir}/*/*
-%{_datadir}/*
-/etc/X11/applnk/Graphics/ImageMagick.desktop
-/usr/share/icons/magick_small.png
+%{_datadir}/ImageMagick
+#/etc/X11/applnk/Graphics/ImageMagick.desktop
+#/usr/share/icons/magick_small.png
 
 %files devel
 %defattr(-,root,root)
@@ -214,8 +224,7 @@ done
 %{_libdir}/libMagick.a
 %{_libdir}/libMagick.la
 %{_libdir}/libMagick.so
-%dir %{_includedir}/
-%{_includedir}/*h
+%{_includedir}/magick
 
 %files c++
 %defattr(-,root,root)
@@ -229,12 +238,32 @@ done
 %{_libdir}/libMagick++.la
 %{_libdir}/libMagick++.so
 
-%files perl
+%files perl -f perl-pkg-files
 %defattr(-,root,root)
-/usr/lib/perl*/site_perl/*/*/auto/Image
-/usr/lib/perl*/site_perl/*/*/Image
+#%{_libdir}/perl*/site_perl/*/*/auto/Image
+#%{_libdir}/perl*/site_perl/*/*/Image
 
 %changelog
+* Wed Jan 22 2003 Tim Powers <timp@redhat.com>
+- rebuilt
+
+* Sat Jan  4 2003 Jeff Johnson <jbj@redhat.com> 5.4.7-9
+- use internal dep generator.
+
+* Mon Dec 16 2002 Tim Powers <timp@redhat.com> 5.4.7-8
+- rebuild
+
+* Sat Dec 14 2002 Tim Powers <timp@redhat.com> 5.4.7-7
+- don't use rpms internal dep generator
+
+* Fri Nov 22 2002 Tim Powers <timp@redhat.com>
+- fix perl paths in file list
+
+* Thu Nov 21 2002 Tim Powers <timp@redhat.com>
+- lib64'ize
+- don't throw stuff in /usr/X11R6, that's for X only
+- remove files we aren't shipping
+
 * Sat Aug 10 2002 Elliot Lee <sopwith@redhat.com>
 - rebuilt with gcc-3.2 (we hope)
 

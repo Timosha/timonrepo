@@ -5,7 +5,7 @@
            */
            FormatString(command,"openURL(%.1024s,new-window,noraise)",
 -            "http://www.imagemagick.org/");
-+            "/usr/X11R6/share/ImageMagick/ImageMagick.html");
++            "/usr/share/ImageMagick/ImageMagick.html");
            mozilla_atom=XInternAtom(display,"_MOZILLA_COMMAND",False);
            (void) XChangeProperty(display,mozilla_window,mozilla_atom,
              XA_STRING,8,PropModeReplace,(unsigned char *) command,
@@ -16,7 +16,7 @@
            */
            FormatString(command,"openURL(%.1024s,new-window,noraise)",
 -            "http://www.imagemagick.org/");
-+            "/usr/X11R6/share/ImageMagick/ImageMagick.html");
++            "/usr/share/ImageMagick/ImageMagick.html");
            mozilla_atom=XInternAtom(display,"_MOZILLA_COMMAND",False);
            (void) XChangeProperty(display,mozilla_window,mozilla_atom,XA_STRING,
              8,PropModeReplace,(unsigned char *) command,(int) strlen(command));
