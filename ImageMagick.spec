@@ -20,7 +20,7 @@ Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.gz
 Source1: magick_small.png
 Patch1: ImageMagick-6.2.0-lprhack.patch
 Patch2: ImageMagick-6.2.0-hp2xx.patch
-Patch3: ImageMagick-6.0.7-vsnprint.patch
+#Patch3: ImageMagick-6.0.7-vsnprint.patch
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
@@ -106,7 +106,7 @@ however.
 %setup -q -n %{name}-%{VER}
 %patch1 -p1 -b .lpr
 %patch2 -p1 -b .hp2xx
-%patch3 -p1 -b .vsnprintf
+#%patch3 -p1 -b .vsnprintf
 
 %build
 libtoolize --copy --force
