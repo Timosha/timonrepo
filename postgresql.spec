@@ -67,17 +67,17 @@ Version: 7.4.3
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 1
+Release: 2
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
 Source3: postgresql.init
 Source5: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2.md5
 Source6: README.rpm-dist
-Source8: http://jdbc.postgresql.org/download/pg74.1jdbc1.jar
-Source9: http://jdbc.postgresql.org/download/pg74.1jdbc2.jar
-Source10: http://jdbc.postgresql.org/download/pg74.1jdbc2ee.jar
-Source11: http://jdbc.postgresql.org/download/pg74.1jdbc3.jar
+Source8: http://jdbc.postgresql.org/download/pg74.214.jdbc1.jar
+Source9: http://jdbc.postgresql.org/download/pg74.214.jdbc2.jar
+Source10: http://jdbc.postgresql.org/download/pg74.214.jdbc2ee.jar
+Source11: http://jdbc.postgresql.org/download/pg74.214.jdbc3.jar
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
 Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.4.tgz
@@ -757,10 +757,10 @@ rm -rf $RPM_BUILD_ROOT
 %if %jdbc
 %files jdbc
 %defattr(-,root,root)
-%{_datadir}/java/pg74.1jdbc1.jar
-%{_datadir}/java/pg74.1jdbc2.jar
-%{_datadir}/java/pg74.1jdbc2ee.jar
-%{_datadir}/java/pg74.1jdbc3.jar
+%{_datadir}/java/pg74.214.jdbc1.jar
+%{_datadir}/java/pg74.214.jdbc2.jar
+%{_datadir}/java/pg74.214.jdbc2ee.jar
+%{_datadir}/java/pg74.214.jdbc3.jar
 %endif
 
 %if %test
@@ -771,6 +771,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Jul 03 2004 Tom Lane <tgl@redhat.com> 7.4.3-2
+- Update JDBC jars to driver build 214.
+
 * Wed Jun 23 2004 Tom Lane <tgl@redhat.com> 7.4.3-1
 - Update to PostgreSQL 7.4.3.
 - Uninstalling server RPM stops postmaster first, per bug 114846.
