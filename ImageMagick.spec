@@ -1,15 +1,28 @@
+# ImageMagick has adopted a new Version.Patchlevel version numbering system...
+# 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
+%define VER 5.4.3
+%define Patchlevel 5
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
-Version: 5.3.8
-Release: 3
+%if "%{Patchlevel}" != ""
+Version: %{VER}.%{Patchlevel}
+%else
+Version: %{VER}
+%endif
+Release: 1
 License: freeware
 Group: Applications/Multimedia
+%if "%{Patchlevel}" != ""
+Source: ftp://ftp.cdrom.com/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.bz2
+%else
 Source: ftp://ftp.cdrom.com/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
+%endif
 Source1: magick_small.png
 Patch1: ImageMagick-5.3.5-lprhack.patch
 Patch2: ImageMagick-5.3.6-nonroot.patch
-Patch3: ImageMagick-5.3.7-builddep.patch
-Patch4: ImageMagick-5.3.7-config.patch
+Patch3: ImageMagick-5.3.7-config.patch
+Patch4: ImageMagick-5.4.0-hp2xx.patch
+Patch5: ImageMagick-5.4.2-localdoc.patch
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
@@ -90,17 +103,20 @@ want to develop/compile applications using the ImageMagick C interface,
 however.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{VER}
 %patch1 -p1 -b .lpr
 %patch2 -p1 -b .nonroot
-%patch3 -p1 -b .bdep
-%patch4 -p1 -b .config
+%patch3 -p1 -b .config
+%patch4 -p1 -b .hp2xx
+%patch5 -p1 -b .ImageMagick
+# Fix up a dependency
+perl -pi -e "s,-L/home/cristy/ImageMagick/magick,-L../magick/.libs,g" PerlMagick/Makefile.PL
 
 %build
 libtoolize --force
 aclocal
 automake || :
-autoconf
+autoconf || :
 %configure --prefix=%{_prefix} --enable-shared \
            --with-perl --with-x \
            --with-threads --with-magick_plus_plus
@@ -138,8 +154,35 @@ Terminal=0
 Type=Application
 EOF
 
-rm -f $RPM_BUILD_ROOT/usr/lib/perl5/site_perl/*/*/auto/Image/Magick/.packlist
 find $RPM_BUILD_ROOT -name "*.bs" |xargs rm -f
+find $RPM_BUILD_ROOT -name ".packlist" |xargs rm -f
+
+# Grr... Broken makefiles!!
+perlver=`perl -v |grep built |sed -e "s,.*v,,;s, .*,,"`
+perlmajor=`echo $perlver |sed -e "s,\..*,,"`
+if [ -d $RPM_BUILD_ROOT/usr/lib/$perlver ]; then
+	mkdir -p $RPM_BUILD_ROOT/usr/lib/perl$perlmajor/site_perl/$perlver
+	mv $RPM_BUILD_ROOT/usr/lib/$perlver/* $RPM_BUILD_ROOT/usr/lib/perl$perlmajor/site_perl/$perlver/
+	rm -rf $RPM_BUILD_ROOT/usr/lib/$perlver
+fi
+if [ -d $RPM_BUILD_ROOT/usr/lib/site_perl ]; then
+	for i in `find $RPM_BUILD_ROOT/usr/lib/site_perl/ -type d`; do
+		mkdir -p `echo $i |sed -e "s,site_perl,perl$perlmajor/site_perl,g"` || :
+	done
+	for i in `find $RPM_BUILD_ROOT/usr/lib/site_perl/ -type f`; do
+		mv -f `echo $i |sed -e "s,site_perl,perl$perlmajor/site_perl,g"` || :
+	done
+fi
+
+cd $RPM_BUILD_ROOT/%{_bindir}
+for i in %{_arch}-redhat-linux-*; do
+	mv $i `echo $i |sed -e "s/^%{_arch}-redhat-linux-//"`
+done
+cd $RPM_BUILD_ROOT/%{_mandir}
+for i in */%{_arch}-redhat-linux-*; do
+	mv $i `echo $i |sed -e "s,/%{_arch}-redhat-linux-,/,"`
+done
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -188,6 +231,40 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/perl*/site_perl/*/*/Image
 
 %changelog
+* Fri Feb 22 2002 Bernhard Rosenkraenzer <bero@redhat.com> 5.4.3.5-1
+- Update to 5.4.3 pl5; this fixes #58080
+
+* Thu Jan 17 2002 Bernhard Rosenkraenzer <bero@redhat.com> 5.4.2.3-1
+- Patchlevel 3
+
+* Wed Jan 09 2002 Tim Powers <timp@redhat.com>
+- automated rebuild
+
+* Fri Jan  4 2002 Bernhard Rosenkraenzer <bero@redhat.com> 5.4.2.2-1
+- Update to 5.4.2-2
+- Fix #57923, also don't hardcode netscape as html viewer
+
+* Wed Dec  5 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.4.1-1
+- 5.4.1
+- Link against new libstdc++
+
+* Fri Nov  9 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.4.0.5-1
+- 5.4.0.5
+- Make the error message when trying to display an hpgl file more
+  explicit (#55875)
+
+* Mon Nov  5 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.4.0.3-1
+- 5.4.0.3
+- Fix names of man pages
+
+* Mon Oct 22 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.4.0-1
+- 5.4.0
+- work around build system breakage causing applications to be named
+  %{_arch}-redhat-linux-foo rather than foo
+
+* Wed Sep 19 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.9-1
+- 5.3.9
+
 * Mon Aug 27 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.8-3
 - Add delegates.mgk back, got lost during the update to 5.3.8 (Makefile bug)
   (#52611)
