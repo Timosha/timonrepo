@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 4
+Release: 5
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -235,6 +235,9 @@ done
 /usr/lib/perl*/site_perl/*/*/Image
 
 %changelog
+* Sat Aug 10 2002 Elliot Lee <sopwith@redhat.com>
+- rebuilt with gcc-3.2 (we hope)
+
 * Tue Jul 23 2002 Tim Powers <timp@redhat.com> 5.4.7-4
 - build using gcc-3.2-0.1
 
