@@ -1,12 +1,12 @@
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 7.0.2
-Release: 17
+Release: 18.2
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz
-Source1: http://www.retep.org.uk/postgres/jdbc6.5-1.1.jar
-Source2: http://www.retep.org.uk/postgres/jdbc6.5-1.2.jar
+Source1: http://jdbc.postgresql.org/download/jdbc6.5-1.1.jar
+Source2: http://jdbc.postgresql.org/download/jdbc6.5-1.2.jar
 Source3: postgresql.init-%{version}
 Source6: README.rpm.postgresql-%{version}
 Source5: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz.md5
@@ -19,6 +19,7 @@ Source12: postgresql-dump.1.gz
 Source14: rh-pgdump.sh
 Patch0: postgresql-%{version}-alpha.patch.gz
 Patch1: rpm-pgsql-%{version}.patch
+Patch2: postgresql-%{version}-security.patch
 Requires: perl
 Prereq: /sbin/chkconfig /sbin/ldconfig /usr/sbin/useradd /lib/cpp initscripts
 BuildPrereq: python-devel perl tcl
@@ -161,6 +162,7 @@ Java programs to access a PostgreSQL database.
 %endif
 
 %patch1 -p1
+%patch2 -p1
 
 %build
 pushd src
@@ -535,6 +537,12 @@ rm -f perlfiles.list
 #/usr/lib/pgsql/test/*
 
 %changelog
+* Tue Jan 7 2003 Andrew Overholt <overholt@redhat.com> [7.0.2-18.2]
+- addition to security backpatch
+
+* Tue Jan 7 2003 Andrew Overholt <overholt@redhat.com> [7.0.2-18]
+- add security backpatch from more recent versions (~#74505)
+
 * Thu Aug 24 2000 Trond Eivind Glomsrød <teg@redhat.com>
 - the old dump script didn't work - added rh-pgdump.sh
   to handle this. Point docs at it, and tell how it is to be used. 
