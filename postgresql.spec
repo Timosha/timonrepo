@@ -51,7 +51,7 @@ Version: 7.2.1
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 15
+Release: 16
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz
@@ -960,6 +960,9 @@ rm -f perlfiles.list
 %endif
 
 %changelog
+* Sat Aug 10 2002 Elliot Lee <sopwith@redhat.com>
+- rebuilt with gcc-3.2 (we hope)
+
 * Fri Aug  9 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-15
 - Minor initscript tweak ( #71027)
 
