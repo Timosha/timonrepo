@@ -42,6 +42,12 @@
 # Version 7.2b2 Lamar Owen <lamar.owen@wgcr.org>
 # version change.
 
+# Version 7.2 final.  Lamar Owen <lamar.owen@wgcr.org>
+# reload from Peter E.
+# Eliminate the pidof postmaster test in stop -- we're using pg_ctl so we don't need pidof.
+# Tested the $? return for the stop script -- it does in fact propagate.
+# TODO: multiple postmasters.
+
 # PGVERSION is:
 PGVERSION=7.2
 
@@ -98,7 +104,7 @@ start(){
 				SYSDOCDIR=/usr/share/doc/packages
 			fi
 			echo
-			echo $"An old version of the database format was found.\nYou need to upgrade the data format before using PostgreSQL.\nSee $SYSDOCDIR/postgresql-$PGVERSION/README.rpm-dist for more information."
+			echo -e $"An old version of the database format was found.\nYou need to upgrade the data format before using PostgreSQL.\nSee $SYSDOCDIR/postgresql-$PGVERSION/README.rpm-dist for more information."
 			exit 1
 #                       This doesn't seem to do anything useful...
 #		else
@@ -169,13 +175,6 @@ start(){
 }
 
 stop(){
-	# Check for postmaster already running... exit if this happens
-	pid=`pidof -s postmaster`
-	if [ "$pid" == "" ]; then
-	    rm -f /var/run/postmaster.pid
-	    rm -f /var/lock/subsys/postgresql
-	    exit 0;
-	fi
 	echo -n $"Stopping postgresql service: "
 	# Check for older PGDATA location.
 	if [ -f /var/lib/pgsql/PG_VERSION ] && [ -d /var/lib/pgsql/base/template1 ]
@@ -185,7 +184,7 @@ stop(){
 		export PGDATA=/var/lib/pgsql/data
 	fi
 	su -l postgres -s /bin/sh -c "/usr/bin/pg_ctl stop -D $PGDATA -s -m fast" > /dev/null 2>&1
-        ret=$? # This will always be 0, as the return code doesn't propagate... Fix that some day.
+        ret=$? 
         if [ $ret -eq 0 ]; then
 	    echo_success
         else
@@ -205,6 +204,9 @@ condrestart(){
     [ -e /var/lock/subsys/postgresql ] && restart || :
 }
 
+reload(){
+    su -l postgres -s /bin/sh -c "/usr/bin/pg_ctl reload -D $PGDATA -s" > /dev/null 2>&1
+}
 
 # This script is slightly unusual in that the name of the daemon (postmaster)
 # is not the same as the name of the subsystem (postgresql)
@@ -226,11 +228,13 @@ case "$1" in
   condrestart)
 	condrestart
 	;;
+  reload|force-reload)
+	reload
+	;;
   *)
-	echo $"Usage: $0 {start|stop|status|restart|condrestart}"
+	echo $"Usage: $0 {start|stop|status|restart|condrestart|reload|force-reload}"
 	exit 1
 esac
 
 exit 0
-
 

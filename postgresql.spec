@@ -1,3 +1,6 @@
+%define beta 0
+
+%{?beta:%define __os_install_post /usr/lib/rpm/brp-compress}
 %{!?perl:%define perl 1}
 %{!?tcl:%define tcl 1}
 %{!?tkpkg:%define tkpkg 1}
@@ -8,18 +11,18 @@
 %{!?pltcl:%define pltcl 1}
 %{?forceplperl:%define plperl %{expand:forceplperl}}
 %{!?forceplperl:%define forceplperl 0}
-%{!?plperl:%define plperl 1}
+%{!?plperl:%define plperl 0}
 %{!?ssl:%define ssl 1}
 %{!?kerberos:%define kerberos 1}
+%{!?nls:%define nls 1}
 
 # Utility feature defines.
 %{!?enable_mb:%define enable_mb 1}
 %{!?pgaccess:%define pgaccess 1}
 
 # Python major version.
-%define pyver 2.2
-%define pymainver 2
-%define pynextver 2.3
+%{expand: %%define pyver %(python -c 'import sys;print(sys.version[0:3])')%{nil}}
+%{expand: %%define pynextver %(python -c 'import sys;print(float(sys.version[0:3])+0.1)')%{nil}}
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
@@ -45,7 +48,7 @@ Version: 7.2
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 0.7.1
+Release: 2.7
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz
@@ -54,23 +57,30 @@ Source4: file-lists.tar.gz
 Source5: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz.md5
 Source6: README.rpm-dist
 Source7: migration-scripts.tar.gz
-Source10: http://www.retep.org.uk/postgres/jdbc7.0-1.1.jar
-Source11: jdbc7.1-1.2.jar
+Source8: http://jdbc.postgresql.org/download/jdbc7.2dev-1.1.jar
+Source9: http://jdbc.postgresql.org/download/jdbc7.2dev-1.2.jar
+Source10: http://jdbc.postgresql.org/download/jdbc7.1-1.1.jar
+Source11: http://jdbc.postgresql.org/download/jdbc7.1-1.2.jar
 Source12: postgresql-dump.1.gz
-Source14: rh-pgdump.sh
 Source15: postgresql-bashprofile
 Patch1: rpm-pgsql-7.2.patch
-Patch2: postgresql-7.2rc2-betterquote.patch
-Buildrequires: perl glibc-devel autoconf
+Patch2: postgresql-7.2-contribfixes.patch
+Patch3: postgresql-7.2rc2-betterquote.patch
+Patch4: postgresql-7.2-tighten.patch
+Buildrequires: perl glibc-devel
 Prereq: /sbin/ldconfig initscripts
-BuildPrereq: python%{?pymainver}-devel perl tcl
+BuildPrereq: perl
 BuildPrereq: readline-devel >= 4.0
 BuildPrereq: zlib-devel >= 1.0.4
+BuildPrereq: patch >= 2.5.4
 %if %ssl
 BuildPrereq: openssl-devel
 %endif
 %if %kerberos
 BuildPrereq: krb5-devel
+%endif
+%if %nls
+BuildPrereq: gettext >= 0.10.36
 %endif
 Url: http://www.postgresql.org/ 
 Obsoletes: postgresql-clients
@@ -81,6 +91,7 @@ Obsoletes: postgresql-plperl
 %endif
 %if ! %{tcl}
 Obsoletes: postgresql-tcl
+Buildrequires: tcl
 %endif
 %if ! %{tkpkg}
 Obsoletes: postgresql-tk
@@ -93,6 +104,7 @@ Obsoletes: postgresql-perl
 %endif
 %if ! %{python}
 Obsoletes: postgresql-python
+BuildRequires: python-devel
 %endif
 %if ! %{jdbc}
 Obsoletes: postgresql-jdbc
@@ -276,8 +288,9 @@ to use when writing Perl code for accessing a PostgreSQL database.
 %package python
 Summary: Development module for Python code to access a PostgreSQL DB.
 Group: Applications/Databases
-Requires: mx%{?pymainver}
-Requires: python%{?pymainver} >= %pyver, python < %pynextver
+Requires: python mx
+Conflicts: python < %pyver, python >= %pynextver
+
 
 %description python
 PostgreSQL is an advanced Object-Relational database management
@@ -317,6 +330,8 @@ system, including regression tests and benchmarks.
 
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
 
 %build
 
@@ -336,9 +351,12 @@ CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS
 # Strip out -ffast-math from CFLAGS....
 
 CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
-export PYTHON="/usr/bin/python%{pyver}"
 
 ./configure --enable-locale  --with-CXX --prefix=/usr --disable-rpath\
+%if %beta
+	--enable-debug \
+	--enable-cassert \
+%endif
 %if %perl
 	--with-perl \
 %endif
@@ -365,13 +383,16 @@ export PYTHON="/usr/bin/python%{pyver}"
 %if %kerberos
 	--with-krb5=/usr/kerberos \
 %endif
+%if %nls
+	--enable-nls \
+%endif
 	--sysconfdir=/etc/pgsql \
 	--mandir=%{_mandir} \
 	--docdir=%{_docdir} \
 	--includedir=%{_includedir} \
 	--datadir=/usr/share/pgsql
 
-make %{?_smp_mflags} all
+make all
 
 %if %test
 	pushd src/test
@@ -421,10 +442,6 @@ pushd $RPM_BUILD_ROOT%{_mandir}
 cp %{SOURCE12} man1
 popd
 
-# install the dump script
-
-install -m755 %SOURCE14 $RPM_BUILD_ROOT/usr/bin/
-
 # install dev headers.
 
 make DESTDIR=$RPM_BUILD_ROOT install-all-headers
@@ -448,7 +465,9 @@ install -m755 src/Makefile.global $RPM_BUILD_ROOT/usr/include/pgsql
 	# Java/JDBC
 	# The user will have to set a CLASSPATH to find it here, but not sure where else to put it...
 
-	# Install 7.0 JDBC jars 
+	# JDBC jars 
+	install -m 755 %{SOURCE8} $RPM_BUILD_ROOT/usr/share/pgsql
+	install -m 755 %{SOURCE9} $RPM_BUILD_ROOT/usr/share/pgsql
 	install -m 755 %{SOURCE10} $RPM_BUILD_ROOT/usr/share/pgsql
 	install -m 755 %{SOURCE11} $RPM_BUILD_ROOT/usr/share/pgsql
 
@@ -525,84 +544,120 @@ pushd $RPM_BUILD_ROOT/usr/lib/pgsql/contrib
 
 # Get rid of useless makefiles
 rm -f Makefile */Makefile
-# earthdistance
-pushd earthdistance
-perl -pi -e "s|/usr/share/pgsql/contrib|/usr/lib/pgsql/contrib/earthdistance|" *
-popd
 
 # array
 pushd array
-perl -pi -e "s|/usr/lib/contrib|/usr/lib/pgsql/contrib/array|" *
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/array|" *
+popd
+
+#  btree_gist
+pushd btree_gist
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/btree_gist|" *.sql
+popd
+
+# chkpass
+pushd chkpass
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/chkpass|" *.sql
 popd
 
 # cube
 pushd cube
-perl -pi -e "s|/usr/lib/contrib|/usr/lib/pgsql/contrib/cube|" cube.sql
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/cube|" cube.sql
+popd
+
+# dblink
+pushd dblink
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/dblink|" dblink.sql
+popd
+
+# earthdistance
+pushd earthdistance
+perl -pi -e "s|/usr/share/pgsql/contrib|/usr/lib/pgsql/contrib/earthdistance|" *.sql
 popd
 
 # fulltext
 pushd fulltextindex
-perl -pi -e "s|/usr/lib/contrib|/usr/lib/pgsql/contrib/fulltextindex|" *.sql
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/fulltextindex|" *.sql
+popd
+
+# fuzzystrmatch
+pushd fuzzystrmatch
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/fuzzystrmatch|" *.sql
 popd
 
 # intarray
 pushd intarray
-perl -pi -e "s|/usr/lib/contrib|/usr/lib/pgsql/contrib/intarray|" *.sql
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/intarray|" *.sql
 popd
 
 # isbn_issn
 pushd isbn_issn
-perl -pi -e "s|/usr/lib/contrib|/usr/lib/pgsql/contrib/isbn_issn|" *.sql
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/isbn_issn|" *.sql
 popd
 
 # lo
 pushd lo
-perl -pi -e "s|/usr/lib/contrib|/usr/lib/pgsql/contrib/lo|" *.sql
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/lo|" *.sql
 popd
 
 # miscutil
 pushd miscutil
-perl -pi -e "s|/usr/lib/contrib|/usr/lib/pgsql/contrib/miscutil|" *.sql
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/miscutil|" *.sql
 popd
 
-# noup
+# noupdate
 pushd noupdate
-perl -pi -e "s|/usr/lib/contrib|/usr/lib/pgsql/contrib/noupdate|" *.sql
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/noupdate|" *.sql
 popd
 
 # pgcrypto
 pushd pgcrypto
-perl -pi -e "s|/usr/lib/contrib|/usr/lib/pgsql/contrib/pgcrypto|" *.sql
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/pgcrypto|" *.sql
 popd
 
+# pgstattuple
+pushd pgstattuple
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/pgstattuple|" *.sql
+popd
 
 # rserv
 pushd rserv
 perl -pi -e "s|/usr/share/|/usr/lib/|" *
-perl -pi -e "s|/usr/lib/contrib|/usr/lib/pgsql/contrib/rserv|" *
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib|" *
 perl -pi -e "s|/usr/bin|/usr/lib/pgsql/contrib/rserv|" *
-perl -pi -e "s|/usr/lib/pgsql/contrib\"|/usr/lib/pgsql/contrib/rserv\"|" *
-perl -pi -e "s|/usr/lib/pgsql/contrib$|/usr/lib/pgsql/contrib/rserv|" *
+popd
+
+# rtree_gist
+pushd pgstattuple
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib|" *.sql
 popd
 
 # seg 
 pushd seg
-perl -pi -e "s|/usr/lib/contrib|/usr/lib/pgsql/contrib/seg|" *.sql
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib|" *.sql
 popd
 
 # spi
 pushd spi
-perl -pi -e "s|/usr/lib/contrib|/usr/lib/pgsql/contrib/spi|" *.sql
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/spi|" *.sql
 popd
+
+# Don"t need these
+rm -fr startscripts
 
 # string
 pushd string
-perl -pi -e "s|/usr/lib/contrib|/usr/lib/pgsql/contrib/string|" *.sql
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/string|" *.sql
+popd
+
+# tsearch
+pushd tsearch
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/tsearch|" *.sql
 popd
 
 # userlock
 pushd userlock
-perl -pi -e "s|/usr/lib/contrib|/usr/lib/pgsql/contrib/userlock|" *.sql
+perl -pi -e "s|\\\$libdir|/usr/lib/pgsql/contrib/userlock|" *.sql
 popd
 
 popd
@@ -618,6 +673,14 @@ pushd $RPM_BUILD_ROOT/usr/lib
 ln -s libpq.so.2 libpq.so.2.0
 popd
 
+
+%find_lang libpq
+%find_lang pg_dump
+%find_lang postgres
+%find_lang psql
+
+cat psql.lang pg_dump.lang > main.lst
+cat postgres.lang files.lst > server.lst
 
 %pre
 # Need to make backups of some executables if an upgrade
@@ -696,7 +759,7 @@ rm -f perlfiles.list
 # Note that macros such as config are available in those lists.
 # The lists differentiate between RedHat, SuSE, and others.
 
-%files
+%files -f main.lst
 %defattr(-,root,root)
 %doc doc/FAQ doc/KNOWN_BUGS doc/MISSING_FEATURES doc/README* 
 %doc COPYRIGHT README HISTORY doc/bug.template
@@ -736,14 +799,14 @@ rm -f perlfiles.list
 %dir /usr/lib/pgsql/contrib/
 /usr/lib/pgsql/contrib/*
 
-%files libs
+%files libs -f libpq.lang
 %defattr(-,root,root)
 /usr/lib/libpq.so.*
 /usr/lib/libecpg.so.*
 /usr/lib/libpq++.so.*
 /usr/lib/libpgeasy.so.*
 
-%files server -f files.lst
+%files server -f server.lst
 %defattr(-,root,root)
 /usr/bin/initdb
 /usr/bin/initlocation
@@ -753,7 +816,6 @@ rm -f perlfiles.list
 /usr/bin/postgres
 /usr/bin/postgresql-dump
 /usr/bin/postmaster
-/usr/bin/rh-pgdump.sh
 %{_mandir}/man1/initdb.1*
 %{_mandir}/man1/initlocation.1*
 %{_mandir}/man1/ipcclean.1*
@@ -784,12 +846,14 @@ rm -f perlfiles.list
 /usr/lib/libecpg.so
 /usr/lib/libpq++.so
 /usr/lib/libpgeasy.so
-/usr/lib/libpgtcl.so
 /usr/lib/libpq.a
 /usr/lib/libecpg.a
 /usr/lib/libpq++.a
 /usr/lib/libpgeasy.a
+%if tcl
+/usr/lib/libpgtcl.so
 /usr/lib/libpgtcl.a
+%endif
 %{_mandir}/man1/ecpg.1*
 %{_mandir}/man1/pg_config.1*
 
@@ -848,8 +912,10 @@ rm -f perlfiles.list
 %if %jdbc
 %files jdbc
 %defattr(-,root,root)
-/usr/share/pgsql/jdbc7.0-1.1.jar
+/usr/share/pgsql/jdbc7.1-1.1.jar
 /usr/share/pgsql/jdbc7.1-1.2.jar
+/usr/share/pgsql/jdbc7.2dev-1.1.jar
+/usr/share/pgsql/jdbc7.2dev-1.2.jar
 %endif
 
 %if %test
@@ -860,32 +926,39 @@ rm -f perlfiles.list
 %endif
 
 %changelog
-* Mon Feb  4 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-0.7
-- 7.2
+* Mon Feb 18 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-3
+- Don't require tcl-devel, it's just tcl
+- Fix contrib. A lot. Again (last time in 7.1)
+- Add buildprereq of recent patch (#59910)
+- make the initscript 0755
 
-* Thu Jan 31 2002 Elliot Lee <sopwith@redhat.com> 7.2rc2-0.3
-- Fix python dependencies
+* Fri Feb  8 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2-2
+- Sync
+- Fix output of backslash-ns from upgrade detection
+- Make the default config use socket credentials, not trust
+- Add patches for tsearch/gist from Oleg Bartunov <oleg@sai.msu.su>
+- Deprecate rh-pgdump script. Dump before upgrading, restore afterwards. 
+  And ask the developers to fix it.
+- Dependency and file inclusion enhancements for conditionals
+- escape previous changelog entry which didn't escape a macro
+- python quote enhancement patch added
 
-* Mon Jan 28 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2rc2-0.2
-- Added Elliot Lee's python quote enhancement patch
+* Tue Feb 04 2002 Lamar Owen <lamar.owen@wgcr.org>
+- 7.2 final.
+- 7.2-1PGDG RPM release.
+- Integrate NLS build per Peter E.
+- Clean up a few things; undef beta for final build.
+- Newer JDBC -- point to correct website and 7.2 dev.
+- postgresql.init changes.
+- NLS build does funky %%defattr things; redhat-style-files.lst changed
+-- for execute permission on /etc/rc.d/init.d/postgresql
 
-* Fri Jan 25 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2rc2-0.1
-- 7.2rc2
-- Patches now included mainstream
+* Sun Jan 27 2002 Lamar Owen <lamar.owen@wgcr.org>
+- 7.2rc2-0.1PGDG
 
-* Wed Jan 23 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2rc1-0.2
-- fix perl
-
-* Wed Jan 23 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2rc1-0.1
-- 7.2rc1
-- Disable perl for now, it doesn't build...
-- autoconf fixes 
-
-* Thu Jan 17 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2b5-0.3
-- Work around buggy autoconf test (AC_PROG_CC_WORKS)
-
-* Tue Jan 15 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2b5-0.2
-- 7.2b5
+* Thu Nov 29 2001 Lamar Owen <lamar.owen@wgcr.org>
+- 7.2b3-0.3PGDG
+- beta conditionals for debugging, assertion checking, and no strip.
 
 * Tue Nov 27 2001 Trond Eivind Glomsrød <teg@redhat.com>
 - Improve python version handling
