@@ -1,7 +1,7 @@
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
 Version: 5.3.8
-Release: 2
+Release: 3
 License: freeware
 Group: Applications/Multimedia
 Source: ftp://ftp.cdrom.com/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
@@ -124,6 +124,9 @@ make install DESTDIR=$RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/usr/share/icons $RPM_BUILD_ROOT/etc/X11/applnk/Graphics
 cp %{SOURCE1} $RPM_BUILD_ROOT/usr/share/icons
 
+# Add files make install constantly forgets
+install -c -m 644 coders/*.mgk $RPM_BUILD_ROOT/usr/X11R6/share/ImageMagick
+
 cat >$RPM_BUILD_ROOT/etc/X11/applnk/Graphics/ImageMagick.desktop <<EOF
 [Desktop Entry]
 Name=ImageMagick
@@ -185,6 +188,10 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/perl*/site_perl/*/*/Image
 
 %changelog
+* Mon Aug 27 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.8-3
+- Add delegates.mgk back, got lost during the update to 5.3.8 (Makefile bug)
+  (#52611)
+
 * Mon Aug 20 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.8-2
 - Remove Magick++ includes from -devel, they're already in -c++-devel
   (#51590)
