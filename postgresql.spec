@@ -67,7 +67,7 @@ Version: 7.4.5
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 2
+Release: 3
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -84,6 +84,7 @@ Source18: ftp://ftp.druid.net/pub/distrib/PyGreSQL-3.5.tgz
 Patch1: rpm-pgsql-7.4.patch
 Patch2: rpm-multilib-%{version}.patch
 Patch3: postgresql-7.4-tighten.patch
+Patch4: postgresql-7.4-getppid.patch
 Patch5: postgresql-plperl.patch
 Patch6: postgresql-7.4-src-tutorial.patch
 Patch7: postgresql-7.3.4-s390-pic.patch
@@ -331,7 +332,7 @@ popd
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-# %patch4 -p1
+%patch4 -p1
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
@@ -784,6 +785,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Oct 05 2004 Tom Lane <tgl@redhat.com> 7.4.5-3
+- Solve the stale lockfile problem (bugs 71295, 96981, 134090)
+- Use runuser instead of su for SELinux (bug 134588)
+
 * Mon Aug 30 2004 Tom Lane <tgl@redhat.com> 7.4.5-2
 - Update to PyGreSQL 3.5.
 

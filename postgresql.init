@@ -56,6 +56,11 @@
 # Support condstop for uninstall
 # Minor other changes suggested by Fernando Nasser.
 
+# Version 7.4.5 Tom Lane <tgl@sss.pgh.pa.us>
+# Rewrite to start postmaster directly, rather than via pg_ctl; this avoids
+# fooling the postmaster's stale-lockfile check by having too many
+# postgres-owned processes laying about.
+
 
 # PGVERSION is:
 PGVERSION=7.4
@@ -75,6 +80,14 @@ NAME=`basename $0`
 if [ ${NAME:0:1} = "S" -o ${NAME:0:1} = "K" ]
 then
 	NAME=${NAME:3}
+fi
+
+# For SELinux we need to use 'runuser' not 'su'
+if [ -x /sbin/runuser ]
+then
+    SU=runuser
+else
+    SU=su
 fi
 
 
@@ -157,45 +170,34 @@ start(){
 		[ -f /etc/sysconfig/i18n ] && cp /etc/sysconfig/i18n $PGDATA/../initdb.i18n
 		# Just in case no locale was set, use en_US
 		[ ! -f /etc/sysconfig/i18n ] && echo "LANG=en_US" > $PGDATA/../initdb.i18n 
-		# Is expanded this early to be used in the command su runs
+		# Is expanded this early to be used in the command $SU runs
 		echo "export LANG LC_ALL LC_CTYPE LC_COLLATE LC_NUMERIC LC_CTYPE LC_TIME" >> $PGDATA/../initdb.i18n
 		# Initialize the database
-		su -l postgres -c "$PGENGINE/initdb --pgdata=$PGDATA" >> $PGLOG 2>&1 < /dev/null
+		$SU -l postgres -c "$PGENGINE/initdb --pgdata=$PGDATA" >> $PGLOG 2>&1 < /dev/null
 		[ -f $PGDATA/PG_VERSION ] && echo_success
 		[ ! -f $PGDATA/PG_VERSION ] && echo_failure
 		echo
  	fi
 
-	# Check for postmaster already running...
-  # note that pg_ctl only looks at the data structures in PGDATA
-  # you really do need the pidof()
+	echo -n "$PSQL_START"
+	$SU -l postgres -c "$PGENGINE/postmaster -p ${PGPORT} -D '${PGDATA}' ${PGOPTS} &" >> $PGLOG 2>&1 < /dev/null
+	sleep 1
 	pid=`pidof -s $PGENGINE/postmaster`
-	if [ $pid ] && $PGENGINE/pg_ctl status -D $PGDATA > /dev/null 2>&1
+	if [ $pid ] && [ -f "${PGDATA}/postmaster.pid" ]
 	then
-		echo $"Postmaster already running."
+		success "$PSQL_START"
+		touch /var/lock/subsys/${NAME}
+		head -n 1 "${PGDATA}/postmaster.pid" > /var/run/postmaster.${PGPORT}.pid
+		echo
 	else
-		#all systems go -- remove any stale lock files
-		rm -f /tmp/.s.PGSQL.${PGPORT} > /dev/null
-		echo -n "$PSQL_START"
-		su -l postgres -c "$PGENGINE/pg_ctl  -D $PGDATA -p $PGENGINE/postmaster -o '-p ${PGPORT} ${PGOPTS}' start"  >> $PGLOG 2>&1 < /dev/null
- 		sleep 1
- 		pid=`pidof -s $PGENGINE/postmaster`
- 		if [ $pid ]
-		then
-			success "$PSQL_START"
-			touch /var/lock/subsys/${NAME}
-			echo $pid > /var/run/postmaster.${PGPORT}.pid
-			echo
-		else
-			failure "$PSQL_START"
-			echo
-		fi
+		failure "$PSQL_START"
+		echo
 	fi
 }
 
 stop(){
 	echo -n $"Stopping ${NAME} service: "
-	su -l postgres -c "$PGENGINE/pg_ctl stop -D $PGDATA -s -m fast" > /dev/null 2>&1 < /dev/null
+	$SU -l postgres -c "$PGENGINE/pg_ctl stop -D '${PGDATA}' -s -m fast" > /dev/null 2>&1 < /dev/null
 	ret=$? 
 	if [ $ret -eq 0 ]
 	then
@@ -222,7 +224,7 @@ condstop(){
 }
 
 reload(){
-    su -l postgres -c "$PGENGINE/pg_ctl reload -D $PGDATA -s" > /dev/null 2>&1 < /dev/null
+    $SU -l postgres -c "$PGENGINE/pg_ctl reload -D '${PGDATA}' -s" > /dev/null 2>&1 < /dev/null
 }
 
 # This script is slightly unusual in that the name of the daemon (postmaster)
@@ -257,4 +259,3 @@ case "$1" in
 esac
 
 exit 0
-
