@@ -67,7 +67,7 @@ Version: 7.4.6
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 1
+Release: 2
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -788,6 +788,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Nov 15 2004 Tom Lane <tgl@redhat.com> 7.4.6-2
+- Rebuild so python components play with python 2.4 (bug 139160)
+
 * Sat Oct 23 2004 Tom Lane <tgl@redhat.com> 7.4.6-1
 - Update to PostgreSQL 7.4.6 (bugs 136947, 136949)
 - Make init script more paranoid about mkdir step of initializing a new
