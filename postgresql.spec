@@ -64,7 +64,7 @@ Version: 8.0.1
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 2
+Release: 3
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -785,6 +785,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Mar  1 2005 Tomas Mraz <tmraz@redhat.com> 8.0.1-3
+- rebuild with openssl-0.9.7e
+
 * Mon Feb 21 2005 Tom Lane <tgl@redhat.com> 8.0.1-2
 - Repair improper error message in init script when PGVERSION doesn't match.
 - Arrange for auto update of version embedded in init script.
