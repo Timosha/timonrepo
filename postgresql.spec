@@ -45,7 +45,7 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 7.4.3
+Version: 7.4.5
 
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
@@ -67,17 +67,17 @@ Version: 7.4.3
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 3
+Release: 1
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
 Source3: postgresql.init
 Source5: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2.md5
 Source6: README.rpm-dist
-Source8: http://jdbc.postgresql.org/download/pg74.214.jdbc1.jar
-Source9: http://jdbc.postgresql.org/download/pg74.214.jdbc2.jar
-Source10: http://jdbc.postgresql.org/download/pg74.214.jdbc2ee.jar
-Source11: http://jdbc.postgresql.org/download/pg74.214.jdbc3.jar
+Source8: http://jdbc.postgresql.org/download/pg74.215.jdbc1.jar
+Source9: http://jdbc.postgresql.org/download/pg74.215.jdbc2.jar
+Source10: http://jdbc.postgresql.org/download/pg74.215.jdbc2ee.jar
+Source11: http://jdbc.postgresql.org/download/pg74.215.jdbc3.jar
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
 Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.4.tgz
@@ -122,9 +122,22 @@ BuildPrereq: pam-devel
 %endif
 
 Url: http://www.postgresql.org/ 
+
 Obsoletes: postgresql-clients
 Obsoletes: postgresql-perl
 Obsoletes: postgresql-tk
+Obsoletes: rh-postgresql
+Obsoletes: rh-postgresql-contrib
+Obsoletes: rh-postgresql-devel
+Obsoletes: rh-postgresql-docs
+Obsoletes: rh-postgresql-jdbc
+Obsoletes: rh-postgresql-libs
+Obsoletes: rh-postgresql-pl
+Obsoletes: rh-postgresql-python
+Obsoletes: rh-postgresql-server
+Obsoletes: rh-postgresql-tcl
+Obsoletes: rh-postgresql-test
+
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 
 # This is the PostgreSQL Global Development Group Official RPMset spec file,
@@ -757,10 +770,10 @@ rm -rf $RPM_BUILD_ROOT
 %if %jdbc
 %files jdbc
 %defattr(-,root,root)
-%{_datadir}/java/pg74.214.jdbc1.jar
-%{_datadir}/java/pg74.214.jdbc2.jar
-%{_datadir}/java/pg74.214.jdbc2ee.jar
-%{_datadir}/java/pg74.214.jdbc3.jar
+%{_datadir}/java/pg74.215.jdbc1.jar
+%{_datadir}/java/pg74.215.jdbc2.jar
+%{_datadir}/java/pg74.215.jdbc2ee.jar
+%{_datadir}/java/pg74.215.jdbc3.jar
 %endif
 
 %if %test
@@ -771,6 +784,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Aug 24 2004 Tom Lane <tgl@redhat.com> 7.4.5-1
+- Update to PostgreSQL 7.4.5.
+- Update JDBC jars to driver build 215.
+- Add Obsoletes: entries for rh-postgresql packages, per bug 129278.
+
 * Sat Jul 10 2004 Tom Lane <tgl@redhat.com> 7.4.3-3
 - Undo ill-considered chkconfig change that causes server to start
   immediately upon install.  Mea culpa (bug 127552).
