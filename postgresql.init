@@ -153,23 +153,12 @@ start(){
  		pid=`pidof -s postmaster`
  		if [ $pid ]
 		then
-			if echo "$TYPESET"|grep "declare -f success ()" >/dev/null
-			then
-				success "$PSQL_START"
-			else
-				echo "  [ OK ]"
-			fi
-			touch /var/lock/subsys/postgresql
-			echo $pid > /var/run/postmaster.pid
-			echo
+		    success "$PSQL_START"
+		    touch /var/lock/subsys/postgresql
+		    echo $pid > /var/run/postmaster.pid
+		    echo
 		else
-			if echo "$TYPESET"|grep "declare -f failure ()" >/dev/null
-			then
-				failure "$PSQL_START"
-			else
-				echo " [ FAILED ]"
-			fi
-			echo
+		    failure "$PSQL_START"
 		fi
 	fi
 }
