@@ -44,7 +44,7 @@ Version: 7.1.3
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 3
+Release: 4bp.2
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz
@@ -62,6 +62,7 @@ Source16: http://www.sai.msu.su/~megera/postgres/gist/code/7.1.2/contrib-intarra
 Patch1: rpm-pgsql-7.1.patch
 Patch2: postgresql-7.1.plperl.patch
 Patch3: postgresql-7.1.s390x.patch
+Patch4: postgresql-7.1.3-security.patch
 Buildrequires: perl glibc-devel
 Prereq: /sbin/ldconfig initscripts
 BuildPrereq: python-devel perl tcl /lib/cpp
@@ -318,6 +319,9 @@ system, including regression tests and benchmarks.
 #PL/Perl stuff
 %patch2 -p1
 %patch3 -p1
+
+#Backpatched security fixes
+%patch4 -p1
 
 
 %if %forceplperl
@@ -948,8 +952,11 @@ rm -f perlfiles.list
 %endif
 
 %changelog
-* Wed Sep 12 2001 Tim Powers <timp@redhat.com>
-- rebuild with new gcc and binutils
+* Wed Jan 9 2003 Andrew Overholt <overholt@redhat.com> [7.1.3-4bp.2]
+- Addition to security backpatch
+
+* Mon Dec 16 2002 Andrew Overholt <overholt@redhat.com> [7.1.3-4bp]
+- Add backpatching of security fixes from 7.2.2 and 7.3.
 
 * Mon Aug 20 2001 Trond Eivind Glomsrød <teg@redhat.com> 7.1.3-2
 - Fix usage of "Red Hat Linux" in the README.rpm-dist, do other minor
