@@ -40,7 +40,7 @@
 # Karl's fixes for some quoting issues.
 
 # PGVERSION is:
-PGVERSION=7.1.2
+PGVERSION=7.1.3
 
 # Source function library.
 INITD=/etc/rc.d/init.d
@@ -95,17 +95,10 @@ start(){
 				SYSDOCDIR=/usr/share/doc/packages
 			fi
 			echo
-			echo $"An old version of the database format was found.\nYou need to upgrade the data format before using PostgreSQL.\nSee $SYSDOCDIR/postgresql-$PGVERSION/README.rpm-dist for more information."
+			echo $"An old version of the database format was found."
+			echo $"You need to upgrade the data format before using PostgreSQL."
+			echo $"See $SYSDOCDIR/postgresql-$PGVERSION/README.rpm-dist for more information."
 			exit 1
-#                       This doesn't seem to do anything useful...
-#		else
-#			if echo "$TYPESET"|grep "declare -f success ()" >/dev/null
-#			then
-#				success "$PSQL_CHECK"
-#			else
-#				echo "  [ OK ]"
-#			fi
-#			echo
 		fi
 
 	# No existing PGDATA! Initdb it.
