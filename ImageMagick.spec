@@ -224,7 +224,6 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 %{_libdir}/ImageMagick-*
 %{_bindir}/[a-zW]*
 %{_mandir}/*/*
-%{_datadir}/ImageMagick
 #/etc/X11/applnk/Graphics/ImageMagick.desktop
 #/usr/share/icons/magick_small.png
 
