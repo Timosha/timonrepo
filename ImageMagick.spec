@@ -1,57 +1,70 @@
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
-Version: 5.2.7
-Release: 4
-Copyright: freeware
+Version: 5.3.7
+Release: 3
+License: freeware
 Group: Applications/Multimedia
 Source: ftp://ftp.cdrom.com/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
-Patch0: ImageMagick-5.2.6-libpath.patch
-Patch1: ImageMagick-5.2.4-lprhack.patch
+Source1: magick_small.png
+Patch1: ImageMagick-5.3.5-lprhack.patch
+Patch2: ImageMagick-5.3.6-nonroot.patch
+Patch3: ImageMagick-5.3.7-builddep.patch
+Patch4: ImageMagick-5.3.7-config.patch
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
-BuildPrereq: libtiff-devel, libungif-devel, zlib-devel
+BuildPrereq: libtiff-devel, libungif-devel, zlib-devel, perl
 Requires: bzip2, freetype, libjpeg, libpng, libtiff, libungif, zlib
 BuildRequires: freetype-devel >= 2.0.1
-Prefix: /usr/X11R6
 %define _prefix /usr/X11R6
 %define _mandir %{_prefix}/man
 %define _includedir %{_prefix}/include/X11/magick
 
 %description
-ImageMagick(TM) is an image display and manipulation tool for the X 
-Window System.  ImageMagick can read and write JPEG, TIFF, PNM, GIF
-and Photo CD image formats.  It can resize, rotate, sharpen, color 
-reduce or add special effects to an image, and when finished you can 
-either save the completed work in the original format or a different 
-one.  ImageMagick also includes command line programs for creating 
-animated or transparent .gifs, creating composite images, creating 
-thumbnail images, and more.  
+ImageMagick(TM) is an image display and manipulation tool for the X
+Window System. ImageMagick can read and write JPEG, TIFF, PNM, GIF,
+and Photo CD image formats. It can resize, rotate, sharpen, color
+reduce, or add special effects to an image, and when finished you can
+either save the completed work in the original format or a different
+one. ImageMagick also includes command line programs for creating
+animated or transparent .gifs, creating composite images, creating
+thumbnail images, and more.
 
-ImageMagick is one of your choices if you need a program to manipulate 
-and display images. If you'd also like to develop your own applications 
-which use ImageMagick code or APIs, you'll need to install 
+ImageMagick is one of your choices if you need a program to manipulate
+and dis play images. If you want to develop your own applications
+which use ImageMagick code or APIs, you need to install
 ImageMagick-devel as well.
 
 %package devel
 Summary: Static libraries and header files for ImageMagick app development.
 Group: Development/Libraries
-Requires: ImageMagick = %{version}
+Requires: ImageMagick = %{version}-%{release}
 
 %description devel
 Image-Magick-devel contains the static libraries and header files you'll
-need to develop ImageMagick applications.  ImageMagick is an image
+need to develop ImageMagick applications. ImageMagick is an image
 manipulation program.
 
-If you want to create applications that will use ImageMagick code
-or APIs, you'll need to install ImageMagick-devel as well as ImageMagick.
-You don't need to install it if you just want to use ImageMagick, 
+If you want to create applications that will use ImageMagick code or
+APIs, you need to install ImageMagick-devel as well as ImageMagick.
+You do noy need to install it if you just want to use ImageMagick,
 however.
 
-%package c++
-Summary: ImageMagick Magick++ library
+%package perl
+Summary: ImageMagick perl bindings
 Group: System Environment/Libraries
-Requires: ImageMagick = %{version}
+Requires: ImageMagick = %{version}-%{release}, perl >= 5.6.0
+
+%description perl
+Perl bindings to ImageMagick.
+
+Install ImageMagick-perl if you want to use any perl scripts that use
+ImageMagick.
+
+%package c++
+Summary: ImageMagick Magick++ library (C++ bindings)
+Group: System Environment/Libraries
+Requires: ImageMagick = %{version}-%{release}
 
 %description c++
 This package contains the Magick++ library, a C++ binding to the ImageMagick
@@ -78,41 +91,55 @@ however.
 
 %prep
 %setup -q
-%patch0 -p1 -b .path
 %patch1 -p1 -b .lpr
-
-rm -f images/Makefile || :
+%patch2 -p1 -b .nonroot
+%patch3 -p1 -b .bdep
+%patch4 -p1 -b .config
 
 %build
-TARGET_PLATFORM=%{_target_platform}
-%define _target_platform --target=$TARGET_PLATFORM
-%ifarch alpha sparc
-RPM_OPT_FLAGS=""
-%endif
-
-%ifarch ia64
-CFLAGS="-g -D_GNU_SOURCE $RPM_OPT_FLAGS"; export CFLAGS
-%else
-CFLAGS="-g $RPM_OPT_FLAGS"; export CFLAGS
-%endif
-mv configure.in configure.in.dontuse # HACK: Don't run libtoolize in %%configure
-%configure --prefix=/usr/X11R6 --enable-shared --with-perl --with-x --with-threads --with-magick_plus_plus --without-wmf
-mv configure.in.dontuse configure.in
+libtoolize --force
+aclocal
+automake || :
+autoconf
+%configure --prefix=%{_prefix} --enable-shared \
+           --with-perl --with-x \
+           --with-threads --with-magick_plus_plus
 make
-make -C Magick++
 
 %install
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
-%makeinstall PREFIX=$RPM_BUILD_ROOT/usr
-%makeinstall -C Magick++ PREFIX=$RPM_BUILD_ROOT/usr
+rm -rf $RPM_BUILD_ROOT
 
-for bin in $RPM_BUILD_ROOT%{_bindir}/*-*-*-* $RPM_BUILD_ROOT%{_mandir}/man*/*-*-*-* ; do
-	mv ${bin} `echo ${bin} | sed 's@[^-/]*-[^-/]*-[^-/]*-@@g'`
-done
-install -m755 utilities/.libs/* $RPM_BUILD_ROOT%{_bindir}/
+make PerlMagick/Makefile
+perl -pi -e 's,^PREFIX.*,PREFIX = \$(DESTDIR)/usr,g;s,^config :: Makefile,config :: ,g;s,Makefile : ,Foo : ,g' PerlMagick/Makefile
+perl -pi -e "s,-lMagick,-L../magick/.libs -lMagick,g" PerlMagick/Makefile
+cat >>PerlMagick/Makefile <<EOF
+Makefile:
+	touch Makefile
+EOF
+perl -pi -e 's,^install-exec-perl:.*,install-exec-perl:,g' Makefile
+rm -f PerlMagick/Makefile.*
+make install DESTDIR=$RPM_BUILD_ROOT
+
+# Generate desktop file
+mkdir -p $RPM_BUILD_ROOT/usr/share/icons $RPM_BUILD_ROOT/etc/X11/applnk/Graphics
+cp %{SOURCE1} $RPM_BUILD_ROOT/usr/share/icons
+
+cat >$RPM_BUILD_ROOT/etc/X11/applnk/Graphics/ImageMagick.desktop <<EOF
+[Desktop Entry]
+Name=ImageMagick
+Comment=The ImageMagick picture viewer and editor
+Comment[de]=Der ImageMagick-Bilderbetrachter und -editor
+Exec=%{_prefix}/bin/display
+Icon=magick_small.png
+Terminal=0
+Type=Application
+EOF
+
+rm -f $RPM_BUILD_ROOT/usr/lib/perl5/site_perl/*/*/auto/Image/Magick/.packlist
+find $RPM_BUILD_ROOT -name "*.bs" |xargs rm -f
 
 %clean
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_ROOT
 
 %post -p /sbin/ldconfig
 
@@ -128,10 +155,10 @@ install -m755 utilities/.libs/* $RPM_BUILD_ROOT%{_bindir}/
 %doc README.txt ImageMagick.html
 %attr(755,root,root) %{_libdir}/libMagick.so.*
 %{_bindir}/*
-/usr/lib/perl*/site_perl/*/*/auto/Image
-/usr/lib/perl*/site_perl/*/*/Image
 %{_mandir}/*/*
 %{_datadir}/*
+/etc/X11/applnk/Graphics/ImageMagick.desktop
+/usr/share/icons/magick_small.png
 
 %files devel
 %defattr(-,root,root)
@@ -152,11 +179,44 @@ install -m755 utilities/.libs/* $RPM_BUILD_ROOT%{_bindir}/
 %{_libdir}/libMagick++.la
 %{_libdir}/libMagick++.so
 
+%files perl
+%defattr(-,root,root)
+/usr/lib/perl*/site_perl/*/*/auto/Image
+/usr/lib/perl*/site_perl/*/*/Image
+
 %changelog
-* Sun Apr 29 2001 Bill Nottingham <notting@redhat.com>
-- rebuild for C++ exception handling on ia64
-- fix build (need -D_GNU_SOURCE at least on ia64...)
-- explicitly disable libwmf support
+* Sun Aug 12 2001 Than Ngo <than@redhat.com> 5.3.7-3
+- fix to build Perlmagic on s390 s390x
+
+* Thu Jul 26 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.7-2
+- Add delegates.mgk to the package (#50725)
+
+* Tue Jul 24 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.7-1
+- Fix build without previously installed ImageMagick-devel (#49816)
+- Move perl bindings to a separate package.
+
+* Mon Jul  9 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.6-2
+- Fix build as non-root again
+- Shut up rpmlint
+
+* Tue Jul  3 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.6-1
+- 5.3.6
+- Get rid of the ia64 patch, it's no longer needed since glibc was fixed
+
+* Sat Jun 16 2001 Than Ngo <than@redhat.com>
+- update to 5.3.5
+- cleanup specfile
+
+* Sat May 19 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.3-2
+- 5.3.3-respin, fixes #41196
+
+* Tue May  1 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.3-1
+- 5.3.3
+- Add a desktop file for "display" (RFE#17417)
+
+* Sun Apr 15 2001 Bernhard Rosenkraenzer <bero@redhat.com>
+- 5.3.2
+- work around bugs in ia64 glibc headers
 
 * Mon Jan 08 2001 Florian La Roche <Florian.LaRoche@redhat.de>
 - remove patch for s390, it is not necessary

@@ -1,0 +1,22 @@
+--- ImageMagick-5.3.7/Magick++/lib/Magick++/Makefile.am.orig	Sun Aug 12 20:44:08 2001
++++ ImageMagick-5.3.7/Magick++/lib/Magick++/Makefile.am	Sun Aug 12 20:44:21 2001
+@@ -5,7 +5,7 @@
+ #
+ AUTOMAKE_OPTIONS = 1.4
+ 
+-includedir = ${prefix}/include
++includedir = ${prefix}/include/X11/magick
+ pkgdatadir = $(datadir)/Magick++
+ pkglibdir = $(libdir)/Magick++
+ pkgincludedir = $(includedir)/Magick++
+--- ImageMagick-5.3.7/Magick++/lib/Makefile.am.orig	Sun Aug 12 20:40:56 2001
++++ ImageMagick-5.3.7/Magick++/lib/Makefile.am	Sun Aug 12 20:42:22 2001
+@@ -9,7 +9,7 @@
+ 
+ INCLUDES = -I../.. -I$(top_srcdir)
+ 
+-includedir = ${prefix}/include
++includedir = ${prefix}/include/X11/magick
+ pkgdatadir = $(datadir)/Magick++
+ pkglibdir = $(libdir)/Magick++
+ pkgincludedir = $(includedir)/Magick++
