@@ -2,7 +2,7 @@
 # postgresql	This is the init script for starting up the PostgreSQL
 #		server
 #
-# chkconfig: - 75 25
+# chkconfig: - 64 36
 # description: Starts and stops the PostgreSQL backend daemon that handles \
 #	       all database requests.
 # processname: postmaster

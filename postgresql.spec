@@ -67,7 +67,7 @@ Version: 7.4.5
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 3
+Release: 4
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -464,6 +464,11 @@ then
 	install -m 755 %{SOURCE3} $RPM_BUILD_ROOT/etc/rc.d/init.d/postgresql
 fi
 
+# Remove stuff we don't want to ship.
+rm -f $RPM_BUILD_ROOT%{_bindir}/findoidjoins
+rm -f $RPM_BUILD_ROOT%{_bindir}/make_oidjoins_check
+rm -f $RPM_BUILD_ROOT%{_docdir}/postgresql/contrib/README.findoidjoins
+rm -f contrib/findoidjoins/README.findoidjoins
 
 # PGDATA needs removal of group and world permissions due to pg_pwd hole.
 install -d -m 700 $RPM_BUILD_ROOT/var/lib/pgsql/data
@@ -644,8 +649,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pgsql/user_locks.so
 %{_datadir}/pgsql/contrib/
 %{_bindir}/dbf2pg
-%{_bindir}/findoidjoins
-%{_bindir}/make_oidjoins_check
 %{_bindir}/fti.pl
 %{_bindir}/oid2name
 %{_bindir}/pg_dumplo
@@ -785,6 +788,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Oct 20 2004 Tom Lane <tgl@redhat.com> 7.4.5-4
+- Remove contrib/oidjoins stuff from installed fileset; it's of no use
+  to ordinary users and has a security issue (bugs 136300, 136301)
+- adjust chkconfig priority (bug 128852)
+
 * Tue Oct 05 2004 Tom Lane <tgl@redhat.com> 7.4.5-3
 - Solve the stale lockfile problem (bugs 71295, 96981, 134090)
 - Use runuser instead of su for SELinux (bug 134588)
