@@ -1,0 +1,142 @@
+--- ImageMagick-5.5.7/Magick++/bin/Makefile.am.amake	2003-03-25 16:09:40.000000000 +0100
++++ ImageMagick-5.5.7/Magick++/bin/Makefile.am	2003-09-10 15:44:00.000000000 +0200
+@@ -3,7 +3,7 @@
+ #
+ # Copyright Bob Friesenhahn, 1999, 2000, 2002
+ #
+-AUTOMAKE_OPTIONS = 1.7
++AUTOMAKE_OPTIONS = 1.6
+ 
+ INCLUDES = -I../.. -I$(top_srcdir)
+ 
+--- ImageMagick-5.5.7/Magick++/lib/Magick++/Makefile.am.amake	2003-05-11 06:07:47.000000000 +0200
++++ ImageMagick-5.5.7/Magick++/lib/Magick++/Makefile.am	2003-09-10 15:44:00.000000000 +0200
+@@ -3,7 +3,7 @@
+ #
+ # Copyright Bob Friesenhahn, 1999, 2000, 2001, 2002
+ #
+-AUTOMAKE_OPTIONS = 1.7
++AUTOMAKE_OPTIONS = 1.6
+ 
+ includedir = ${prefix}/include
+ pkgdatadir = $(datadir)/Magick++
+--- ImageMagick-5.5.7/Magick++/lib/Makefile.am.amake	2003-05-31 16:53:42.000000000 +0200
++++ ImageMagick-5.5.7/Magick++/lib/Makefile.am	2003-09-10 15:44:00.000000000 +0200
+@@ -3,7 +3,7 @@
+ #
+ # Copyright Bob Friesenhahn, 1999, 2000, 2001, 2002, 2003
+ #
+-AUTOMAKE_OPTIONS = 1.7 nostdinc
++AUTOMAKE_OPTIONS = 1.6 nostdinc
+ 
+ SUBDIRS = Magick++
+ 
+--- ImageMagick-5.5.7/Magick++/tests/Makefile.am.amake	2003-05-06 17:15:08.000000000 +0200
++++ ImageMagick-5.5.7/Magick++/tests/Makefile.am	2003-09-10 15:44:00.000000000 +0200
+@@ -3,7 +3,7 @@
+ #
+ # Copyright Bob Friesenhahn, 1999, 2000, 2002
+ #
+-AUTOMAKE_OPTIONS = 1.7 foreign
++AUTOMAKE_OPTIONS = 1.6 foreign
+ 
+ INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/magick -I$(top_builddir)/magick
+ 
+--- ImageMagick-5.5.7/Magick++/demo/Makefile.am.amake	2003-05-06 17:08:22.000000000 +0200
++++ ImageMagick-5.5.7/Magick++/demo/Makefile.am	2003-09-10 15:44:00.000000000 +0200
+@@ -3,7 +3,7 @@
+ #
+ # Copyright Bob Friesenhahn, 1999, 2000, 2001, 2002
+ #
+-AUTOMAKE_OPTIONS = 1.7 foreign
++AUTOMAKE_OPTIONS = 1.6 foreign
+ 
+ INCLUDES = -I$(srcdir)/../lib -I../.. -I$(top_srcdir)
+ 
+--- ImageMagick-5.5.7/Magick++/Makefile.am.amake	2003-03-25 16:09:40.000000000 +0100
++++ ImageMagick-5.5.7/Magick++/Makefile.am	2003-09-10 15:44:00.000000000 +0200
+@@ -3,7 +3,7 @@
+ #
+ # Copyright Bob Friesenhahn, 1999, 2000, 2002
+ #
+-AUTOMAKE_OPTIONS = 1.7 foreign
++AUTOMAKE_OPTIONS = 1.6 foreign
+ 
+ # Additional files to distribute
+ EXTRA_DIST = 
+--- ImageMagick-5.5.7/coders/Makefile.am.amake	2003-05-12 22:00:59.000000000 +0200
++++ ImageMagick-5.5.7/coders/Makefile.am	2003-09-10 15:44:00.000000000 +0200
+@@ -32,7 +32,7 @@
+ #
+ 
+ # Don't require all the GNU mandated files
+-AUTOMAKE_OPTIONS = 1.7 foreign
++AUTOMAKE_OPTIONS = 1.6 foreign
+ 
+ INCLUDES = -I$(top_builddir) -I$(top_srcdir) -I$(top_srcdir)/magick
+ 
+--- ImageMagick-5.5.7/magick/Makefile.am.amake	2003-05-31 16:52:41.000000000 +0200
++++ ImageMagick-5.5.7/magick/Makefile.am	2003-09-10 15:44:00.000000000 +0200
+@@ -29,7 +29,7 @@
+ #
+ 
+ # Don't require all the GNU mandated files
+-AUTOMAKE_OPTIONS = 1.7 foreign
++AUTOMAKE_OPTIONS = 1.6 foreign
+ 
+ includedir = ${prefix}/include
+ pkgincludedir = $(includedir)/magick
+--- ImageMagick-5.5.7/filters/Makefile.am.amake	2003-09-10 15:44:40.000000000 +0200
++++ ImageMagick-5.5.7/filters/Makefile.am	2003-09-10 15:44:59.000000000 +0200
+@@ -29,7 +29,7 @@
+ #
+ 
+ # Don't require all the GNU mandated files
+-AUTOMAKE_OPTIONS = 1.7 foreign
++AUTOMAKE_OPTIONS = 1.6 foreign
+ 
+ INCLUDES = -I$(top_builddir) -I$(top_srcdir) -I$(top_srcdir)/magick
+ 
+--- ImageMagick-5.5.7/locale/Makefile.am.amake	2003-09-10 15:44:40.000000000 +0200
++++ ImageMagick-5.5.7/locale/Makefile.am	2003-09-10 15:45:03.000000000 +0200
+@@ -29,7 +29,7 @@
+ #
+ 
+ # Don't require all the GNU mandated files
+-AUTOMAKE_OPTIONS = 1.7 foreign
++AUTOMAKE_OPTIONS = 1.6 foreign
+ 
+ # Where locale modules are installed
+ pkgdir =  @MagickLibPath@
+--- ImageMagick-5.5.7/utilities/Makefile.am.amake	2003-03-25 16:10:38.000000000 +0100
++++ ImageMagick-5.5.7/utilities/Makefile.am	2003-09-10 15:44:00.000000000 +0200
+@@ -29,7 +29,7 @@
+ #
+ 
+ # Don't require all the GNU mandated files
+-AUTOMAKE_OPTIONS = 1.7 foreign
++AUTOMAKE_OPTIONS = 1.6 foreign
+ 
+ MAGICK_LIB	= ../magick/libMagick.la # libtool library name
+ INCLUDES	=  -I$(top_builddir) -I$(top_srcdir) -I$(top_srcdir)/magick
+--- ImageMagick-5.5.7/tests/Makefile.am.amake	2003-09-10 15:44:40.000000000 +0200
++++ ImageMagick-5.5.7/tests/Makefile.am	2003-09-10 15:45:07.000000000 +0200
+@@ -1,6 +1,6 @@
+ # Makefile written by Bob Friesenhahn
+ 
+-AUTOMAKE_OPTIONS = 1.7 foreign
++AUTOMAKE_OPTIONS = 1.6 foreign
+ 
+ INCLUDES = -I$(top_builddir) -I$(top_srcdir) -I$(top_srcdir)/magick
+ #INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/magick
+--- ImageMagick-5.5.7/Makefile.am.amake	2003-05-15 17:24:39.000000000 +0200
++++ ImageMagick-5.5.7/Makefile.am	2003-09-10 15:44:00.000000000 +0200
+@@ -2,7 +2,7 @@
+ #
+ 
+ # Don't require all the GNU mandated files
+-AUTOMAKE_OPTIONS = 1.7.2 dist-zip dist-bzip2 foreign
++AUTOMAKE_OPTIONS = 1.6 dist-zip dist-bzip2 foreign
+ 
+ PACKAGE_NAME = @PACKAGE_NAME@
+ PACKAGE_VERSION = @PACKAGE_VERSION@

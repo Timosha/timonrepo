@@ -1,7 +1,7 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 5.5.6
-%define Patchlevel %{nil}
+%define VER 5.5.7
+%define Patchlevel 15
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
 %if "%{Patchlevel}" != ""
@@ -9,13 +9,13 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 5
+Release: 0.2
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
 Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.bz2
 %else
-Source: ftp://ftp.ImageMagick.org/ImageMagick/ImageMagick-%{version}.tar.bz2
+Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
 %endif
 Source1: magick_small.png
 Patch1: ImageMagick-5.5.6-lprhack.patch
@@ -23,15 +23,15 @@ Patch2: ImageMagick-5.3.6-nonroot.patch
 Patch3: ImageMagick-5.3.7-config.patch
 Patch4: ImageMagick-5.5.6-hp2xx.patch
 Patch5: ImageMagick-5.4.7-localdoc.patch
-Patch6: ImageMagick-5.4.7-stdin.patch
-Patch7: ImageMagick-5.5.6-automake.patch
+Patch6: ImageMagick-5.5.7-stdin.patch
+Patch7: ImageMagick-5.5.7-automake.patch
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
 BuildPrereq: libtiff-devel, libungif-devel, zlib-devel, perl
 Requires: bzip2, freetype, libjpeg, libpng, libtiff, libungif, zlib
 BuildRequires: freetype-devel >= 2.0.1
-
+BuildRequires: automake >= 1.6 autoconf >= 2.57 libtool >= 1.5
 
 %description
 ImageMagick(TM) is an image display and manipulation tool for the X
@@ -113,10 +113,10 @@ however.
 %patch4 -p1 -b .hp2xx
 %patch5 -p1 -b .ImageMagick
 %patch6 -p1 -b .stdin
-%patch7 -p1 -b .amake
+#%patch7 -p1 -b .amake
 
 %build
-libtoolize --force
+libtoolize --copy --force
 aclocal
 automake || :
 autoconf || :
@@ -127,20 +127,21 @@ autoconf || :
            --with-magick_plus_plus
 make
 
+# Link against built not installed library
+%define perl_make_options CC='%__cc -L$PWD/magick/.libs' LD='%__ld -L$PWD/magick/.libs'
+make PERL_MAKE_OPTIONS="%perl_make_options" PerlMagick/Makefile
+make -C PerlMagick
+
 %install
 rm -rf $RPM_BUILD_ROOT
 
-make PerlMagick/Makefile
 perl -pi -e 's,^PREFIX.*,PREFIX = \$(DESTDIR)/usr,g;s,^config :: Makefile,config :: ,g;s,Makefile : ,Foo : ,g;s,^INSTALLSITEARCH = /usr,INSTALLSITEARCH = \$(DESTDIR)/usr,g' PerlMagick/Makefile
-perl -pi -e "s,-lMagick,-L../magick/.libs -lMagick,g" PerlMagick/Makefile
 cat >>PerlMagick/Makefile <<EOF
 Makefile:
 	touch Makefile
 EOF
-#perl -pi -e 's,^includedir = \${prefix}/include/magick,includedir = \${prefix}/include/magick,g' magick/Makefile
-perl -pi -e 's,^install-exec-perl:.*,install-exec-perl:,g' Makefile
-#rm -f PerlMagick/Makefile.*
-make install DESTDIR=$RPM_BUILD_ROOT
+
+make install DESTDIR=$RPM_BUILD_ROOT PERL_MAKE_OPTIONS="%perl_make_options"
 
 # Generate desktop file
 #mkdir -p $RPM_BUILD_ROOT/usr/share/icons $RPM_BUILD_ROOT/etc/X11/applnk/Graphics
@@ -193,6 +194,7 @@ done
 popd
 
 # get the perl file list. We know what we need, so this is easy
+rm -f perl-pkg-files.orig
 echo "%defattr(-,root,root)" > perl-pkg-files
 find $RPM_BUILD_ROOT%{_libdir}/perl$perlmajor/site_perl/$perlver -type d -name Image >> perl-pkg-files.orig
 sed -e s,$RPM_BUILD_ROOT,, perl-pkg-files.orig > perl-pkg-files
@@ -200,6 +202,7 @@ sed -e s,$RPM_BUILD_ROOT,, perl-pkg-files.orig > perl-pkg-files
 # remove files we aren't shipping 
 rm -f `find $RPM_BUILD_ROOT%{_libdir}/perl$perlmajor/ -name perllocal.pod -type f`
 rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
+rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 
 %clean
 #rm -rf $RPM_BUILD_ROOT
@@ -214,9 +217,9 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
 
 %files
 %defattr(-,root,root)
-%doc www images
-%doc README.txt ImageMagick.html
-%attr(755,root,root) %{_libdir}/libMagick-*.so.*
+%doc index.html www images Copyright.txt QuickStart.txt
+%doc README.txt
+%attr(755,root,root) %{_libdir}/libMagick.so.*
 %{_libdir}/ImageMagick-*
 %{_bindir}/[a-z]*
 %{_mandir}/*/*
@@ -230,11 +233,12 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
 %{_libdir}/libMagick.a
 %{_libdir}/libMagick.la
 %{_libdir}/libMagick.so
+%{_libdir}/pkgconfig/*.pc
 %{_includedir}/magick
 
 %files c++
 %defattr(-,root,root)
-%{_libdir}/libMagick++-*.so.*
+%{_libdir}/libMagick++.so.*
 
 %files c++-devel
 %defattr(-,root,root)
@@ -251,6 +255,22 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
 #%{_libdir}/perl*/site_perl/*/*/Image
 
 %changelog
+* Sun Jan 25 2004 Nils Philippsen <nphilipp@redhat.com> 5.5.7.15-0.2
+- make perl module link against the built library instead of the installed one
+
+* Thu Jan 22 2004 Nils Philippsen <nphilipp@redhat.com> 5.5.7.15-0.1
+- version 5.5.7 patchlevel 15
+
+* Mon Oct 13 2003 Nils Philippsen <nphilipp@redhat.com> 5.5.7.10-0.1
+- rebuild with release 0.1 to not block an official update package
+
+* Wed Sep 10 2003 Nils Philippsen <nphilipp@redhat.com> 5.5.7.10-2
+- hack around libtool stupidity
+- disable automake patch as we require automake-1.7 anyway
+
+* Wed Sep 10 2003 Nils Philippsen <nphilipp@redhat.com> 5.5.7.10-1
+- version 5.5.7 patchlevel 10
+
 * Wed Jun 04 2003 Elliot Lee <sopwith@redhat.com>
 - rebuilt
 

@@ -1,0 +1,30 @@
+--- ImageMagick-5.5.7/magick/command.c.stdin	2003-09-10 08:59:31.000000000 +0200
++++ ImageMagick-5.5.7/magick/command.c	2003-09-10 09:01:42.000000000 +0200
+@@ -4410,7 +4410,8 @@
+     *client_name,
+     *option,
+     *resource_value,
+-    *server_name;
++    *server_name,
++    c_tmp;
+ 
+   Display
+     *display;
+@@ -4549,7 +4550,16 @@
+         break;
+       else
+         if (!isatty(STDIN_FILENO))
+-          option=(char *) "-";
++        {
++                c_tmp = getc(stdin);
++                if(c_tmp != EOF)
++                {
++                        ungetc(c_tmp, stdin);
++                        option=(char *) "-";
++                } else
++                        option=(char *) "logo:Untitled";
++                        /* option=(char *) "-"; */
++        }
+         else
+           option=(char *) "logo:Untitled";
+     if ((strlen(option) == 1) || ((*option != '-') && (*option != '+')))
