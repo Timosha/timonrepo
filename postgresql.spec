@@ -410,8 +410,8 @@ export LIBNAME=%{_lib}
 	--datadir=/usr/share/pgsql \
 	--with-docdir=%{_docdir}
 
-make all
-make -C contrib all
+make %{?_smp_mflags} all
+make %{?_smp_mflags} -C contrib all
 
 %if %test
 	pushd src/test
