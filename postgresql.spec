@@ -4,7 +4,7 @@
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 7.0.3
-Release: 8
+Release: 8a
 License: BSD
 Group: Applications/Databases
 # originally .gz
@@ -25,7 +25,7 @@ Patch0: postgresql-%{version}-alpha.patch.gz
 Patch1: rpm-pgsql-%{version}.patch
 Patch2: postgresql-7.0.3-ia64-2.patch
 Patch3: postgresql-7.0.3-mkstemp.patch
-Patch10: postgresql-7.0.2-s390.patch
+Patch10: postgresql-7.0.2-s390x.patch
 Requires: perl
 Prereq: /sbin/chkconfig /sbin/ldconfig /usr/sbin/useradd initscripts
 BuildPrereq: /lib/cpp
@@ -196,7 +196,7 @@ system, including regression tests and benchmarks.
 
 %patch3 -p1
 
-%ifarch s390
+%ifarch s390 s390x
 %patch10 -p1 -b .s390
 %endif
 
