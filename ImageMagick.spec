@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 3
+Release: 4
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -29,7 +29,7 @@ Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
 BuildPrereq: libtiff-devel, libungif-devel, zlib-devel, perl
 BuildRequires: freetype-devel >= 2.0.1
-BuildRequires: automake >= 1.6 autoconf >= 2.57 libtool >= 1.5
+BuildRequires: automake >= 1.7 autoconf >= 2.58 libtool >= 1.5
 
 %description
 ImageMagick(TM) is an image display and manipulation tool for the X
@@ -52,6 +52,7 @@ Group: Development/Libraries
 Requires: ImageMagick = %{version}-%{release}, bzip2-devel, freetype-devel 
 Requires: libjpeg-devel, libpng-devel, libtiff-devel, zlib-devel, libxml2-devel
 Requires: libexif-devel
+Requires: XFree86-devel
 
 %description devel
 Image-Magick-devel contains the static libraries and header files you'll
@@ -259,6 +260,10 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 #%{_libdir}/perl*/site_perl/*/*/Image
 
 %changelog
+* Mon Oct 11 2004 Tim Waugh <twaugh@redhat.com> 6.0.7.1-4
+- The devel subpackage requires XFree86-devel (bug #126509).
+- Fixed build requirements (bug #120776).  From Robert Scheck.
+
 * Tue Sep 14 2004 Karsten Hopp <karsten@redhat.de> 6.0.7.1-3 
 - move *.mgk files (#132007, #131708, #132397)
 
