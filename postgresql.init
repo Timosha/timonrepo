@@ -17,7 +17,7 @@
 # Changed PGDATA.
 #
 
-# Version 7.0.2 Trond Eivind Glomsrød <teg@redhat.com>
+# Version 7.0.2 Trond Eivind Glomsrd <teg@redhat.com>
 # use functions, add conditional restart
           
 # Version 7.0.3 Lamar Owen <lamar@postgresql.org>
@@ -28,7 +28,7 @@
 # Version 7.1 Release Candidate Lamar Owen <lamar@postgresql.org>
 # initdb parameters have changed.
 
-# Version 7.1.2 Trond Eivind Glomsrød <teg@redhat.com>
+# Version 7.1.2 Trond Eivind Glomsrd <teg@redhat.com>
 # Specify shell for su
 # Handle stop better - kill unwanted output, make it wait until the database is ready
 # Handle locales slightly differently - always using "C" isn't a valid option 
@@ -48,8 +48,11 @@
 # Tested the $? return for the stop script -- it does in fact propagate.
 # TODO: multiple postmasters.
 
-# PGVERSION is:  (note that PGVERSION is the major: 7.2.1 -> PGVERSION 7.2)
-PGVERSION=7.2
+# VErsion 7.3 Lamar OWen <lamar.owen@ramifordistat.net>
+# Multiple postmasters, courtesy Karl DeBisschop
+
+# PGVERSION is:
+PGVERSION=7.3
 
 # Source function library.
 INITD=/etc/rc.d/init.d
@@ -61,30 +64,40 @@ TYPESET=`typeset -f|grep "declare"`
 # Get config.
 . /etc/sysconfig/network
 
+# Find the name of the script
+NAME=`basename $0`
+
+# Set defaults for port and database directory
+PGPORT=5432
+export PGDATA=/var/lib/pgsql
+if [ -f $PGDATA/PG_VERSION ] && [ -d $PGDATA/base/template1 ]
+then
+	echo "Using old-style directory structure"
+else
+	export PGDATA=/var/lib/pgsql/data
+fi
+
+# Override defaults from /etc/sysconfig/pgsql if file is present
+[ -f /etc/sysconfig/pgsql/${NAME} ] && . /etc/sysconfig/pgsql/${NAME}
+export PGDATA
+export PGPORT
+export PGOPTS
+
 # Check that networking is up.
 # Pretty much need it for postmaster.
 [ "${NETWORKING}" = "no" ] && exit 0
 
 [ -f /usr/bin/postmaster ] || exit 0
 
-
 start(){
-	PSQL_START=$"Starting postgresql service: "
-	
-	# Check for older PGDATA location.
-	if [ -f /var/lib/pgsql/PG_VERSION ] && [ -d /var/lib/pgsql/base/template1 ]
-	then
-		export PGDATA=/var/lib/pgsql
-	else
-		export PGDATA=/var/lib/pgsql/data
-	fi
+	PSQL_START=$"Starting ${NAME} service: "
 
 	# Check for the PGDATA structure
 	if [ -f $PGDATA/PG_VERSION ] && [ -d $PGDATA/base ]
 	then
 	# Check version of existing PGDATA
 
-		if [ `cat $PGDATA/PG_VERSION` != '7.2' ]
+		if [ `cat $PGDATA/PG_VERSION` != '7.3' ]
 		then
 			SYSDOCDIR="(Your System's documentation directory)"
 			if [ -d /usr/doc/postgresql-$PGVERSION ]
@@ -125,6 +138,7 @@ start(){
 		then
 			mkdir -p $PGDATA
 			chown postgres.postgres $PGDATA
+			chmod go-rwx $PGDATA
 		fi
 		# Make sure the locale from the initdb is preserved for later startups...
 		[ -f /etc/sysconfig/i18n ] && cp /etc/sysconfig/i18n $PGDATA/../initdb.i18n
@@ -133,29 +147,31 @@ start(){
 		# Is expanded this early to be used in the command su runs
 		echo "export LANG LC_ALL LC_CTYPE LC_COLLATE LC_NUMERIC LC_CTYPE LC_TIME" >> $PGDATA/../initdb.i18n
 		# Initialize the database
-		su -l postgres -s /bin/sh -c "/usr/bin/initdb --pgdata=/var/lib/pgsql/data > /dev/null 2>&1" < /dev/null
+		su -l postgres -s /bin/sh -c "/usr/bin/initdb --pgdata=$PGDATA > /dev/null 2>&1" < /dev/null
 		[ -f $PGDATA/PG_VERSION ] && echo_success
 		[ ! -f $PGDATA/PG_VERSION ] && echo_failure
 		echo
  	fi
 
 	# Check for postmaster already running...
-	pid=`pidof -s postmaster`
-	if [ $pid ]
+  # note that pg_ctl only looks at the data structures in PGDATA
+  # you really do need the pidof()
+	pid=`pidof -s /usr/bin/postmaster`
+	if [ $pid ] && /usr/bin/pg_ctl status -D $PGDATA > /dev/null 2>&1
 	then
 		echo $"Postmaster already running."
 	else
 		#all systems go -- remove any stale lock files
-		rm -f /tmp/.s.PGSQL.* > /dev/null
+		rm -f /tmp/.s.PGSQL.${PGPORT} > /dev/null
 		echo -n "$PSQL_START"
-		su -l postgres -s /bin/sh -c "/usr/bin/pg_ctl  -D $PGDATA -p /usr/bin/postmaster start  > /dev/null 2>&1" < /dev/null
+		su -l postgres -s /bin/sh -c "/usr/bin/pg_ctl  -D $PGDATA -p /usr/bin/postmaster -o '-p ${PGPORT}' start  > /dev/null 2>&1" < /dev/null
  		sleep 1
- 		pid=`pidof -s postmaster`
+ 		pid=`pidof -s /usr/bin/postmaster`
  		if [ $pid ]
 		then
 			success "$PSQL_START"
-			touch /var/lock/subsys/postgresql
-			echo $pid > /var/run/postmaster.pid
+			touch /var/lock/subsys/${NAME}
+			echo $pid > /var/run/postmaster.${PGPORT}.pid
 			echo
 		else
 			failure "$PSQL_START"
@@ -165,24 +181,18 @@ start(){
 }
 
 stop(){
-	echo -n $"Stopping postgresql service: "
-	# Check for older PGDATA location.
-	if [ -f /var/lib/pgsql/PG_VERSION ] && [ -d /var/lib/pgsql/base/template1 ]
-	then
-		export PGDATA=/var/lib/pgsql
-	else
-		export PGDATA=/var/lib/pgsql/data
-	fi
+	echo -n $"Stopping ${NAME} service: "
 	su -l postgres -s /bin/sh -c "/usr/bin/pg_ctl stop -D $PGDATA -s -m fast" > /dev/null 2>&1
-        ret=$? 
-        if [ $ret -eq 0 ]; then
-	    echo_success
-        else
-            echo_failure
-        fi
+	ret=$? 
+	if [ $ret -eq 0 ]
+	then
+		echo_success
+	else
+		echo_failure
+	fi
 	echo
-	rm -f /var/run/postmaster.pid
-	rm -f /var/lock/subsys/postgresql
+	rm -f /var/run/postmaster.${PGPORT}.pid
+	rm -f /var/lock/subsys/${NAME}
 }
 
 restart(){
@@ -191,7 +201,7 @@ restart(){
 }
 
 condrestart(){
-    [ -e /var/lock/subsys/postgresql ] && restart || :
+    [ -e /var/lock/subsys/${NAME} ] && restart
 }
 
 reload(){
