@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 1
+Release: 2
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -28,7 +28,6 @@ Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
 BuildPrereq: libtiff-devel, libungif-devel, zlib-devel, perl
-Requires: bzip2, freetype, libjpeg, libpng, libtiff, libungif, zlib
 BuildRequires: freetype-devel >= 2.0.1
 BuildRequires: automake >= 1.6 autoconf >= 2.57 libtool >= 1.5
 
@@ -219,6 +218,7 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 %doc index.html www images QuickStart.txt
 %doc README.txt
 %attr(755,root,root) %{_libdir}/libMagick.so.*
+%attr(755,root,root) %{_libdir}/libWand.so.*
 %{_libdir}/ImageMagick-*
 %{_bindir}/[a-zW]*
 %{_mandir}/*/*
@@ -232,7 +232,9 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 %{_libdir}/libMagick.a
 %{_libdir}/libMagick.la
 %{_libdir}/libMagick.so
-%{_libdir}/libWand.*
+%{_libdir}/libWand.a
+%{_libdir}/libWand.la
+%{_libdir}/libWand.so
 %{_libdir}/pkgconfig/*.pc
 %{_includedir}/magick
 %{_includedir}/wand
@@ -256,6 +258,9 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 #%{_libdir}/perl*/site_perl/*/*/Image
 
 %changelog
+* Sat Sep 4 2004 Bill Nottingham <notting@redhat.com> 6.0.6.2-2
+- move libWand out of -devel, fix requirements (#131767)
+
 * Wed Sep 01 2004 Karsten Hopp <karsten@redhat.de> 6.0.6.2-1 
 - update to latest stable version
 - get rid of obsolete patches
