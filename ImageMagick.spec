@@ -1,6 +1,6 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 5.4.7
+%define VER 5.5.6
 %define Patchlevel %{nil}
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 10
+Release: 5
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -18,12 +18,13 @@ Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchleve
 Source: ftp://ftp.ImageMagick.org/ImageMagick/ImageMagick-%{version}.tar.bz2
 %endif
 Source1: magick_small.png
-Patch1: ImageMagick-5.3.5-lprhack.patch
+Patch1: ImageMagick-5.5.6-lprhack.patch
 Patch2: ImageMagick-5.3.6-nonroot.patch
 Patch3: ImageMagick-5.3.7-config.patch
-Patch4: ImageMagick-5.4.0-hp2xx.patch
+Patch4: ImageMagick-5.5.6-hp2xx.patch
 Patch5: ImageMagick-5.4.7-localdoc.patch
 Patch6: ImageMagick-5.4.7-stdin.patch
+Patch7: ImageMagick-5.5.6-automake.patch
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
@@ -50,7 +51,8 @@ ImageMagick-devel as well.
 %package devel
 Summary: Static libraries and header files for ImageMagick app development.
 Group: Development/Libraries
-Requires: ImageMagick = %{version}-%{release}
+Requires: ImageMagick = %{version}-%{release}, bzip2-devel, freetype-devel 
+Requires: libjpeg-devel, libpng-devel, libtiff-devel, zlib-devel, libxml2-devel
 
 %description devel
 Image-Magick-devel contains the static libraries and header files you'll
@@ -87,7 +89,9 @@ Install ImageMagick-c++ if you want to use any applications that use Magick++.
 %package c++-devel
 Summary: C++ bindings for the ImageMagick library
 Group: Development/Libraries
-Requires: ImageMagick = %{version}, ImageMagick-c++ = %{version}, ImageMagick-devel = %{version}
+Requires: ImageMagick = %{version}, ImageMagick-c++ = %{version}
+Requires: ImageMagick-devel = %{version}, bzip2-devel, freetype-devel
+Requires: libjpeg-devel, libpng-devel, libtiff-devel, zlib-devel, libxml2-devel
 
 %description c++-devel
 ImageMagick-devel contains the static libraries and header files you'll
@@ -109,6 +113,7 @@ however.
 %patch4 -p1 -b .hp2xx
 %patch5 -p1 -b .ImageMagick
 %patch6 -p1 -b .stdin
+%patch7 -p1 -b .amake
 
 %build
 libtoolize --force
@@ -134,7 +139,7 @@ Makefile:
 EOF
 #perl -pi -e 's,^includedir = \${prefix}/include/magick,includedir = \${prefix}/include/magick,g' magick/Makefile
 perl -pi -e 's,^install-exec-perl:.*,install-exec-perl:,g' Makefile
-rm -f PerlMagick/Makefile.*
+#rm -f PerlMagick/Makefile.*
 make install DESTDIR=$RPM_BUILD_ROOT
 
 # Generate desktop file
@@ -176,14 +181,14 @@ if [ -d $RPM_BUILD_ROOT%{_libdir}/site_perl ]; then
 fi
 
 pushd $RPM_BUILD_ROOT/%{_bindir}
-for i in %{_arch}-redhat-linux-*; do
-	[ -f $i ] && mv $i `echo $i |sed -e "s/^%{_arch}-redhat-linux-//"`
+for i in %{_target}-redhat-linux-*; do
+	[ -f $i ] && mv $i `echo $i |sed -e "s/^%{_target}-redhat-linux-//"`
 done
 popd
 
 pushd $RPM_BUILD_ROOT/%{_mandir}
-for i in */%{_arch}-redhat-linux-*; do
-	[ -f $i ] && mv $i `echo $i |sed -e "s,/%{_arch}-redhat-linux-,/,"`
+for i in */%{_target}-redhat-linux-*; do
+	[ -f $i ] && mv $i `echo $i |sed -e "s,/%{_target}-redhat-linux-,/,"`
 done
 popd
 
@@ -211,7 +216,8 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
 %defattr(-,root,root)
 %doc www images
 %doc README.txt ImageMagick.html
-%attr(755,root,root) %{_libdir}/libMagick.so.*
+%attr(755,root,root) %{_libdir}/libMagick-*.so.*
+%{_libdir}/ImageMagick-*
 %{_bindir}/[a-z]*
 %{_mandir}/*/*
 %{_datadir}/ImageMagick
@@ -220,7 +226,7 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
 
 %files devel
 %defattr(-,root,root)
-%{_bindir}/Magick*
+%{_bindir}/Magick-config
 %{_libdir}/libMagick.a
 %{_libdir}/libMagick.la
 %{_libdir}/libMagick.so
@@ -228,10 +234,11 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
 
 %files c++
 %defattr(-,root,root)
-%{_libdir}/libMagick++.so.*
+%{_libdir}/libMagick++-*.so.*
 
 %files c++-devel
 %defattr(-,root,root)
+%{_bindir}/Magick++-config
 %{_includedir}/Magick++
 %{_includedir}/Magick++.h
 %{_libdir}/libMagick++.a
@@ -244,6 +251,37 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
 #%{_libdir}/perl*/site_perl/*/*/Image
 
 %changelog
+* Wed Jun 04 2003 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
+* Thu May 29 2003 Tim Powers <timp@redhat.com> %{nil}-4
+- rebuild for RHEL to fix broken deps
+
+* Thu May 15 2003 Tim Powers <timp@redhat.com> 5.5.6-3
+- rebuild again to fix broken dep on libMagick.so.5
+
+* Mon May 12 2003 Karsten Hopp <karsten@redhat.de> 5.5.6-2
+- rebuild
+
+* Fri May 09 2003 Karsten Hopp <karsten@redhat.de> 5.5.6-1
+- update
+- specfile fixes
+  #63897 (_target instead of _arch)
+  #74521 (SRPM doesn't compile)
+  #80441 (RFE: a newer version of ImageMagick is available)
+  #88450 (-devel package missing dependancy)
+  #57396 (convert won't read RAW format images)
+- verified that the upstream version fixes the following bugreports:
+  #57544 (display cannot handle many xpm's which both ee and rh71 display can)
+  #63727 (ImageMagick fails to handle RGBA files)
+  #73864 (composite dumps core on certain operations)
+  #78242 (Header files for c missing in devel rpms)
+  #79783 (magick_config.h is missing from ImageMagick-c++-devel)
+  #80117 (Documentation is installed twice by RPM )
+  #82762 (Trouble with browsing help files)
+  #85760 (Segmentation fault)
+  #86120 (eps->ppm convert crashes)
+
 * Wed Jan 22 2003 Tim Powers <timp@redhat.com>
 - rebuilt
 
