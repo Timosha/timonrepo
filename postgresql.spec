@@ -44,7 +44,7 @@ Version: 7.1.3
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 4bp.2
+Release: 5.72
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz
@@ -952,6 +952,13 @@ rm -f perlfiles.list
 %endif
 
 %changelog
+* Tue Nov 04 2003 David Jee <djee@redhat.com> [7.1.3-5.72]
+- Add to the security patch a fix for to_ascii() buffer overrun.
+[Bug #108578]
+- Add to the security patch another fix that avoids running off
+the end of to_timestamp()'s input string when the input is shorter
+than the format string expects. [Bug #109067]
+
 * Wed Jan 9 2003 Andrew Overholt <overholt@redhat.com> [7.1.3-4bp.2]
 - Addition to security backpatch
 
