@@ -1,7 +1,7 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 6.0.6
-%define Patchlevel 2
+%define VER 6.0.7
+%define Patchlevel 1
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
 %if "%{Patchlevel}" != ""
@@ -9,11 +9,11 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 2
+Release: 1
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
-Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.gz
+Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.bz2
 %else
 Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.gz
 %endif
@@ -258,6 +258,9 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 #%{_libdir}/perl*/site_perl/*/*/Image
 
 %changelog
+* Sun Sep 12 2004 Karsten Hopp <karsten@redhat.de> 6.0.7.1-1 
+- update to 6.0.7 Patchlevel 1, fixes #132106
+
 * Sat Sep 4 2004 Bill Nottingham <notting@redhat.com> 6.0.6.2-2
 - move libWand out of -devel, fix requirements (#131767)
 
