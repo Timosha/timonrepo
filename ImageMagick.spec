@@ -1,7 +1,7 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 6.0.7
-%define Patchlevel 1
+%define VER 6.2.0
+%define Patchlevel 7
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
 %if "%{Patchlevel}" != ""
@@ -9,22 +9,18 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 7
+Release: 1
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
-Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.bz2
+Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.gz
 %else
 Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.gz
 %endif
 Source1: magick_small.png
-Patch2: ImageMagick-5.3.6-nonroot.patch
-Patch3: ImageMagick-5.3.7-config.patch
-Patch4: ImageMagick-6.0.6-hp2xx.patch
-Patch5: ImageMagick-5.4.7-localdoc.patch
-Patch6: ImageMagick-5.5.7-stdin.patch
-Patch7: ImageMagick-5.5.7-automake.patch
-Patch8: ImageMagick-6.0.7-vsnprintf.patch
+Patch1: ImageMagick-6.2.0-lprhack.patch
+Patch2: ImageMagick-6.2.0-hp2xx.patch
+Patch3: ImageMagick-6.0.7-vsnprint.patch
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
@@ -108,13 +104,9 @@ however.
 
 %prep
 %setup -q -n %{name}-%{VER}
-#%patch2 -p1 -b .nonroot
-#%patch3 -p1 -b .config
-%patch4 -p1 -b .hp2xx
-%patch5 -p1 -b .ImageMagick
-# KH: %patch6 -p1 -b .stdin
-#%patch7 -p1 -b .amake
-%patch8 -p1 -b .vsnprintf
+%patch1 -p1 -b .lpr
+%patch2 -p1 -b .hp2xx
+%patch3 -p1 -b .vsnprintf
 
 %build
 libtoolize --copy --force
@@ -262,6 +254,11 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 #%{_libdir}/perl*/site_perl/*/*/Image
 
 %changelog
+* Wed Mar 16 2005  <mclasen@redhat.com> - 6.2.0.7-1
+- Update to 6.2.0 to fix a number of security issues:
+  #145112 (CAN-2005-05), #151265 (CAN-2005-0397)
+- Drop a lot of upstreamed patches
+
 * Wed Mar  2 2005 Matthias Clasen <mclasen@redhat.com> 6.0.7.1-7
 - rebuild with gcc4
 - remove an extraneous vsnprintf prototype which causes
