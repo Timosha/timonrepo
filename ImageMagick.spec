@@ -1,7 +1,7 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 5.5.7
-%define Patchlevel 15
+%define VER 6.0.6
+%define Patchlevel 2
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
 %if "%{Patchlevel}" != ""
@@ -9,23 +9,21 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 1.3
+Release: 1
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
-Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.bz2
+Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.gz
 %else
-Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
+Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.gz
 %endif
 Source1: magick_small.png
-Patch1: ImageMagick-5.5.6-lprhack.patch
 Patch2: ImageMagick-5.3.6-nonroot.patch
 Patch3: ImageMagick-5.3.7-config.patch
-Patch4: ImageMagick-5.5.6-hp2xx.patch
+Patch4: ImageMagick-6.0.6-hp2xx.patch
 Patch5: ImageMagick-5.4.7-localdoc.patch
 Patch6: ImageMagick-5.5.7-stdin.patch
 Patch7: ImageMagick-5.5.7-automake.patch
-Patch8: ImageMagick-5.5.7-freetype.patch
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
@@ -54,6 +52,7 @@ Summary: Static libraries and header files for ImageMagick app development.
 Group: Development/Libraries
 Requires: ImageMagick = %{version}-%{release}, bzip2-devel, freetype-devel 
 Requires: libjpeg-devel, libpng-devel, libtiff-devel, zlib-devel, libxml2-devel
+Requires: libexif-devel
 
 %description devel
 Image-Magick-devel contains the static libraries and header files you'll
@@ -108,14 +107,12 @@ however.
 
 %prep
 %setup -q -n %{name}-%{VER}
-%patch1 -p1 -b .lpr
 #%patch2 -p1 -b .nonroot
 #%patch3 -p1 -b .config
 %patch4 -p1 -b .hp2xx
 %patch5 -p1 -b .ImageMagick
-%patch6 -p1 -b .stdin
+# KH: %patch6 -p1 -b .stdin
 #%patch7 -p1 -b .amake
-%patch8 -p1 -b .ftype
 
 %build
 libtoolize --copy --force
@@ -150,7 +147,7 @@ make install DESTDIR=$RPM_BUILD_ROOT PERL_MAKE_OPTIONS="%perl_make_options"
 #cp %{SOURCE1} $RPM_BUILD_ROOT/usr/share/icons
 
 # Add files make install constantly forgets
-install -c -m 644 coders/*.mgk $RPM_BUILD_ROOT/usr/share/ImageMagick
+install -c -m 644 config/*.mgk $RPM_BUILD_ROOT/usr/share/ImageMagick
 
 #cat >$RPM_BUILD_ROOT/etc/X11/applnk/Graphics/ImageMagick.desktop <<EOF
 #[Desktop Entry]
@@ -219,11 +216,11 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 
 %files
 %defattr(-,root,root)
-%doc index.html www images Copyright.txt QuickStart.txt
+%doc index.html www images QuickStart.txt
 %doc README.txt
 %attr(755,root,root) %{_libdir}/libMagick.so.*
 %{_libdir}/ImageMagick-*
-%{_bindir}/[a-z]*
+%{_bindir}/[a-zW]*
 %{_mandir}/*/*
 %{_datadir}/ImageMagick
 #/etc/X11/applnk/Graphics/ImageMagick.desktop
@@ -235,8 +232,10 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 %{_libdir}/libMagick.a
 %{_libdir}/libMagick.la
 %{_libdir}/libMagick.so
+%{_libdir}/libWand.*
 %{_libdir}/pkgconfig/*.pc
 %{_includedir}/magick
+%{_includedir}/wand
 
 %files c++
 %defattr(-,root,root)
@@ -257,6 +256,18 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 #%{_libdir}/perl*/site_perl/*/*/Image
 
 %changelog
+* Wed Sep 01 2004 Karsten Hopp <karsten@redhat.de> 6.0.6.2-1 
+- update to latest stable version
+- get rid of obsolete patches
+- fix remaining patches
+
+* Sat Jun 19 2004 Alan Cox <alan@redhat.com>
+- Easyfixes (#124791) - fixed missing dependancy between -devel and
+  libexif-devel
+
+* Tue Jun 15 2004 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
 * Tue Mar 23 2004 Karsten Hopp <karsten@redhat.de> 5.5.7.15-1.3 
 - freetype patch to fix convert (#115716)
 
