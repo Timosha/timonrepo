@@ -62,8 +62,11 @@
 # postgres-owned processes laying about.
 
 
-# PGVERSION is:
-PGVERSION=8.0
+# PGVERSION is the full package version, e.g., 7.4.7
+# Note: the specfile ordinarily updates this during install
+PGVERSION=xxxx
+# PGMAJORVERSION is major version, e.g., 7.4 (this should match PG_VERSION)
+PGMAJORVERSION=`echo "$PGVERSION" | sed 's/^\([0-9]*\.[0-9]*\).*$/\1/'`
 
 # Source function library.
 INITD=/etc/rc.d/init.d
@@ -134,7 +137,7 @@ start(){
 	then
 	# Check version of existing PGDATA
 
-		if [ `cat "$PGDATA/PG_VERSION"` != "$PGVERSION" ]
+		if [ x`cat "$PGDATA/PG_VERSION"` != x"$PGMAJORVERSION" ]
 		then
 			SYSDOCDIR="(Your System's documentation directory)"
 			if [ -d "/usr/doc/postgresql-$PGVERSION" ]
@@ -154,7 +157,9 @@ start(){
 				SYSDOCDIR=/usr/share/doc/packages
 			fi
 			echo
-			echo $"An old version of the database format was found.\nYou need to upgrade the data format before using PostgreSQL.\nSee $SYSDOCDIR/postgresql-$PGVERSION/README.rpm-dist for more information."
+			echo $"An old version of the database format was found."
+			echo $"You need to upgrade the data format before using PostgreSQL."
+			echo $"See $SYSDOCDIR/postgresql-$PGVERSION/README.rpm-dist for more information."
 			exit 1
 		fi
 

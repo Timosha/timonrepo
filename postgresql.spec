@@ -64,7 +64,7 @@ Version: 8.0.1
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 1
+Release: 2
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -483,7 +483,8 @@ cp src/tutorial/* $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
 if [ -d /etc/rc.d/init.d ]
 then
 	install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
-	install -m 755 %{SOURCE3} $RPM_BUILD_ROOT/etc/rc.d/init.d/postgresql
+	sed 's/^PGVERSION=.*$/PGVERSION=%{version}/' <%{SOURCE3} >postgresql.init
+	install -m 755 postgresql.init $RPM_BUILD_ROOT/etc/rc.d/init.d/postgresql
 fi
 
 # Remove stuff we don't want to ship.
@@ -784,6 +785,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Feb 21 2005 Tom Lane <tgl@redhat.com> 8.0.1-2
+- Repair improper error message in init script when PGVERSION doesn't match.
+- Arrange for auto update of version embedded in init script.
+
 * Sun Jan 30 2005 Tom Lane <tgl@redhat.com> 8.0.1-1
 - Update to PostgreSQL 8.0.1.
 - Add versionless symlinks to jar files (bz#145744)
