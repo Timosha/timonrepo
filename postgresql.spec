@@ -64,7 +64,7 @@ Version: 8.0.1
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 4
+Release: 5
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -84,6 +84,7 @@ Patch1: rpm-pgsql.patch
 Patch2: postgresql-src-tutorial.patch
 Patch3: postgresql-logging.patch
 Patch4: postgresql-test.patch
+Patch5: pgtcl-no-rpath.patch
 Buildrequires: perl glibc-devel bison flex
 Prereq: /sbin/ldconfig initscripts
 %if %python
@@ -358,6 +359,11 @@ cp -p %{SOURCE17} .
    unzip %{SOURCE20}
    PGTCLDOCDIR=`basename %{SOURCE20} .zip`
    mv $PGTCLDOCDIR Pgtcl-docs
+
+%patch5 -p0
+   pushd Pgtcl
+%aconfver
+   popd
 %endif
 
 %build
@@ -787,6 +793,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Fri Mar 11 2005 Tom Lane <tgl@redhat.com> 8.0.1-5
+- Remove unwanted rpath specification from pgtcl (bz#150649)
+
 * Wed Mar  2 2005 Tom Lane <tgl@redhat.com> 8.0.1-4
 - Attach Obsoletes: declarations for rh-postgresql to subpackages (bz#144435)
 - Make Requires: and Prereq: package linkages specify release not only
