@@ -51,8 +51,10 @@
 # VErsion 7.3 Lamar OWen <lamar.owen@ramifordistat.net>
 # Multiple postmasters, courtesy Karl DeBisschop
 
+# VErsion 7.4 Lamar Owen.
+
 # PGVERSION is:
-PGVERSION=7.3
+PGVERSION=7.4
 
 # Source function library.
 INITD=/etc/rc.d/init.d
@@ -101,7 +103,7 @@ start(){
 	then
 	# Check version of existing PGDATA
 
-		if [ `cat $PGDATA/PG_VERSION` != '7.3' ]
+		if [ `cat $PGDATA/PG_VERSION` != '7.4' ]
 		then
 			SYSDOCDIR="(Your System's documentation directory)"
 			if [ -d /usr/doc/postgresql-$PGVERSION ]
