@@ -67,7 +67,7 @@ Version: 7.4.3
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 2
+Release: 3
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -771,6 +771,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Jul 10 2004 Tom Lane <tgl@redhat.com> 7.4.3-3
+- Undo ill-considered chkconfig change that causes server to start
+  immediately upon install.  Mea culpa (bug 127552).
+
 * Sat Jul 03 2004 Tom Lane <tgl@redhat.com> 7.4.3-2
 - Update JDBC jars to driver build 214.
 

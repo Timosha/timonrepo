@@ -2,7 +2,7 @@
 # postgresql	This is the init script for starting up the PostgreSQL
 #		server
 #
-# chkconfig: 2345 75 25
+# chkconfig: - 75 25
 # description: Starts and stops the PostgreSQL backend daemon that handles \
 #	       all database requests.
 # processname: postmaster
@@ -110,7 +110,7 @@ start(){
 	then
 	# Check version of existing PGDATA
 
-		if [ `cat $PGDATA/PG_VERSION` != '7.4' ]
+		if [ `cat $PGDATA/PG_VERSION` != "$PGVERSION" ]
 		then
 			SYSDOCDIR="(Your System's documentation directory)"
 			if [ -d /usr/doc/postgresql-$PGVERSION ]
