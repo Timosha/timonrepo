@@ -24,6 +24,7 @@ Patch4: ImageMagick-6.0.6-hp2xx.patch
 Patch5: ImageMagick-5.4.7-localdoc.patch
 Patch6: ImageMagick-5.5.7-stdin.patch
 Patch7: ImageMagick-5.5.7-automake.patch
+Patch8: ImageMagick-6.0.7-vsnprintf.patch
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
@@ -113,6 +114,7 @@ however.
 %patch5 -p1 -b .ImageMagick
 # KH: %patch6 -p1 -b .stdin
 #%patch7 -p1 -b .amake
+%patch8 -p1 -b .vsnprintf
 
 %build
 libtoolize --copy --force
@@ -262,6 +264,8 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 %changelog
 * Wed Mar  2 2005 Matthias Clasen <mclasen@redhat.com> 6.0.7.1-7
 - rebuild with gcc4
+- remove an extraneous vsnprintf prototype which causes
+  gcc4 to complain
 
 * Mon Oct 11 2004 Tim Waugh <twaugh@redhat.com> 6.0.7.1-4
 - The devel subpackage requires XFree86-devel (bug #126509).

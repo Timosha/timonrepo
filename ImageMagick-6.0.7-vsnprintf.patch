@@ -1,0 +1,14 @@
+--- ImageMagick-6.0.7/magick/studio.h.vsnprintf	2005-03-03 23:05:58.000000000 -0500
++++ ImageMagick-6.0.7/magick/studio.h	2005-03-03 23:06:36.000000000 -0500
+@@ -161,11 +161,6 @@
+   strlcpy(char *,const char *,size_t);
+ #endif
+ 
+-#if defined(HAVE_VSNPRINTF) && !defined(HAVE_VSNPRINTF_PROTOTYPE)
+-extern int
+-  vsnprintf(char *,size_t,const char *,va_list);
+-#endif
+-
+ #if defined(__WINDOWS__) || defined(POSIX)
+ # include <sys/types.h>
+ # include <sys/stat.h>
