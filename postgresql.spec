@@ -52,7 +52,7 @@ Version: 7.3.4
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 1.rhl9
+Release: 2
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz
@@ -349,7 +349,7 @@ export LIBNAME=%{_lib}
 	--with-pam \
 %endif
 %if %kerberos
-	--with-krb5=/usr/kerberos \
+	--with-krb5 \
 %endif
 %if %nls
 	--enable-nls \
@@ -698,10 +698,6 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
-* Fri Oct 31 2003 Andrew Overholt <overholt@redhat.com> 7.3.4-1.rhl9
-- Erratum version for RHL 9.
-- Fix kerberos location (/usr/kerberos)
-
 * Thu Sep 04 2003 David Jee <djee@redhat.com> 7.3.4-2
 - fix src-tutorial patch handling to include all files in the
   original postgres.tar.gz (*.html catalogs.gif connections.gif
