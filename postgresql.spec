@@ -30,7 +30,7 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 7.2.1
+Version: 7.2.2
 
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
@@ -52,20 +52,18 @@ Version: 7.2.1
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 17
+Release: 1
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz
 Source3: postgresql.init
 Source4: file-lists.tar.gz
-Source5: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz.md5
 Source6: README.rpm-dist
 Source7: migration-scripts.tar.gz
 Source8: http://jdbc.postgresql.org/download/devpgjdbc1.jar
 Source9: http://jdbc.postgresql.org/download/devpgjdbc2.jar
 Source10: http://jdbc.postgresql.org/download/pgjdbc1.jar
 Source11: http://jdbc.postgresql.org/download/pgjdbc2.jar
-Source12: postgresql-dump.1.gz
 Source15: postgresql-bashprofile
 Patch1: rpm-pgsql-7.2.patch
 Patch3: postgresql-7.2rc2-betterquote.patch
@@ -465,12 +463,6 @@ make DESTDIR=$RPM_BUILD_ROOT install
 %endif
 
 
-# man pages....
-# the postgresql-dump manpage.....
-pushd $RPM_BUILD_ROOT%{_mandir}
-cp %{SOURCE12} man1
-popd
-
 # install dev headers.
 
 make DESTDIR=$RPM_BUILD_ROOT install-all-headers
@@ -825,8 +817,8 @@ rm -f perlfiles.list
 %{_mandir}/man1/pg_dumpall.1*
 %{_mandir}/man1/psql.1*
 %{_mandir}/man1/vacuumdb.1*
+%{_mandir}/man1/pg_restore.1*
 %{_mandir}/man7/*
-
 
 %if %sgmldocs
 %files docs
@@ -900,8 +892,12 @@ rm -f perlfiles.list
 %attr(755,root,root) /usr/lib/libpgtcl.so.*
 /usr/lib/libpgtcl.so
 /usr/bin/pgtclsh
+/usr/bin/pltcl_delmod
+/usr/bin/pltcl_listmod
+/usr/bin/pltcl_loadmod
 %{_mandir}/man1/pgtclsh.1*
 /usr/lib/pgsql/pltcl.so
+/usr/share/pgsql/unknown.pltcl
 %endif
 
 %if %tkpkg
@@ -931,6 +927,7 @@ rm -f perlfiles.list
 %dir /usr/lib/perl5/site_perl/%{_arch}-linux/auto
 /usr/share/pgsql/perl5
 %{_mandir}/man3/Pg.*
+/usr/lib/pgsql/plperl.so
 %endif
 
 %if %plperl
@@ -945,6 +942,7 @@ rm -f perlfiles.list
 %doc src/interfaces/python/README src/interfaces/python/tutorial
 /usr/lib/python%{pyver}/site-packages/_pgmodule.so
 /usr/lib/python%{pyver}/site-packages/*.py
+/usr/lib/pgsql/plpython.so
 %endif
 
 %if %jdbc
@@ -961,6 +959,9 @@ rm -f perlfiles.list
 %endif
 
 %changelog
+* Wed Sep  4 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.2-1
+- 7.2.2 - security update
+
 * Wed Aug 28 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-17
 - Add bison and flex to buildprereq (#71590)
 
