@@ -67,7 +67,7 @@ Version: 7.4.6
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 3
+Release: 4
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -790,6 +790,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Jan 11 2005 Dan Walsh <dwalsh@redhat.com> 7.4.6-4
+- Add restorecon to postgresql.init in order to restore database to correct
+- SELinux context.
+
 * Thu Dec 16 2004 Tom Lane <tgl@redhat.com> 7.4.6-3
 - Update to PyGreSQL 3.6 (to fix bug #142711)
 - Adjust a few file permissions (bug #142431)
