@@ -146,9 +146,9 @@ make install DESTDIR=$RPM_BUILD_ROOT PERL_MAKE_OPTIONS="%perl_make_options"
 #cp %{SOURCE1} $RPM_BUILD_ROOT/usr/share/icons
 
 # Add files make install constantly forgets
-mkdir -p $RPM_BUILD_ROOT/usr/lib/ImageMagick-%{VER}/config
-install -c -m 644 config/*.mgk $RPM_BUILD_ROOT/usr/lib/ImageMagick-%{VER}/config/
-mv -f $RPM_BUILD_ROOT/usr/share/ImageMagick-%{VER}/config/* $RPM_BUILD_ROOT/usr/lib/ImageMagick-%{VER}/config/
+mkdir -p $RPM_BUILD_ROOT/%{_libdir}/ImageMagick-%{VER}/config
+install -c -m 644 config/*.mgk $RPM_BUILD_ROOT/%{_libdir}/ImageMagick-%{VER}/config/
+mv -f $RPM_BUILD_ROOT/%{_datadir}/ImageMagick-%{VER}/config/* $RPM_BUILD_ROOT/%{_libdir}/ImageMagick-%{VER}/config/
 
 #cat >$RPM_BUILD_ROOT/etc/X11/applnk/Graphics/ImageMagick.desktop <<EOF
 #[Desktop Entry]
