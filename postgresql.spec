@@ -4,7 +4,7 @@
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 7.0.3
-Release: 8a
+Release: 9.2
 License: BSD
 Group: Applications/Databases
 # originally .gz
@@ -16,8 +16,8 @@ Source6: README.rpm-dist.postgresql-%{version}
 Source7: pg-migration-scripts-%{version}.tar.gz
 Source8: logrotate.postgresql-%{version}
 Source9: pg_options-%{version}
-Source10: http://www.retep.org.uk/postgres/jdbc7.0-1.1.jar
-Source11: http://www.retep.org.uk/postgres/jdbc7.0-1.2.jar
+Source10: http://jdbc.postgresql.org/download/jdbc7.0-1.1.jar
+Source11: http://jdbc.postgresql.org/download/jdbc7.0-1.2.jar
 Source12: postgresql-dump.1.gz
 Source14: rh-pgdump.sh
 Source15: pg_dumpall.1
@@ -25,7 +25,8 @@ Patch0: postgresql-%{version}-alpha.patch.gz
 Patch1: rpm-pgsql-%{version}.patch
 Patch2: postgresql-7.0.3-ia64-2.patch
 Patch3: postgresql-7.0.3-mkstemp.patch
-Patch10: postgresql-7.0.2-s390x.patch
+Patch4: postgresql-%{version}-security.patch
+Patch10: postgresql-7.0.2-s390.patch
 Requires: perl
 Prereq: /sbin/chkconfig /sbin/ldconfig /usr/sbin/useradd initscripts
 BuildPrereq: /lib/cpp
@@ -195,8 +196,9 @@ system, including regression tests and benchmarks.
 %endif
 
 %patch3 -p1
+%patch4 -p1
 
-%ifarch s390 s390x
+%ifarch s390
 %patch10 -p1 -b .s390
 %endif
 
@@ -626,6 +628,12 @@ rm -f perlfiles.list
 
 
 %changelog
+* Wed Jan 9 2003 Andrew Overholt <overholt@redhat.com> [7.0.3-9.2]
+- addition to security backpatch
+
+* Tue Jan 7 2003 Andrew Overholt <overholt@redhat.com> [7.0.3-9]
+- add security backpatch from more recent versions (~#74505)
+
 * Thu Mar 22 2001 Trond Eivind Glomsrød <teg@redhat.com>
 - obsolete postgresql-test when not building it (#32640)
 - make /lib/cpp a buildprereq, not a standard prereq
