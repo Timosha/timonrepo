@@ -1,4 +1,5 @@
-baae3796a93a2aaac512cc05abfebc89  pg-migration-scripts-7.0.2.tar.gz
-c139d0716a459622c463bab8c438e3cc  postgresql-7.0.2-alpha.patch.gz
-fc512e38394256e2749299fdd69a937e  postgresql-7.0.2.tar.gz
+57d69fb52be57f7caa91cccf7d24d199  file-lists-pgsql-7.0.3.tar.gz
+baae3796a93a2aaac512cc05abfebc89  pg-migration-scripts-7.0.3.tar.gz
+c139d0716a459622c463bab8c438e3cc  postgresql-7.0.3-alpha.patch.gz
+b416c04e6c91967160dfde866293ee6f  postgresql-7.0.3.tar.gz
 3d2e8223f6bb715659cbecedeae81ccc  postgresql-dump.1.gz
