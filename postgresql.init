@@ -94,7 +94,6 @@ fi
 # Set defaults for configuration variables
 PGENGINE=/usr/bin
 PGPORT=5432
-export PGDATADIR=/var/lib/pgsql
 export PGDATA=/var/lib/pgsql
 if [ -f $PGDATA/PG_VERSION ] && [ -d $PGDATA/base/template1 ]
 then
@@ -166,7 +165,7 @@ start(){
 			mkdir -p $PGDATA || exit 1
 			chown postgres:postgres $PGDATA
 			chmod go-rwx $PGDATA
-			[ -x /sbin/restorecon ] && restorecon -R $PGDATADIR 
+			[ -x /sbin/restorecon ] && restorecon -R $PGDATA 
 		fi
 		# Make sure the locale from the initdb is preserved for later startups...
 		[ -f /etc/sysconfig/i18n ] && cp /etc/sysconfig/i18n $PGDATA/../initdb.i18n
