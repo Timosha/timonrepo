@@ -1,7 +1,7 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
 %define VER 5.4.3
-%define Patchlevel 5
+%define Patchlevel 11
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
 %if "%{Patchlevel}" != ""
@@ -231,6 +231,9 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/perl*/site_perl/*/*/Image
 
 %changelog
+* Thu Mar 14 2002 Bernhard Rosenkraenzer <bero@redhat.com> 5.4.3.11-1
+- Update to pl 11
+
 * Fri Feb 22 2002 Bernhard Rosenkraenzer <bero@redhat.com> 5.4.3.5-1
 - Update to 5.4.3 pl5; this fixes #58080
 
