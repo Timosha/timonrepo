@@ -30,7 +30,7 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 7.3.2
+Version: 7.3.4
 
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
@@ -52,22 +52,26 @@ Version: 7.3.2
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 3
+Release: 1.rhl9
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz
 Source3: postgresql.init
 Source5: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz.md5
 Source6: README.rpm-dist
-Source8: http://jdbc.postgresql.org/download/pg73b1jdbc1.jar
-Source9: http://jdbc.postgresql.org/download/pg73b1jdbc2.jar
-Source10: http://jdbc.postgresql.org/download/pg73b1jdbc3.jar
+Source8: http://jdbc.postgresql.org/download/pg73jdbc1.jar
+Source9: http://jdbc.postgresql.org/download/pg73jdbc2.jar
+Source10: http://jdbc.postgresql.org/download/pg73jdbc3.jar
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
+Source17: postgresql-7.3.4-USpdfdocs.tar.gz
 Patch1: rpm-pgsql-%{version}.patch
 Patch2: rpm-multilib-%{version}.patch
 Patch3: postgresql-%{version}-tighten.patch
-Patch4: postgresql-7.3.1-isblank.patch
+Patch4: postgresql-ppc64.patch
+Patch5: postgresql-plperl.patch
+Patch6: postgresql-7.3.4-src-tutorial.patch
+Patch7: postgresql-7.3.4-s390-pic.patch
 Buildrequires: perl glibc-devel bison flex
 Prereq: /sbin/ldconfig initscripts
 %if %python
@@ -75,6 +79,7 @@ BuildPrereq: python-devel
 %endif
 %if %tcl
 BuildPrereq: tcl
+#Buildrequires: tcl-devel
 %endif
 %if %tkpkg
 BuildPrereq: tk
@@ -99,6 +104,8 @@ BuildPrereq: pam-devel
 
 Url: http://www.postgresql.org/ 
 Obsoletes: postgresql-clients
+Obsoletes: postgresql-perl
+Obsoletes: postgresql-tk
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 
 # This is the PostgreSQL Global Development Group Official RPMset spec file,
@@ -148,7 +155,9 @@ if you're installing the postgresql-server package.
 %package libs
 Summary: The shared libraries required for any PostgreSQL clients.
 Group: Applications/Databases
-Provides: libpq.so.2 libpq.so.2.0 libpq.so
+#XXX should not be needed:
+#Provides: libpq.so.3 libpq.so.3.0
+Provides: libpq.so
 
 %description libs
 The postgresql-libs package provides the essential shared libraries for any 
@@ -180,7 +189,7 @@ Summary: Extra documentation for PostgreSQL
 Group: Applications/Databases
 %description docs
 The postgresql-docs package includes the SGML source for the documentation
-as well as the documentation in other formats, and some extra documentation.
+as well as the documentation in PDF format and some extra documentation.
 Install this package if you want to help with the PostgreSQL documentation
 project, or if you want to generate printed documentation.
 
@@ -281,17 +290,33 @@ system, including regression tests and benchmarks.
 
 %prep
 %setup -q 
-
+pushd doc
+tar zxf postgres.tar.gz
+popd
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
 autoconf
+pushd doc
+tar -zcf postgres.tar.gz *.html catalogs.gif connections.gif stylesheet.css
+rm -f *.html catalogs.gif connections.gif stylesheet.css
+popd
+
+cp -p %{SOURCE17} .
+tar zxf %{SOURCE17}
 
 %build
 
 CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS
 CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS
+%if %kerberos
+CPPFLAGS="${CPPFLAGS} -I%{_includedir}/et" ; export CPPFLAGS
+CFLAGS="${CFLAGS} -I%{_includedir}/et" ; export CFLAGS
+%endif
 
 # Strip out -ffast-math from CFLAGS....
 
@@ -402,19 +427,11 @@ install -d -m 700 $RPM_BUILD_ROOT/etc/sysconfig/pgsql
 # gzip doc/internals.ps
 cp %{SOURCE6} README.rpm-dist
 mv $RPM_BUILD_ROOT%{_docdir}/postgresql/html doc
-
 rm -rf $RPM_BUILD_ROOT%{_docdir}/postgresql
 %if %tkpkg
 %else
 rm -rf $RPM_BUILD_ROOT%{_mandir}/man1/pgtksh.*
 %endif
-
-# Symlink libpq.so.2.0 to libpq.so.2 for backwards compatibility, until 
-# -soname patches are the norm.
-pushd $RPM_BUILD_ROOT/usr/lib
-ln -s libpq.so.2 libpq.so.2.0
-popd
-
 
 %find_lang libpq
 %find_lang pg_dump
@@ -437,7 +454,6 @@ useradd -M -n -g postgres -o -r -d /var/lib/pgsql -s /bin/bash \
 touch /var/log/pgsql
 chown postgres.postgres /var/log/pgsql
 chmod 0700 /var/log/pgsql
-
 
 %post server
 chkconfig --add postgresql
@@ -515,6 +531,8 @@ rm -rf $RPM_BUILD_ROOT
 %files docs
 %defattr(-,root,root)
 %doc doc/src/*
+%doc *-US.pdf
+%doc src/tutorial
 
 %files contrib
 %defattr(-,root,root)
@@ -667,9 +685,9 @@ rm -rf $RPM_BUILD_ROOT
 %if %jdbc
 %files jdbc
 %defattr(-,root,root)
-%{_datadir}/pgsql/pg73b1jdbc1.jar
-%{_datadir}/pgsql/pg73b1jdbc2.jar
-%{_datadir}/pgsql/pg73b1jdbc3.jar
+%{_datadir}/pgsql/pg73jdbc1.jar
+%{_datadir}/pgsql/pg73jdbc2.jar
+%{_datadir}/pgsql/pg73jdbc3.jar
 %endif
 
 %if %test
@@ -680,6 +698,67 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Fri Oct 31 2003 Andrew Overholt <overholt@redhat.com> 7.3.4-1.rhl9
+- Erratum version for RHL 9.
+- Fix kerberos location (/usr/kerberos)
+
+* Thu Sep 04 2003 David Jee <djee@redhat.com> 7.3.4-2
+- fix src-tutorial patch handling to include all files in the
+  original postgres.tar.gz (*.html catalogs.gif connections.gif
+  stylesheet.css)
+
+* Thu Jul 31 2003 David Jee <djee@redhat.com> 7.3.4-1
+- initial 7.3.4 build
+
+* Wed Jul 30 2003 Andrew Overholt <overholt@redhat.com> 7.3.3-10
+- fix basename call in postgresql.init (courtesy E. Jay Berkenbilt)
+- fix x86_64 issues with /usr/lib64 and regression tests
+- backout previous lib64 change
+
+* Tue Jul 22 2003 Nalin Dahyabhai <nalin@redhat.com> 7.3.3-9
+- rebuild for updated krb5 1.3, which moves headers and libs to /usr
+- use -fPIC instead of -fpic on s390x to allow the plpython bits to link
+
+* Wed Jul 16 2003 Olga Rodimina <rodimina@redhat.com> 7.3.3-8
+- fix tutorial location
+- modify tutorial patch to be 7.3.3-specific
+
+* Mon Jul 14 2003 Chip Turner <cturner@redhat.com>
+- rebuild for new perl 5.8.1
+
+* Fri Jul 11 2003 Olga Rodimina <rodimina@redhat.com> 7.3.3-6
+- add src/tutorial to -docs package [Bug #54711]
+- add postgresql-src-tutorial.patch [Bug #54711]
+- postgresql-src-tutorial.patch builds src/tutorial before
+  installing and corrects entry specifying path to tutorial in 
+  tutorial-sql.html
+
+* Mon Jul 07 2003 Kim Ho <kho@redhat.com> 7.3.3-5
+- add patch to use rpath when creating plperl [Bug #83000]
+- add Buildrequires: tcl-devel for libpgtcl --overholt
+
+* Fri Jun 13 2003 Andrew Overholt <overholt@redhat.com> 7.3.3-4
+- add PDF docs to -docs package [Bug #91941]
+
+* Wed Jun 04 2003 Andrew Overholt <overholt@redhat.com> 7.3.3-3
+- remove PGOPTS from init script [Bug #91943]
+- fix system startup 'S90postgresql' issue [Bug #91943]
+
+* Wed Jun 04 2003 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
+* Mon May 26 2003 Andrew Overholt <overholt@redhat.com> 7.3.3-1
+- initial 7.3.3 build
+
+* Thu May 22 2003 Florian La Roche <Florian.LaRoche@redhat.de>
+- remove libpq.so.2*
+
+* Wed Apr 16 2003 Andrew Overholt <overholt@redhat.com> 7.3.2-4
+- Obsolete postgresql-perl and postgresql-tk [Bugzilla #79814]
+
+* Mon Feb 17 2003 Elliot Lee <sopwith@redhat.com> 7.3.2-4
+- Add ppc64 patch
+
 * Fri Feb 14 2003 Andrew Overholt <overholt@redhat.com> 7.3.2-3
 - Remove pltcl.so from postgresql-tcl and plpython.so from postgresql-server.
   [Bugzilla #83906]

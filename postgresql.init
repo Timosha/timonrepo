@@ -66,6 +66,11 @@ TYPESET=`typeset -f|grep "declare"`
 
 # Find the name of the script
 NAME=`basename $0`
+if [ ${NAME:0:1} = "S" -o ${NAME:0:1} = "K" ]
+then
+	NAME=${NAME:3}
+fi
+
 
 # Set defaults for port and database directory
 PGPORT=5432
@@ -81,7 +86,6 @@ fi
 [ -f /etc/sysconfig/pgsql/${NAME} ] && . /etc/sysconfig/pgsql/${NAME}
 export PGDATA
 export PGPORT
-export PGOPTS
 
 # Check that networking is up.
 # Pretty much need it for postmaster.
