@@ -36,7 +36,7 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 7.2.3
+Version: 7.2.4
 
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
@@ -76,7 +76,7 @@ Source12: postgresql-dump.1.gz
 Source14: rh-pgdump.sh
 Source15: postgresql-bashprofile
 Patch1: rpm-pgsql-%{version}.patch
-Patch2: postgresql-%{version}-geo_ops.patch
+Patch2: postgresql-%{version}-security.patch
 Patch3: postgresql-%{version}-tighten.patch
 Buildrequires: perl glibc-devel
 Prereq: /sbin/ldconfig initscripts
@@ -708,12 +708,14 @@ rm -f perlfiles.list
 /usr/lib/pgsql/moddatetime.so
 /usr/lib/pgsql/noup.so
 /usr/lib/pgsql/pgcrypto.so
+/usr/lib/pgsql/pgstattuple.so
 /usr/lib/pgsql/refint.so
 /usr/lib/pgsql/rserv.so
 /usr/lib/pgsql/rtree_gist.so
 /usr/lib/pgsql/seg.so
 /usr/lib/pgsql/string_io.so
 /usr/lib/pgsql/timetravel.so
+/usr/lib/pgsql/tsearch.so
 /usr/lib/pgsql/user_locks.so
 /usr/share/pgsql/contrib/
 /usr/bin/dbf2pg
@@ -739,7 +741,8 @@ rm -f perlfiles.list
 /usr/bin/ApplySnapshot
 /usr/bin/InitRservTest
 /usr/bin/vacuumlo
-%doc contrib/*/README.* contrib/spi/*.example
+%doc %{_docdir}/postgresql/contrib/README.* 
+%doc %{_docdir}/postgresql/contrib/*.example
 
 %files libs -f libpq.lang
 %defattr(-,root,root)
@@ -764,6 +767,7 @@ rm -f perlfiles.list
 %{_mandir}/man1/ipcclean.1*
 %{_mandir}/man1/pg_ctl.1*
 %{_mandir}/man1/pg_passwd.1*
+%{_mandir}/man1/pg_restore.1*
 %{_mandir}/man1/postgres.1*
 %{_mandir}/man1/postmaster.1*
 %{_mandir}/man1/postgresql-dump.1*
@@ -793,6 +797,9 @@ rm -f perlfiles.list
 /usr/lib/libecpg.a
 /usr/lib/libpq++.a
 /usr/lib/libpgeasy.a
+%if %odbc
+/usr/lib/libpsqlodbc.a
+%endif
 %if %tcl
 /usr/lib/libpgtcl.a
 %endif
@@ -808,6 +815,10 @@ rm -f perlfiles.list
 /usr/bin/pgtclsh
 %{_mandir}/man1/pgtclsh.1*
 /usr/lib/pgsql/pltcl.so
+/usr/bin/pltcl_delmod
+/usr/bin/pltcl_listmod
+/usr/bin/pltcl_loadmod
+/usr/share/pgsql/unknown.pltcl
 %endif
 
 %if %tkpkg
@@ -829,6 +840,7 @@ rm -f perlfiles.list
 %defattr(-,root,root)
 %attr(755,root,root) /usr/lib/libpsqlodbc.so*
 /usr/share/pgsql/odbc.sql
+/usr/share/pgsql/odbc-drop.sql
 %endif
 
 %if %perl
@@ -851,6 +863,7 @@ rm -f perlfiles.list
 %doc src/interfaces/python/README src/interfaces/python/tutorial
 /usr/lib/python%{pyver}/site-packages/_pgmodule.so
 /usr/lib/python%{pyver}/site-packages/*.py
+/usr/lib/pgsql/plpython.so
 %endif
 
 %if %jdbc
@@ -870,6 +883,23 @@ rm -f perlfiles.list
 %endif
 
 %changelog
+* Mon Nov 03 2003 David Jee <djee@redhat.com>
+- 7.2.4-4.(73,80) - rename the to_ascii() patch to a generic security
+patch, and add another security patch to it, which avoids running off
+the end of to_timestamp()'s input string when the input is shorter than
+the format string expects. 
+- 7.2.4-5.(73,80) - fix the entry above to say to_timestamp(), not
+to_char()
+
+* Fri Oct 31 2003 David Jee <djee@redhat.com>
+- 7.2.4-2.(73,80) - merge changes from 7.2.4-2PGDG release: Fixed some
+missing files in devel, python, odbc, tcl, and contrib packages.
+- 7.2.4-3.(73,80) - include a patch for to_ascii() buffer overrun
+vulnerability.
+
+* Tue Oct 28 2003 David Jee <djee@redhat.com>
+- 7.2.4-1.(73,80) - initial Red Hat build.
+
 * Wed Dec 20 2002 Andrew Overholt <overholt@redhat.com>
 - 7.2.3-4.(73,80) - add buffer overrun patch for geo_ops
 - 7.2.3-5.(73,80) - add pg_hba.conf tightening patch
