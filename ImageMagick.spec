@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 1
+Release: 2
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -251,7 +251,7 @@ rm -rf $RPM_BUILD_ROOT
 #%{_libdir}/perl*/site_perl/*/*/Image
 
 %changelog
-* Wed Mar 16 2005  <mclasen@redhat.com> - 6.2.0.7-1
+* Wed Mar 16 2005  <mclasen@redhat.com> - 6.2.0.7-2
 - Update to 6.2.0 to fix a number of security issues:
   #145112 (CAN-2005-05), #151265 (CAN-2005-0397)
 - Drop a lot of upstreamed patches
