@@ -1,12 +1,14 @@
+# Do we want to build the postgresql-test package ? (1=yes 0=no)
+%define build_testpackage 0
+
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 7.0.3
-Release: 0.4
+Release: 8
 License: BSD
 Group: Applications/Databases
-Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz
-Source1: http://www.retep.org.uk/postgres/jdbc6.5-1.1.jar
-Source2: http://www.retep.org.uk/postgres/jdbc6.5-1.2.jar
+# originally .gz
+Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
 Source3: postgresql.init-%{version}
 Source4: file-lists-pgsql-%{version}.tar.gz
 Source5: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz.md5
@@ -18,16 +20,26 @@ Source10: http://www.retep.org.uk/postgres/jdbc7.0-1.1.jar
 Source11: http://www.retep.org.uk/postgres/jdbc7.0-1.2.jar
 Source12: postgresql-dump.1.gz
 Source14: rh-pgdump.sh
+Source15: pg_dumpall.1
 Patch0: postgresql-%{version}-alpha.patch.gz
 Patch1: rpm-pgsql-%{version}.patch
 Patch2: postgresql-7.0.3-ia64-2.patch
+Patch3: postgresql-7.0.3-mkstemp.patch
+Patch10: postgresql-7.0.2-s390.patch
 Requires: perl
 Prereq: /sbin/chkconfig /sbin/ldconfig /usr/sbin/useradd initscripts
-BuildPrereq: python-devel perl tcl /lib/cpp
+BuildPrereq: /lib/cpp
+BuildPrereq: python-devel perl tcl tk
 Url: http://www.postgresql.org/ 
 Obsoletes: postgresql-clients
-Buildroot: %{_tmppath}/%{name}-%{version}-root
+%if %{build_testpackage}
+%else
+Obsoletes: postgresql-test
+%endif
 
+
+
+Buildroot: %{_tmppath}/%{name}-%{version}-root
 
 # This is the PostgreSQL Global Development Group Official RPMset spec file.
 # Copyright 2000 Lamar Owen <lamar@postgresql.org> <lamar.owen@wgcr.org>
@@ -64,7 +76,7 @@ if you're installing the postgresql-server package.
 Summary: The programs needed to create and run a PostgreSQL server.
 Group: Applications/Databases
 Prereq: /usr/sbin/useradd
-Requires: postgresql = %{version}
+Requires: postgresql = %{version} , bash >= 2
 
 %description server
 The postgresql-server package includes the programs needed to create
@@ -99,7 +111,7 @@ Requires: tcl >= 8.0, postgresql = %{version}
 %description tcl
 PostgreSQL is an advanced Object-Relational database management
 system.  The postgresql-tcl package contains the libpgtcl client library,
-the pg-enchanced pgtclsh, and the PL/Tcl procedural language for the backend.
+the pg-enhanced pgtclsh, and the PL/Tcl procedural language for the backend.
 
 %package tk
 Summary: Tk shell and tk-based GUI for PostgreSQL.
@@ -111,7 +123,6 @@ PostgreSQL is an advanced Object-Relational database management
 system.  The postgresql-tk package contains the pgaccess
 program. Pgaccess is a graphical front end, written in Tcl/Tk, for the
 psql and related PostgreSQL client programs.
-
 
 %package odbc
 Summary: The ODBC driver needed for accessing a PostgreSQL DB using ODBC.
@@ -155,6 +166,7 @@ PostgreSQL is an advanced Object-Relational database management
 system. The postgresql-jdbc package includes the .jar file needed for
 Java programs to access a PostgreSQL database.
 
+%if %{build_testpackage}
 %package test
 Summary: The test suite distributed with PostgreSQL.
 Group: Applications/Databases
@@ -165,6 +177,7 @@ PostgreSQL is an advanced Object-Relational database management
 system. The postgresql-test package includes the sources and pre-built
 binaries of various tests for the PostgreSQL database management
 system, including regression tests and benchmarks.
+%endif
 
 %prep
 %setup -q 
@@ -181,8 +194,13 @@ system, including regression tests and benchmarks.
 %patch2 -p1
 %endif
 
+%patch3 -p1
 
-# I hope this works....
+%ifarch s390
+%patch10 -p1 -b .s390
+%endif
+
+# Seems to work just fine
 
 %ifarch ia64
 ln -s linux_i386 src/template/linux
@@ -192,7 +210,6 @@ ln -s linux_i386 src/template/linux
 
 # Get file lists....
 tar xzf %{SOURCE4}
-
 
 pushd src
 
@@ -231,10 +248,11 @@ make all
 popd
 
 %install
+eval `perl '-V:installarchlib'` 
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/usr/{include/pgsql,lib,bin}
 mkdir -p $RPM_BUILD_ROOT%{_mandir}
-mkdir -p $RPM_BUILD_ROOT/usr/lib/perl5/site_perl/%{_arch}-linux/auto/Pg
+mkdir -p $RPM_BUILD_ROOT/$installarchlib
 make POSTGRESDIR=$RPM_BUILD_ROOT/usr PREFIX=$RPM_BUILD_ROOT/usr -C src install
 make POSTGRESDIR=$RPM_BUILD_ROOT/usr PREFIX=$RPM_BUILD_ROOT/usr -C src/interfaces/perl5 install
 
@@ -242,9 +260,10 @@ make POSTGRESDIR=$RPM_BUILD_ROOT/usr PREFIX=$RPM_BUILD_ROOT/usr -C src/interface
 find $RPM_BUILD_ROOT/usr/lib/perl5 -name .packlist -exec rm -f {} \;
 find $RPM_BUILD_ROOT/usr/lib/perl5 -type f -print | \
 	sed -e "s|$RPM_BUILD_ROOT/|/|g"  | \
-	sed -e "s|.*/man/.*|&\*|" > perlfiles.list
+	sed -e "s|.*/man/.*|&\*|" | grep -v  -E "(Pg.bs|perllocal.pod)" > perlfiles.list
 find $RPM_BUILD_ROOT/usr/lib/perl5 -type d -name Pg -print | \
 	sed -e "s|$RPM_BUILD_ROOT/|%dir /|g" >> perlfiles.list
+
 
 # check and fixup Pg manpage location....
 if [ ! -e $RPM_BUILD_ROOT%{_mandir}/man3/Pg.* ]
@@ -258,6 +277,7 @@ make -C doc
 # man pages....
 pushd $RPM_BUILD_ROOT%{_mandir}
 tar xzf $RPM_BUILD_DIR/postgresql-%{version}/doc/man.tar.gz
+install -m 644 %SOURCE15 $RPM_BUILD_ROOT/%{_mandir}/man1
 
 # the postgresql-dump manpage.....
 cp %{SOURCE12} man1
@@ -321,10 +341,7 @@ popd
 
 # Java/JDBC
 # The user will have to set a CLASSPATH to find it here, but not sure where else to put it...
-# Install 6.5 JDBC jars for now.
-install -m 755 %{SOURCE1} $RPM_BUILD_ROOT/usr/lib/pgsql
-install -m 755 %{SOURCE2} $RPM_BUILD_ROOT/usr/lib/pgsql
-# Install 7.0 JDBC jars -- in addition to, not replacing 6.5 stuff yet.
+# Install 7.0 JDBC jars -- no longer include the 6.5 versions
 install -m 755 %{SOURCE10} $RPM_BUILD_ROOT/usr/lib/pgsql
 install -m 755 %{SOURCE11} $RPM_BUILD_ROOT/usr/lib/pgsql
 
@@ -398,10 +415,6 @@ mkdir -p $RPM_BUILD_ROOT/usr/include/pgsql/port
 cp src/include/port/linux.h $RPM_BUILD_ROOT/usr/include/pgsql/port/
 ln -sf port/linux.h $RPM_BUILD_ROOT/usr/include/pgsql/os.h
 
-# remove perllocal.pod from the file list - only occurs with 5.6
-
-perl -pi -e "s/^.*perllocal.pod$//" perlfiles.list
-
 # Symlink libpq.so.2.0 to libpq.so.2.1 for backwards compatibility, until 
 # -soname patches are the norm.
 pushd $RPM_BUILD_ROOT/usr/lib
@@ -432,15 +445,13 @@ fi
 groupadd -g 26 postgres >/dev/null 2>&1 || :
 useradd -M -n -g postgres -o -r -d /var/lib/pgsql -s /bin/bash \
 	-c "PostgreSQL Server" -u 26 postgres >/dev/null 2>&1 || :
-touch /var/log/postgresql
-chown postgres.postgres /var/log/postgresql
-chmod 0700 /var/log/postgresql
 
-
-%post -p /sbin/ldconfig  server
+%post  server
+/sbin/ldconfig
 echo PGLIB=/usr/lib/pgsql >> ~postgres/.bash_profile
 echo PGDATA=/var/lib/pgsql/data >> ~postgres/.bash_profile
 echo export PGLIB PGDATA >> ~postgres/.bash_profile
+/sbin/chkconfig --add postgresql
 
 %preun server
 if [ $1 = 0 ] ; then
@@ -463,8 +474,10 @@ fi
 %post -p /sbin/ldconfig   tcl
 %postun -p /sbin/ldconfig   tcl
 
+%if %{build_testpackage}
 %post test
 chown -R postgres.postgres /usr/lib/pgsql/test >/dev/null 2>&1 || :
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -510,7 +523,6 @@ rm -f perlfiles.list
 
 %files server -f files.lst
 %defattr(-,root,root)
-/etc/logrotate.d/postgres
 /usr/bin/initdb
 /usr/bin/initlocation
 /usr/bin/ipcclean
@@ -576,7 +588,6 @@ rm -f perlfiles.list
 
 %files -f perlfiles.list perl
 %defattr (-,root,root)
-%dir /usr/lib/perl5/site_perl/%{_arch}-linux/auto
 /usr/lib/pgsql/perl5
 %{_mandir}/man3/Pg.*
 
@@ -588,15 +599,15 @@ rm -f perlfiles.list
 
 %files jdbc
 %defattr(-,root,root)
-/usr/lib/pgsql/jdbc6.5-1.1.jar
-/usr/lib/pgsql/jdbc6.5-1.2.jar
 /usr/lib/pgsql/jdbc7.0-1.1.jar
 /usr/lib/pgsql/jdbc7.0-1.2.jar
 
+%if %{build_testpackage}
 %files test
 %defattr(-,postgres,postgres)
 %attr(755,postgres,postgres)/usr/lib/pgsql/config.guess
 %attr(-,postgres,postgres)/usr/lib/pgsql/test/regress/*
+%endif
 
 # Conventions for PostgreSQL RPM releases:
 # Pre-releases are those that are built from CVS snapshots or pre-release
@@ -612,9 +623,48 @@ rm -f perlfiles.list
 # -- only full integer releases should be.
 
 # Start changelog proper below this comment
+
+
 %changelog
-* Wed Nov 15 2000 Trond Eivind Glomsrød <teg@redhat.com>
-- move /lib/cpp from Prereq to BuildPrereq
+* Thu Mar 22 2001 Trond Eivind Glomsrød <teg@redhat.com>
+- obsolete postgresql-test when not building it (#32640)
+- make /lib/cpp a buildprereq, not a standard prereq
+- remove the /var/log/postgresql and /etc/logrotate.d
+  files - I don't see a way to enable it currently...
+  (#31165). The logrotate file is still included in the SRPM,
+  so make it easier to add logging later.
+- remove mentions of "-u" from pg_dumpall, as it doesn't seem
+  to work 
+
+
+* Tue Jan 23 2001 Trond Eivind Glomsrød <teg@redhat.com>
+- improve gettextization
+
+* Wed Jan 17 2001 Trond Eivind Glomsrød <teg@redhat.com>
+- gettextize
+- turn off by default
+
+* Fri Jan 12 2001 Trond Eivind Glomsrød <teg@redhat.com>
+- use mkstemp for creating the file used by \e in the psql
+  client (problem from #23695, patch made from scratch)
+- increase sleep interval in init script (#23870)
+- don't include JDBC jars for 6.5 anymore
+- add a conditional for building test subpackage
+- misc cleanups
+
+* Thu Jan 11 2001 Trond Eivind Glomsrød <teg@redhat.com>
+- add tk as a buildprereq (#23693)
+
+* Mon Jan 01 2001 Trond Eivind Glomsrød <teg@redhat.com>
+- bzip sources
+- remove test package
+
+* Mon Dec 11 2000 Oliver Paukstadt <oliver.paukstadt@millenux.com>
+- ported to s390
+
+* Fri Dec 01 2000 Trond Eivind Glomsrød <teg@redhat.com>
+- changes to the logrotate script 
+- fix spelling error in postgresql-tcl description
 
 * Tue Nov 14 2000 Trond Eivind Glomsrød <teg@redhat.com>
 - made a template for IA64 (symlink to i386)
