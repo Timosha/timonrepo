@@ -1,19 +1,18 @@
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
-Version: 5.2.2
-Release: 5
+Version: 5.2.7
+Release: 2
 Copyright: freeware
 Group: Applications/Multimedia
-Source: ftp://ftp.cdrom.com/pub/ImageMagick/ImageMagick-%{version}.tar.gz
-Patch0: ImageMagick-5.2.1-libpath.patch
-Patch1: ImageMagick-5.2.1-lprhack.patch
-Patch2: ImageMagick-5.1.1-bzip2_10.patch 
-Patch3: ImageMagick-5.2.0-build.patch 
+Source: ftp://ftp.cdrom.com/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
+Patch0: ImageMagick-5.2.6-libpath.patch
+Patch1: ImageMagick-5.2.4-lprhack.patch
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
 BuildPrereq: libtiff-devel, libungif-devel, zlib-devel
 Requires: bzip2, freetype, libjpeg, libpng, libtiff, libungif, zlib
+BuildRequires: freetype-devel >= 2.0.1
 Prefix: /usr/X11R6
 %define _prefix /usr/X11R6
 %define _mandir %{_prefix}/man
@@ -49,12 +48,39 @@ or APIs, you'll need to install ImageMagick-devel as well as ImageMagick.
 You don't need to install it if you just want to use ImageMagick, 
 however.
 
+%package c++
+Summary: ImageMagick Magick++ library
+Group: System Environment/Libraries
+Requires: ImageMagick = %{version}
+
+%description c++
+This package contains the Magick++ library, a C++ binding to the ImageMagick
+graphics manipulation library.
+
+Install ImageMagick-c++ if you want to use any applications that use Magick++.
+
+%package c++-devel
+Summary: C++ bindings for the ImageMagick library
+Group: Development/Libraries
+Requires: ImageMagick = %{version}, ImageMagick-c++ = %{version}, ImageMagick-devel = %{version}
+
+%description c++-devel
+ImageMagick-devel contains the static libraries and header files you'll
+need to develop ImageMagick applications using the Magick++ C++ bindings.
+ImageMagick is an image manipulation program.
+
+If you want to create applications that will use Magick++ code
+or APIs, you'll need to install ImageMagick-c++-devel, ImageMagick-devel and
+ImageMagick.
+You don't need to install it if you just want to use ImageMagick, or if you
+want to develop/compile applications using the ImageMagick C interface,
+however.
+
 %prep
 %setup -q
-%patch0 -p0
-%patch1 -p0
-#%patch2 -p1 -b .bzip2patch
-%patch3 -p1 -b .build
+%patch0 -p1 -b .path
+%patch1 -p1 -b .lpr
+
 rm -f images/Makefile || :
 
 %build
@@ -63,13 +89,18 @@ TARGET_PLATFORM=%{_target_platform}
 %ifarch alpha sparc
 RPM_OPT_FLAGS=""
 %endif
+
 CFLAGS="-g $RPM_OPT_FLAGS"; export CFLAGS
-%configure --prefix=/usr/X11R6 --enable-shared --with-perl --with-x
+mv configure.in configure.in.dontuse # HACK: Don't run libtoolize in %%configure
+%configure --prefix=/usr/X11R6 --enable-shared --with-perl --with-x --with-threads --with-magick_plus_plus
+mv configure.in.dontuse configure.in
 make
+make -C Magick++
 
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 %makeinstall PREFIX=$RPM_BUILD_ROOT/usr
+%makeinstall -C Magick++ PREFIX=$RPM_BUILD_ROOT/usr
 
 for bin in $RPM_BUILD_ROOT%{_bindir}/*-*-*-* $RPM_BUILD_ROOT%{_mandir}/man*/*-*-*-* ; do
 	mv ${bin} `echo ${bin} | sed 's@[^-/]*-[^-/]*-[^-/]*-@@g'`
@@ -81,13 +112,17 @@ install -m755 utilities/.libs/* $RPM_BUILD_ROOT%{_bindir}/
 
 %post -p /sbin/ldconfig
 
+%post c++ -p /sbin/ldconfig
+
 %postun -p /sbin/ldconfig
+
+%postun c++ -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
 %doc www images
 %doc README.txt ImageMagick.html
-%attr(755,root,root) %{_libdir}/*.so.*
+%attr(755,root,root) %{_libdir}/libMagick.so.*
 %{_bindir}/*
 /usr/lib/perl*/site_perl/*/*/auto/Image
 /usr/lib/perl*/site_perl/*/*/Image
@@ -96,12 +131,40 @@ install -m755 utilities/.libs/* $RPM_BUILD_ROOT%{_bindir}/
 
 %files devel
 %defattr(-,root,root)
-%{_libdir}/*.a
-%{_libdir}/*.la
-%{_libdir}/*.so
+%{_libdir}/libMagick.a
+%{_libdir}/libMagick.la
+%{_libdir}/libMagick.so
 %{_includedir}
 
+%files c++
+%defattr(-,root,root)
+%{_libdir}/libMagick++.so.*
+
+%files c++-devel
+%defattr(-,root,root)
+%{_includedir}/Magick++
+%{_includedir}/Magick++.h
+%{_libdir}/libMagick++.a
+%{_libdir}/libMagick++.la
+%{_libdir}/libMagick++.so
+
 %changelog
+* Mon Jan 08 2001 Florian La Roche <Florian.LaRoche@redhat.de>
+- remove patch for s390, it is not necessary
+
+* Mon Jan  1 2001 Bernhard Rosenkraenzer <bero@redhat.com>
+- 5.2.7
+
+* Wed Dec 27 2000 Bernhard Rosenkraenzer <bero@redhat.com>
+- 5.2.6
+
+* Mon Dec 18 2000 Than Ngo <than@redhat.com>
+- ported to s390
+
+* Mon Sep 25 2000 Bernhard Rosenkraenzer <bero@redhat.com>
+- 5.2.4
+- Fix up and package the C++ bindings in the new c++/c++-devel packages.
+
 * Wed Aug  2 2000 Matt Wilson <msw@redhat.com>
 - rebuild against new libpng
 
