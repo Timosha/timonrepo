@@ -2,7 +2,7 @@
 # postgresql	This is the init script for starting up the PostgreSQL
 #		server
 #
-# chkconfig: - 85 15
+# chkconfig: 2345 75 25
 # description: Starts and stops the PostgreSQL backend daemon that handles \
 #	       all database requests.
 # processname: postmaster
@@ -15,7 +15,6 @@
 # Version 7.0 Lamar Owen
 # Added logging code
 # Changed PGDATA.
-#
 
 # Version 7.0.2 Trond Eivind Glomsrd <teg@redhat.com>
 # use functions, add conditional restart
@@ -48,10 +47,15 @@
 # Tested the $? return for the stop script -- it does in fact propagate.
 # TODO: multiple postmasters.
 
-# VErsion 7.3 Lamar OWen <lamar.owen@ramifordistat.net>
+# Version 7.3 Lamar Owen <lamar.owen@ramifordistat.net>
 # Multiple postmasters, courtesy Karl DeBisschop
 
-# VErsion 7.4 Lamar Owen.
+# Version 7.4 Lamar Owen.
+
+# Version 7.4.3 Tom Lane <tgl@sss.pgh.pa.us>
+# Support condstop for uninstall
+# Minor other changes suggested by Fernando Nasser.
+
 
 # PGVERSION is:
 PGVERSION=7.4
@@ -74,7 +78,8 @@ then
 fi
 
 
-# Set defaults for port and database directory
+# Set defaults for configuration variables
+PGENGINE=/usr/bin
 PGPORT=5432
 export PGDATA=/var/lib/pgsql
 if [ -f $PGDATA/PG_VERSION ] && [ -d $PGDATA/base/template1 ]
@@ -83,6 +88,7 @@ then
 else
 	export PGDATA=/var/lib/pgsql/data
 fi
+PGLOG=/dev/null
 
 # Override defaults from /etc/sysconfig/pgsql if file is present
 [ -f /etc/sysconfig/pgsql/${NAME} ] && . /etc/sysconfig/pgsql/${NAME}
@@ -94,7 +100,7 @@ export PGOPTS
 # Pretty much need it for postmaster.
 [ "${NETWORKING}" = "no" ] && exit 0
 
-[ -f /usr/bin/postmaster ] || exit 0
+[ -f $PGENGINE/postmaster ] || exit 0
 
 start(){
 	PSQL_START=$"Starting ${NAME} service: "
@@ -154,7 +160,7 @@ start(){
 		# Is expanded this early to be used in the command su runs
 		echo "export LANG LC_ALL LC_CTYPE LC_COLLATE LC_NUMERIC LC_CTYPE LC_TIME" >> $PGDATA/../initdb.i18n
 		# Initialize the database
-		su -l postgres -c "/usr/bin/initdb --pgdata=$PGDATA > /dev/null 2>&1" < /dev/null
+		su -l postgres -c "$PGENGINE/initdb --pgdata=$PGDATA" >> $PGLOG 2>&1 < /dev/null
 		[ -f $PGDATA/PG_VERSION ] && echo_success
 		[ ! -f $PGDATA/PG_VERSION ] && echo_failure
 		echo
@@ -163,17 +169,17 @@ start(){
 	# Check for postmaster already running...
   # note that pg_ctl only looks at the data structures in PGDATA
   # you really do need the pidof()
-	pid=`pidof -s /usr/bin/postmaster`
-	if [ $pid ] && /usr/bin/pg_ctl status -D $PGDATA > /dev/null 2>&1
+	pid=`pidof -s $PGENGINE/postmaster`
+	if [ $pid ] && $PGENGINE/pg_ctl status -D $PGDATA > /dev/null 2>&1
 	then
 		echo $"Postmaster already running."
 	else
 		#all systems go -- remove any stale lock files
 		rm -f /tmp/.s.PGSQL.${PGPORT} > /dev/null
 		echo -n "$PSQL_START"
-		su -l postgres -c "/usr/bin/pg_ctl  -D $PGDATA -p /usr/bin/postmaster -o '-p ${PGPORT} ${PGOPTS}' start  > /dev/null 2>&1" < /dev/null
+		su -l postgres -c "$PGENGINE/pg_ctl  -D $PGDATA -p $PGENGINE/postmaster -o '-p ${PGPORT} ${PGOPTS}' start"  >> $PGLOG 2>&1 < /dev/null
  		sleep 1
- 		pid=`pidof -s /usr/bin/postmaster`
+ 		pid=`pidof -s $PGENGINE/postmaster`
  		if [ $pid ]
 		then
 			success "$PSQL_START"
@@ -189,7 +195,7 @@ start(){
 
 stop(){
 	echo -n $"Stopping ${NAME} service: "
-	su -l postgres -c "/usr/bin/pg_ctl stop -D $PGDATA -s -m fast" > /dev/null 2>&1 < /dev/null
+	su -l postgres -c "$PGENGINE/pg_ctl stop -D $PGDATA -s -m fast" > /dev/null 2>&1 < /dev/null
 	ret=$? 
 	if [ $ret -eq 0 ]
 	then
@@ -211,8 +217,12 @@ condrestart(){
     [ -e /var/lock/subsys/${NAME} ] && restart
 }
 
+condstop(){
+    [ -e /var/lock/subsys/${NAME} ] && stop
+}
+
 reload(){
-    su -l postgres -c "/usr/bin/pg_ctl reload -D $PGDATA -s" > /dev/null 2>&1 < /dev/null
+    su -l postgres -c "$PGENGINE/pg_ctl reload -D $PGDATA -s" > /dev/null 2>&1 < /dev/null
 }
 
 # This script is slightly unusual in that the name of the daemon (postmaster)
@@ -235,11 +245,14 @@ case "$1" in
   condrestart)
 	condrestart
 	;;
+  condstop)
+	condstop
+	;;
   reload|force-reload)
 	reload
 	;;
   *)
-	echo $"Usage: $0 {start|stop|status|restart|condrestart|reload|force-reload}"
+	echo $"Usage: $0 {start|stop|status|restart|condrestart|condstop|reload|force-reload}"
 	exit 1
 esac
 

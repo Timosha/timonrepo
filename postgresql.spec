@@ -45,7 +45,7 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 7.4.2
+Version: 7.4.3
 
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
@@ -81,7 +81,7 @@ Source11: http://jdbc.postgresql.org/download/pg74.1jdbc3.jar
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
 Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.4.tgz
-Patch1: rpm-pgsql-%{version}.patch
+Patch1: rpm-pgsql-7.4.patch
 Patch2: rpm-multilib-%{version}.patch
 Patch3: postgresql-7.4-tighten.patch
 Patch5: postgresql-plperl.patch
@@ -339,6 +339,9 @@ popd
    tar xzf %{SOURCE18}
    PYGRESQLDIR=`basename %{SOURCE18} .tgz`
    mv $PYGRESQLDIR PyGreSQL
+   # Some versions of PyGreSQL.tgz contain wrong permissions for docs files
+   chmod 644 PyGreSQL/Announce PyGreSQL/ChangeLog
+   chmod 755 PyGreSQL/tutorial PyGreSQL/tutorial/*.py
 %endif
 
 %build
@@ -521,14 +524,12 @@ chkconfig --add postgresql
 
 %preun server
 if [ $1 = 0 ] ; then
+	/sbin/service postgresql condstop >/dev/null 2>&1
 	chkconfig --del postgresql
 fi
 
 %postun server
 /sbin/ldconfig 
-if [ $1 -ge 1 ]; then
-  /sbin/service postgresql condrestart >/dev/null 2>&1
-fi
 if [ $1 = 0 ] ; then
 	userdel postgres >/dev/null 2>&1 || :
 	groupdel postgres >/dev/null 2>&1 || : 
@@ -770,6 +771,16 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Jun 23 2004 Tom Lane <tgl@redhat.com> 7.4.3-1
+- Update to PostgreSQL 7.4.3.
+- Uninstalling server RPM stops postmaster first, per bug 114846.
+- Fix su commands to not assume PG user's shell is sh-like, per bug 124024.
+- Fix permissions on postgresql-python doc files, per bug 124822.
+- Minor postgresql.init improvements.
+
+* Tue Jun 15 2004 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
 * Wed Mar 10 2004 Tom Lane <tgl@redhat.com> 7.4.2-1
 - Update to PostgreSQL 7.4.2; sync with community SRPM as much as possible.
 - Support PGOPTS from /etc/sysconfig/pgsql, per bug 111504.
