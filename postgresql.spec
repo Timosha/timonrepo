@@ -64,7 +64,7 @@ Version: 8.0.1
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 3
+Release: 4
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -120,16 +120,6 @@ Obsoletes: postgresql-clients
 Obsoletes: postgresql-perl
 Obsoletes: postgresql-tk
 Obsoletes: rh-postgresql
-Obsoletes: rh-postgresql-contrib
-Obsoletes: rh-postgresql-devel
-Obsoletes: rh-postgresql-docs
-Obsoletes: rh-postgresql-jdbc
-Obsoletes: rh-postgresql-libs
-Obsoletes: rh-postgresql-pl
-Obsoletes: rh-postgresql-python
-Obsoletes: rh-postgresql-server
-Obsoletes: rh-postgresql-tcl
-Obsoletes: rh-postgresql-test
 
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 
@@ -186,6 +176,7 @@ if you're installing the postgresql-server package.
 Summary: The shared libraries required for any PostgreSQL clients.
 Group: Applications/Databases
 Provides: libpq.so
+Obsoletes: rh-postgresql-libs
 
 %description libs
 The postgresql-libs package provides the essential shared libraries for any 
@@ -197,8 +188,8 @@ PostgreSQL server.
 Summary: The programs needed to create and run a PostgreSQL server.
 Group: Applications/Databases
 Prereq: /usr/sbin/useradd /sbin/chkconfig 
-Prereq: postgresql = %{version} libpq.so
-Conflicts: postgresql < 7.4
+Prereq: postgresql = %{version}-%{release} libpq.so
+Obsoletes: rh-postgresql-server
 
 %description server
 The postgresql-server package includes the programs needed to create
@@ -215,16 +206,21 @@ to install the postgresql package.
 %package docs
 Summary: Extra documentation for PostgreSQL
 Group: Applications/Databases
-Prereq: postgresql = %{version}
+Prereq: postgresql = %{version}-%{release}
+Obsoletes: rh-postgresql-docs
+
 %description docs
 The postgresql-docs package includes some additional documentation for
 PostgreSQL.  Currently, this includes the main documentation in PDF format,
 the FAQ, and source files for the PostgreSQL tutorial.
 
+
 %package contrib
 Summary: Contributed source and binaries distributed with PostgreSQL
 Group: Applications/Databases
-Prereq: postgresql = %{version}
+Prereq: postgresql = %{version}-%{release}
+Obsoletes: rh-postgresql-contrib
+
 %description contrib
 The postgresql-contrib package contains contributed packages that are
 included in the PostgreSQL distribution.
@@ -233,8 +229,9 @@ included in the PostgreSQL distribution.
 %package devel
 Summary: PostgreSQL development header files and libraries.
 Group: Development/Libraries
-Prereq: postgresql = %{version}
-Requires: postgresql-libs = %{version}
+Prereq: postgresql = %{version}-%{release}
+Requires: postgresql-libs = %{version}-%{release}
+Obsoletes: rh-postgresql-devel
 
 %description devel
 The postgresql-devel package contains the header files and libraries
@@ -250,8 +247,9 @@ package.
 %package pl
 Summary: The PL procedural languages for PostgreSQL.
 Group: Applications/Databases
-PreReq: postgresql = %{version}
-PreReq: postgresql-server = %{version}
+PreReq: postgresql = %{version}-%{release}
+PreReq: postgresql-server = %{version}-%{release}
+Obsoletes: rh-postgresql-pl
 
 %description pl
 PostgreSQL is an advanced Object-Relational database management
@@ -266,6 +264,7 @@ Summary: A Tcl client library for PostgreSQL.
 Group: Applications/Databases
 Requires: libpq.so
 Requires: tcl >= 8.3
+Obsoletes: rh-postgresql-tcl
 
 %description tcl
 PostgreSQL is an advanced Object-Relational database management
@@ -281,6 +280,7 @@ Group: Applications/Databases
 Requires: libpq.so
 Requires: python mx
 Conflicts: python < %pyver, python >= %pynextver
+Obsoletes: rh-postgresql-python
 
 %description python
 PostgreSQL is an advanced Object-Relational database management
@@ -294,6 +294,7 @@ database.
 %package jdbc
 Summary: Files needed for Java programs to access a PostgreSQL database.
 Group: Applications/Databases
+Obsoletes: rh-postgresql-jdbc
 
 %description jdbc
 PostgreSQL is an advanced Object-Relational database management
@@ -306,8 +307,9 @@ Java programs to access a PostgreSQL database.
 %package test
 Summary: The test suite distributed with PostgreSQL.
 Group: Applications/Databases
-PreReq: postgresql = %{version}
-PreReq: postgresql-server = %{version}
+PreReq: postgresql = %{version}-%{release}
+PreReq: postgresql-server = %{version}-%{release}
+Obsoletes: rh-postgresql-test
 
 %description test
 PostgreSQL is an advanced Object-Relational database management
@@ -785,6 +787,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Mar  2 2005 Tom Lane <tgl@redhat.com> 8.0.1-4
+- Attach Obsoletes: declarations for rh-postgresql to subpackages (bz#144435)
+- Make Requires: and Prereq: package linkages specify release not only
+  version, as per recent mailing list discussion.
+
 * Tue Mar  1 2005 Tomas Mraz <tmraz@redhat.com> 8.0.1-3
 - rebuild with openssl-0.9.7e
 
