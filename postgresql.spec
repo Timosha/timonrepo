@@ -1,12 +1,12 @@
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 7.0.2
-Release: 18.2
+Release: 19
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz
-Source1: http://jdbc.postgresql.org/download/jdbc6.5-1.1.jar
-Source2: http://jdbc.postgresql.org/download/jdbc6.5-1.2.jar
+Source1: http://www.retep.org.uk/postgres/jdbc6.5-1.1.jar
+Source2: http://www.retep.org.uk/postgres/jdbc6.5-1.2.jar
 Source3: postgresql.init-%{version}
 Source6: README.rpm.postgresql-%{version}
 Source5: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz.md5
@@ -19,7 +19,6 @@ Source12: postgresql-dump.1.gz
 Source14: rh-pgdump.sh
 Patch0: postgresql-%{version}-alpha.patch.gz
 Patch1: rpm-pgsql-%{version}.patch
-Patch2: postgresql-%{version}-security.patch
 Requires: perl
 Prereq: /sbin/chkconfig /sbin/ldconfig /usr/sbin/useradd /lib/cpp initscripts
 BuildPrereq: python-devel perl tcl
@@ -162,15 +161,11 @@ Java programs to access a PostgreSQL database.
 %endif
 
 %patch1 -p1
-%patch2 -p1
 
 %build
 pushd src
-# XXX libtoolize dinna work
-# WHAT is 'libtoolize???' LRO
-# a program distributed with the libtool package
 
-#cp /usr/share/libtool/config.* .
+cp /usr/share/libtool/config.* .
 CFLAGS="$RPM_OPT_FLAGS"
 %ifarch alpha
 	./configure --enable-hba --enable-locale --prefix=/usr\
@@ -264,8 +259,6 @@ popd
 pushd src/interfaces
 mkdir -p $RPM_BUILD_ROOT/usr/lib/pgsql/perl5
 cp -a perl5/test.pl perl5/eg $RPM_BUILD_ROOT/usr/lib/pgsql/perl5
-mkdir -p $RPM_BUILD_ROOT/usr/lib/pgsql/python
-cp -a python/tutorial $RPM_BUILD_ROOT/usr/lib/pgsql/python
 popd
 
 # Get example odbcinst.ini and put in /usr/lib/pgsql
@@ -520,9 +513,9 @@ rm -f perlfiles.list
 
 %files python
 %defattr(-,root,root)
+%doc src/interfaces/python/README src/interfaces/python/tutorial
 /usr/lib/python1.5/site-packages/_pgmodule.so
 /usr/lib/python1.5/site-packages/*.py
-/usr/lib/pgsql/python
 
 %files jdbc
 %defattr(-,root,root)
@@ -537,11 +530,12 @@ rm -f perlfiles.list
 #/usr/lib/pgsql/test/*
 
 %changelog
-* Tue Jan 7 2003 Andrew Overholt <overholt@redhat.com> [7.0.2-18.2]
-- addition to security backpatch
+* Thu Oct 19 2000 Trond Eivind Glomsrød <teg@redhat.com>
+- rebuild with new glibc which has semaphore fixes for Alpha 
 
-* Tue Jan 7 2003 Andrew Overholt <overholt@redhat.com> [7.0.2-18]
-- add security backpatch from more recent versions (~#74505)
+* Tue Sep 05 2000 Trond Eivind Glomsrød <teg@redhat.com>
+- add documention for python interface (#17261)
+- move the python interface tutorial to the %%doc section
 
 * Thu Aug 24 2000 Trond Eivind Glomsrød <teg@redhat.com>
 - the old dump script didn't work - added rh-pgdump.sh
