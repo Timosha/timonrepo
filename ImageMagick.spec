@@ -1,7 +1,7 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 5.4.3
-%define Patchlevel 11
+%define VER 5.4.7
+%define Patchlevel %{nil}
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
 %if "%{Patchlevel}" != ""
@@ -9,20 +9,21 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 1
+Release: 4
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
-Source: ftp://ftp.cdrom.com/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.bz2
+Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.bz2
 %else
-Source: ftp://ftp.cdrom.com/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
+Source: ftp://ftp.ImageMagick.org/ImageMagick/ImageMagick-%{version}.tar.bz2
 %endif
 Source1: magick_small.png
 Patch1: ImageMagick-5.3.5-lprhack.patch
 Patch2: ImageMagick-5.3.6-nonroot.patch
 Patch3: ImageMagick-5.3.7-config.patch
 Patch4: ImageMagick-5.4.0-hp2xx.patch
-Patch5: ImageMagick-5.4.2-localdoc.patch
+Patch5: ImageMagick-5.4.7-localdoc.patch
+Patch6: ImageMagick-5.4.7-stdin.patch
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
@@ -105,12 +106,11 @@ however.
 %prep
 %setup -q -n %{name}-%{VER}
 %patch1 -p1 -b .lpr
-%patch2 -p1 -b .nonroot
+#%patch2 -p1 -b .nonroot
 %patch3 -p1 -b .config
 %patch4 -p1 -b .hp2xx
 %patch5 -p1 -b .ImageMagick
-# Fix up a dependency
-perl -pi -e "s,-L/home/cristy/ImageMagick/magick,-L../magick/.libs,g" PerlMagick/Makefile.PL
+%patch6 -p1 -b .stdin
 
 %build
 libtoolize --force
@@ -126,12 +126,13 @@ make
 rm -rf $RPM_BUILD_ROOT
 
 make PerlMagick/Makefile
-perl -pi -e 's,^PREFIX.*,PREFIX = \$(DESTDIR)/usr,g;s,^config :: Makefile,config :: ,g;s,Makefile : ,Foo : ,g' PerlMagick/Makefile
+perl -pi -e 's,^PREFIX.*,PREFIX = \$(DESTDIR)/usr,g;s,^config :: Makefile,config :: ,g;s,Makefile : ,Foo : ,g;s,^INSTALLSITEARCH = /usr,INSTALLSITEARCH = \$(DESTDIR)/usr,g' PerlMagick/Makefile
 perl -pi -e "s,-lMagick,-L../magick/.libs -lMagick,g" PerlMagick/Makefile
 cat >>PerlMagick/Makefile <<EOF
 Makefile:
 	touch Makefile
 EOF
+perl -pi -e 's,^includedir = \${prefix}/include/magick,includedir = \${prefix}/include/X11/magick,g' magick/Makefile
 perl -pi -e 's,^install-exec-perl:.*,install-exec-perl:,g' Makefile
 rm -f PerlMagick/Makefile.*
 make install DESTDIR=$RPM_BUILD_ROOT
@@ -176,16 +177,17 @@ fi
 
 cd $RPM_BUILD_ROOT/%{_bindir}
 for i in %{_arch}-redhat-linux-*; do
-	mv $i `echo $i |sed -e "s/^%{_arch}-redhat-linux-//"`
+	[ -f $i ] && mv $i `echo $i |sed -e "s/^%{_arch}-redhat-linux-//"`
 done
+
 cd $RPM_BUILD_ROOT/%{_mandir}
 for i in */%{_arch}-redhat-linux-*; do
-	mv $i `echo $i |sed -e "s,/%{_arch}-redhat-linux-,/,"`
+	[ -f $i ] && mv $i `echo $i |sed -e "s,/%{_arch}-redhat-linux-,/,"`
 done
 
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+#rm -rf $RPM_BUILD_ROOT
 
 %post -p /sbin/ldconfig
 
@@ -200,7 +202,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc www images
 %doc README.txt ImageMagick.html
 %attr(755,root,root) %{_libdir}/libMagick.so.*
-%{_bindir}/*
+%{_bindir}/[a-z]*
 %{_mandir}/*/*
 %{_datadir}/*
 /etc/X11/applnk/Graphics/ImageMagick.desktop
@@ -208,10 +210,12 @@ rm -rf $RPM_BUILD_ROOT
 
 %files devel
 %defattr(-,root,root)
+%{_bindir}/Magick*
 %{_libdir}/libMagick.a
 %{_libdir}/libMagick.la
 %{_libdir}/libMagick.so
-%{_includedir}/magick
+%dir %{_includedir}/
+%{_includedir}/*h
 
 %files c++
 %defattr(-,root,root)
@@ -231,6 +235,30 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/perl*/site_perl/*/*/Image
 
 %changelog
+* Tue Jul 23 2002 Tim Powers <timp@redhat.com> 5.4.7-4
+- build using gcc-3.2-0.1
+
+* Wed Jul 03 2002 Karsten Hopp <karsten@redhat.de> 5.4.7-3
+- fix non-cpp headers in -devel package
+- fix #62157 (wrong path for include files in ImageMagick-devel)
+- fix #63897 (use _target instead of _arch) in libtool workaround
+- fix #65860, #65780 (tiff2ps) expands images to >10 MB Postscript files.
+
+* Mon Jul 01 2002 Karsten Hopp <karsten@redhat.de> 5.4.7-1
+- update
+- fix localdoc patch
+- fix %%files section
+- disable nonroot patch
+- fix #62100,55950,62162,63136 (display doesn't start form gnome menu)
+- fix libtool workaround
+- moved Magick*-config into -devel package (#64249)
+
+* Sun May 26 2002 Tim Powers <timp@redhat.com>
+- automated rebuild
+
+* Mon May  6 2002 Bernhard Rosenkraenzer <bero@redhat.com> 5.4.6-1
+- 5.4.6
+
 * Thu Mar 14 2002 Bernhard Rosenkraenzer <bero@redhat.com> 5.4.3.11-1
 - Update to pl 11
 

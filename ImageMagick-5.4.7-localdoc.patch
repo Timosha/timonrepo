@@ -1,0 +1,33 @@
+--- ImageMagick-5.4.7/magick/animate.c.ImageMagick	2002-06-10 21:14:57.000000000 -0400
++++ ImageMagick-5.4.7/magick/animate.c	2002-07-01 08:17:32.000000000 -0400
+@@ -332,7 +332,7 @@
+             Display documentation using Netscape remote control.
+           */
+           FormatString(command,"openURL(%.1024s,new-window,noraise)",
+-            "http://www.imagemagick.org/");
++            "/usr/X11R6/share/ImageMagick/ImageMagick.html");
+           mozilla_atom=XInternAtom(display,"_MOZILLA_COMMAND",False);
+           (void) XChangeProperty(display,mozilla_window,mozilla_atom,
+             XA_STRING,8,PropModeReplace,(unsigned char *) command,
+--- ImageMagick-5.4.7/magick/display.c.ImageMagick	2002-06-10 21:14:57.000000000 -0400
++++ ImageMagick-5.4.7/magick/display.c	2002-07-01 08:17:32.000000000 -0400
+@@ -6966,7 +6966,7 @@
+             Display documentation using Netscape remote control.
+           */
+           FormatString(command,"openURL(%.1024s,new-window,noraise)",
+-            "http://www.imagemagick.org/");
++            "/usr/X11R6/share/ImageMagick/ImageMagick.html");
+           mozilla_atom=XInternAtom(display,"_MOZILLA_COMMAND",False);
+           (void) XChangeProperty(display,mozilla_window,mozilla_atom,XA_STRING,
+             8,PropModeReplace,(unsigned char *) command,(int) strlen(command));
+--- ImageMagick-5.4.7/configure.ac.ImageMagick	2002-06-30 15:18:18.000000000 -0400
++++ ImageMagick-5.4.7/configure.ac	2002-07-01 08:20:59.000000000 -0400
+@@ -1587,7 +1587,7 @@
+ # Default delegate definitions
+ AutotraceDecodeDelegateDefault='autotrace'
+ BZIPDelegateDefault='bzip2'
+-BrowseDelegateDefault='netscape'
++BrowseDelegateDefault='htmlview'
+ CGMDecodeDelegateDefault='ralcgm'
+ CatDelegateDefault='cat'
+ ConvertDelegateDefault='convert'
