@@ -45,7 +45,7 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 7.4.5
+Version: 7.4.6
 
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
@@ -67,7 +67,7 @@ Version: 7.4.5
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 4
+Release: 1
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -788,6 +788,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Oct 23 2004 Tom Lane <tgl@redhat.com> 7.4.6-1
+- Update to PostgreSQL 7.4.6 (bugs 136947, 136949)
+- Make init script more paranoid about mkdir step of initializing a new
+  database (bugs 136947, 136949)
+
 * Wed Oct 20 2004 Tom Lane <tgl@redhat.com> 7.4.5-4
 - Remove contrib/oidjoins stuff from installed fileset; it's of no use
   to ordinary users and has a security issue (bugs 136300, 136301)

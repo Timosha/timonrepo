@@ -160,9 +160,9 @@ start(){
 
 	else
 	        echo -n $"Initializing database: "
-                if [ ! -d $PGDATA ]
+                if [ ! -e $PGDATA -a ! -h $PGDATA ]
 		then
-			mkdir -p $PGDATA
+			mkdir -p $PGDATA || exit 1
 			chown postgres:postgres $PGDATA
 			chmod go-rwx $PGDATA
 		fi
