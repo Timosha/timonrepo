@@ -42,7 +42,7 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 8.0.0
+Version: 8.0.1
 
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
@@ -466,6 +466,12 @@ cp src/tutorial/* $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
 	install -m 644 %{SOURCE8} $RPM_BUILD_ROOT/usr/share/java
 	install -m 644 %{SOURCE9} $RPM_BUILD_ROOT/usr/share/java
 	install -m 644 %{SOURCE10} $RPM_BUILD_ROOT/usr/share/java
+	# Versionless symlinks to the versioned jars
+	pushd $RPM_BUILD_ROOT/usr/share/java
+	ln -s `basename %{SOURCE8}` postgresql-jdbc2.jar
+	ln -s `basename %{SOURCE9}` postgresql-jdbc2ee.jar
+	ln -s `basename %{SOURCE10}` postgresql-jdbc3.jar
+	popd
 %endif
 
 %if %tcl
@@ -507,7 +513,7 @@ install -d -m 700 $RPM_BUILD_ROOT/etc/sysconfig/pgsql
 	cp -a src/test/regress $RPM_BUILD_ROOT%{_libdir}/pgsql/test
 	install -m 0755 contrib/spi/refint.so $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress
 	install -m 0755 contrib/spi/autoinc.so $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress
-	pushd  $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress/
+	pushd  $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress
 	strip *.so
 	rm -f GNUmakefile Makefile
 	popd
@@ -778,6 +784,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sun Jan 30 2005 Tom Lane <tgl@redhat.com> 8.0.1-1
+- Update to PostgreSQL 8.0.1.
+- Add versionless symlinks to jar files (bz#145744)
+
 * Wed Jan 19 2005 Tom Lane <tgl@redhat.com> 8.0.0-1
 - Update to PostgreSQL 8.0.0, PyGreSQL 3.6.1, pgtcl 1.5.2,
   and jdbc driver build 309.
