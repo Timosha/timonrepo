@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 0.2
+Release: 1.2.1
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -255,6 +255,12 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}
 #%{_libdir}/perl*/site_perl/*/*/Image
 
 %changelog
+* Tue Mar 02 2004 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
+* Fri Feb 13 2004 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
 * Sun Jan 25 2004 Nils Philippsen <nphilipp@redhat.com> 5.5.7.15-0.2
 - make perl module link against the built library instead of the installed one
 
