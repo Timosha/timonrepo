@@ -49,7 +49,7 @@ Version: 7.2.1
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 4
+Release: 5
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.gz
@@ -73,6 +73,7 @@ BuildPrereq: perl
 BuildPrereq: readline-devel >= 4.0
 BuildPrereq: zlib-devel >= 1.0.4
 BuildPrereq: patch >= 2.5.4
+Url: http://www.postgresql.org/ 
 Requires: postgresql-libs = %{version}
 %if %ssl
 BuildPrereq: openssl-devel
@@ -83,16 +84,17 @@ BuildPrereq: krb5-devel
 %if %nls
 BuildPrereq: gettext >= 0.10.36
 %endif
-Url: http://www.postgresql.org/ 
 Obsoletes: postgresql-clients
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 # Obsolete the packages we are not building...
 %if ! %{plperl}
 Obsoletes: postgresql-plperl
 %endif
+%if %{tcl}
+Buildrequires: tcl
+%endif
 %if ! %{tcl}
 Obsoletes: postgresql-tcl
-Buildrequires: tcl
 %endif
 %if ! %{tkpkg}
 Obsoletes: postgresql-tk
@@ -103,9 +105,11 @@ Obsoletes: postgresql-odbc
 %if ! %{perl}
 Obsoletes: postgresql-perl
 %endif
+%if %{python}
+BuildRequires: python-devel
+%endif
 %if ! %{python}
 Obsoletes: postgresql-python
-BuildRequires: python-devel
 %endif
 %if ! %{jdbc}
 Obsoletes: postgresql-jdbc
@@ -113,7 +117,7 @@ Obsoletes: postgresql-jdbc
 %if ! %{test}
 Obsoletes: postgresql-test
 %endif
-%if ! %{pam}
+%if %{pam}
 BuildRequires: pam-devel
 %endif
 
@@ -938,6 +942,11 @@ rm -f perlfiles.list
 %endif
 
 %changelog
+* Fri Apr 12 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-5
+- Fix conditional build dependencies... it required tcl
+  and python-devel only when you didn't build the modules,
+  not if you needed them
+
 * Wed Apr 10 2002 Trond Eivind Glomsrød <teg@redhat.com> 7.2.1-4
 - Fix pgcrypto (#63073)
 - Remove postgresql-dump. Dump before upgrade, as we've documented many times
