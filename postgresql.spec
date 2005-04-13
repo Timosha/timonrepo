@@ -64,7 +64,7 @@ Version: 8.0.2
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 1
+Release: 2
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -793,6 +793,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Apr 14 2005 Florian La Roche <laroche@redhat.com>
+- rebuild for postgresql-tcl
+
 * Tue Apr 12 2005 Tom Lane <tgl@redhat.com> 8.0.2-1
 - Update to PostgreSQL 8.0.2.
 
