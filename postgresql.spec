@@ -42,7 +42,7 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 8.0.1
+Version: 8.0.2
 
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
@@ -64,7 +64,7 @@ Version: 8.0.1
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 5
+Release: 1
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -793,6 +793,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Apr 12 2005 Tom Lane <tgl@redhat.com> 8.0.2-1
+- Update to PostgreSQL 8.0.2.
+
 * Fri Mar 11 2005 Tom Lane <tgl@redhat.com> 8.0.1-5
 - Remove unwanted rpath specification from pgtcl (bz#150649)
 
