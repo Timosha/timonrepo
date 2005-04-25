@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 1
+Release: 2
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -160,8 +160,8 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
 # Keep config
 rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}/[a-b,d-z,A-Z]*
 rm -rf $RPM_BUILD_ROOT%{_libdir}/libltdl.*
-rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules/*.a
-rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules/*.la
+rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules/*/*.a
+rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules/*/*.la
 rm -f  $RPM_BUILD_ROOT%{_libdir}/*.la
 
 # link docs
