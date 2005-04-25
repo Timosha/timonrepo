@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 2
+Release: 3
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -160,8 +160,8 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
 # Keep config
 rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}/[a-b,d-z,A-Z]*
 rm -rf $RPM_BUILD_ROOT%{_libdir}/libltdl.*
-rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules/*/*.a
-rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules/*/*.la
+rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules*/*/*.a
+rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules*/*/*.la
 rm -f  $RPM_BUILD_ROOT%{_libdir}/*.la
 
 # link docs
@@ -226,6 +226,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Mon Apr 25 2005  Matthias Clasen <mclasen@redhat.com> - 6.2.1.7-3
+- Really remove .la files for modules
+
 * Mon Apr 25 2005  <mclasen@redhat.com> - 6.2.1.7-1
 - Update to 6.2.1
 - Include multiple improvements and bugfixes
