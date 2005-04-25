@@ -136,18 +136,15 @@ rm -rf $RPM_BUILD_ROOT
 
 make install DESTDIR=$RPM_BUILD_ROOT
 
-#find $RPM_BUILD_ROOT -name "*.bs" |xargs rm -f
-#find $RPM_BUILD_ROOT -name ".packlist" |xargs rm -f
-
 # perlmagick: fix perl path of demo files
 %{__perl} -MExtUtils::MakeMaker -e 'MY->fixin(@ARGV)' PerlMagick/demo/*.pl
 
 # perlmagick: remove special files
-find $RPM_BUILD_ROOT%{_libdir}/perl* -name perllocal.pod -o -name .packlist \
+find $RPM_BUILD_ROOT%{_libdir} -name perllocal.pod -o -name .packlist \
 	-o -name "*.bs" | xargs -ri rm -f {}
 
 # perlmagick: no empty directories
-find $RPM_BUILD_ROOT%{_libdir}/perl* -depth -type d -a -empty -exec rmdir {} \;
+find $RPM_BUILD_ROOT%{_libdir} -depth -type d -a -empty -exec rmdir {} \;
 
 # perlmagick: build files list
 echo "%defattr(-,root,root)" > perl-pkg-files
