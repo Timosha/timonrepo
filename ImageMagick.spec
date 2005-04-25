@@ -136,8 +136,8 @@ rm -rf $RPM_BUILD_ROOT
 
 make install DESTDIR=$RPM_BUILD_ROOT
 
-find $RPM_BUILD_ROOT -name "*.bs" |xargs rm -f
-find $RPM_BUILD_ROOT -name ".packlist" |xargs rm -f
+#find $RPM_BUILD_ROOT -name "*.bs" |xargs rm -f
+#find $RPM_BUILD_ROOT -name ".packlist" |xargs rm -f
 
 # perlmagick: fix perl path of demo files
 %{__perl} -MExtUtils::MakeMaker -e 'MY->fixin(@ARGV)' PerlMagick/demo/*.pl
