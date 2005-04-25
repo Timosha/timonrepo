@@ -1,0 +1,14 @@
+--- ImageMagick-6.2.1/config/delegates.xml.in.hp2xx	2005-04-24 23:34:14.481721000 -0400
++++ ImageMagick-6.2.1/config/delegates.xml.in	2005-04-24 23:34:40.886290000 -0400
+@@ -74,10 +74,7 @@
+     @HPGLDecodeDelegate@ -q -m eps -f `basename "%o"` "%i"
+     mv -f `basename "%o"` "%o
+   else
+-    echo "You need to install hp2xx (which is not part of Red Hat Linux) to use"
+-    echo "HPGL files with ImageMagick."
+-    echo "Current hp2xx RPM packages for Red Hat Linux can be found at"
+-    echo "http://rhcontrib.bero.org/search.php in the Applications/Multimedia section."
++    echo "You need to install hp2xx to use HPGL files with ImageMagick."
+     exit 1
+   fi' />
+   <delegate decode="htm" command='"@HTMLDecodeDelegate@" -U -o "%o" "%i"' />

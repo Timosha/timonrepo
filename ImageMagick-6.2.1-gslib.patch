@@ -1,0 +1,131 @@
+--- ImageMagick-5.5.7/magick/delegate.h.gs	2003-06-03 12:37:50.000000000 -0500
++++ ImageMagick-5.5.7/magick/delegate.h	2004-01-20 10:18:57.000000000 -0600
+@@ -9,8 +9,8 @@
+ #endif
+ 
+ #if defined(HasGS)
+-#include "ps/iapi.h"
+-#include "ps/errors.h"
++#include "ghostscript/iapi.h"
++#include "ghostscript/errors.h"
+ #endif
+ 
+ /*
+--- ImageMagick-5.5.7/configure.ac.gs	2004-01-20 10:13:27.000000000 -0600
++++ ImageMagick-5.5.7/configure.ac	2004-01-20 10:15:42.000000000 -0600
+@@ -1349,8 +1349,8 @@
+     AC_MSG_RESULT()
+     failed=0;
+     passed=0;
+-    AC_CHECK_HEADER(ps/iapi.h,passed=`expr $passed + 1`,failed=`expr $failed + 1`,)
+-    AC_CHECK_HEADER(ps/errors.h,passed=`expr $passed + 1`,failed=`expr $failed + 1`,)
++    AC_CHECK_HEADER(ghostscript/iapi.h,passed=`expr $passed + 1`,failed=`expr $failed + 1`,)
++    AC_CHECK_HEADER(ghostscript/errors.h,passed=`expr $passed + 1`,failed=`expr $failed + 1`,)
+     AC_CHECK_LIB(gs,gsapi_new_instance,passed=`expr $passed + 1`,failed=`expr $failed + 1`,)
+     AC_MSG_CHECKING(if Ghostscript library package is complete)
+     if test $passed -gt 0
+--- ImageMagick-5.5.7/configure.gs	2003-12-17 18:10:55.000000000 -0600
++++ ImageMagick-5.5.7/configure	2004-01-20 10:18:26.000000000 -0600
+@@ -36513,8 +36513,8 @@
+     failed=0;
+     passed=0;
+     if test "${ac_cv_header_ps_iapi_h+set}" = set; then
+-  echo "$as_me:$LINENO: checking for ps/iapi.h" >&5
+-echo $ECHO_N "checking for ps/iapi.h... $ECHO_C" >&6
++  echo "$as_me:$LINENO: checking for ghostscript/iapi.h" >&5
++echo $ECHO_N "checking for ghostscript/iapi.h... $ECHO_C" >&6
+ if test "${ac_cv_header_ps_iapi_h+set}" = set; then
+   echo $ECHO_N "(cached) $ECHO_C" >&6
+ fi
+@@ -36522,8 +36522,8 @@
+ echo "${ECHO_T}$ac_cv_header_ps_iapi_h" >&6
+ else
+   # Is the header compilable?
+-echo "$as_me:$LINENO: checking ps/iapi.h usability" >&5
+-echo $ECHO_N "checking ps/iapi.h usability... $ECHO_C" >&6
++echo "$as_me:$LINENO: checking ghostscript/iapi.h usability" >&5
++echo $ECHO_N "checking ghostscript/iapi.h usability... $ECHO_C" >&6
+ cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */
+ _ACEOF
+@@ -36531,7 +36531,7 @@
+ cat >>conftest.$ac_ext <<_ACEOF
+ /* end confdefs.h.  */
+ $ac_includes_default
+-#include <ps/iapi.h>
++#include <ghostscript/iapi.h>
+ _ACEOF
+ rm -f conftest.$ac_objext
+ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+@@ -36567,15 +36567,15 @@
+ echo "${ECHO_T}$ac_header_compiler" >&6
+ 
+ # Is the header present?
+-echo "$as_me:$LINENO: checking ps/iapi.h presence" >&5
+-echo $ECHO_N "checking ps/iapi.h presence... $ECHO_C" >&6
++echo "$as_me:$LINENO: checking ghostscript/iapi.h presence" >&5
++echo $ECHO_N "checking ghostscript/iapi.h presence... $ECHO_C" >&6
+ cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */
+ _ACEOF
+ cat confdefs.h >>conftest.$ac_ext
+ cat >>conftest.$ac_ext <<_ACEOF
+ /* end confdefs.h.  */
+-#include <ps/iapi.h>
++#include <ghostscript/iapi.h>
+ _ACEOF
+ if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
+   (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
+@@ -36609,25 +36609,25 @@
+ # So?  What about this header?
+ case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+   yes:no: )
+-    { echo "$as_me:$LINENO: WARNING: ps/iapi.h: accepted by the compiler, rejected by the preprocessor!" >&5
+-echo "$as_me: WARNING: ps/iapi.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+-    { echo "$as_me:$LINENO: WARNING: ps/iapi.h: proceeding with the compiler's result" >&5
+-echo "$as_me: WARNING: ps/iapi.h: proceeding with the compiler's result" >&2;}
++    { echo "$as_me:$LINENO: WARNING: ghostscript/iapi.h: accepted by the compiler, rejected by the preprocessor!" >&5
++echo "$as_me: WARNING: ghostscript/iapi.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
++    { echo "$as_me:$LINENO: WARNING: ghostscript/iapi.h: proceeding with the compiler's result" >&5
++echo "$as_me: WARNING: ghostscript/iapi.h: proceeding with the compiler's result" >&2;}
+     ac_header_preproc=yes
+     ;;
+   no:yes:* )
+-    { echo "$as_me:$LINENO: WARNING: ps/iapi.h: present but cannot be compiled" >&5
+-echo "$as_me: WARNING: ps/iapi.h: present but cannot be compiled" >&2;}
+-    { echo "$as_me:$LINENO: WARNING: ps/iapi.h:     check for missing prerequisite headers?" >&5
+-echo "$as_me: WARNING: ps/iapi.h:     check for missing prerequisite headers?" >&2;}
+-    { echo "$as_me:$LINENO: WARNING: ps/iapi.h: see the Autoconf documentation" >&5
+-echo "$as_me: WARNING: ps/iapi.h: see the Autoconf documentation" >&2;}
+-    { echo "$as_me:$LINENO: WARNING: ps/iapi.h:     section \"Present But Cannot Be Compiled\"" >&5
+-echo "$as_me: WARNING: ps/iapi.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+-    { echo "$as_me:$LINENO: WARNING: ps/iapi.h: proceeding with the preprocessor's result" >&5
+-echo "$as_me: WARNING: ps/iapi.h: proceeding with the preprocessor's result" >&2;}
+-    { echo "$as_me:$LINENO: WARNING: ps/iapi.h: in the future, the compiler will take precedence" >&5
+-echo "$as_me: WARNING: ps/iapi.h: in the future, the compiler will take precedence" >&2;}
++    { echo "$as_me:$LINENO: WARNING: ghostscript/iapi.h: present but cannot be compiled" >&5
++echo "$as_me: WARNING: ghostscript/iapi.h: present but cannot be compiled" >&2;}
++    { echo "$as_me:$LINENO: WARNING: ghostscript/iapi.h:     check for missing prerequisite headers?" >&5
++echo "$as_me: WARNING: ghostscript/iapi.h:     check for missing prerequisite headers?" >&2;}
++    { echo "$as_me:$LINENO: WARNING: ghostscript/iapi.h: see the Autoconf documentation" >&5
++echo "$as_me: WARNING: ghostscript/iapi.h: see the Autoconf documentation" >&2;}
++    { echo "$as_me:$LINENO: WARNING: ghostscript/iapi.h:     section \"Present But Cannot Be Compiled\"" >&5
++echo "$as_me: WARNING: ghostscript/iapi.h:     section \"Present But Cannot Be Compiled\"" >&2;}
++    { echo "$as_me:$LINENO: WARNING: ghostsript/iapi.h: proceeding with the preprocessor's result" >&5
++echo "$as_me: WARNING: ghostscript/iapi.h: proceeding with the preprocessor's result" >&2;}
++    { echo "$as_me:$LINENO: WARNING: ghostscript/iapi.h: in the future, the compiler will take precedence" >&5
++echo "$as_me: WARNING: ghostscript/iapi.h: in the future, the compiler will take precedence" >&2;}
+     (
+       cat <<\_ASBOX
+ ## ------------------------------------------ ##
+@@ -36638,8 +36638,8 @@
+       sed "s/^/$as_me: WARNING:     /" >&2
+     ;;
+ esac
+-echo "$as_me:$LINENO: checking for ps/iapi.h" >&5
+-echo $ECHO_N "checking for ps/iapi.h... $ECHO_C" >&6
++echo "$as_me:$LINENO: checking for ghostscript/iapi.h" >&5
++echo $ECHO_N "checking for ghostscript/iapi.h... $ECHO_C" >&6
+ if test "${ac_cv_header_ps_iapi_h+set}" = set; then
+   echo $ECHO_N "(cached) $ECHO_C" >&6
+ else

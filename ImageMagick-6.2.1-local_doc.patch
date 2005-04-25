@@ -1,0 +1,33 @@
+--- ImageMagick-6.1.8/configure.ac.local_doc	2005-01-18 10:36:52.264401000 -0600
++++ ImageMagick-6.1.8/configure.ac	2005-01-18 10:43:20.923316728 -0600
+@@ -1986,7 +1986,7 @@
+ # Default delegate definitions
+ AutotraceDecodeDelegateDefault='autotrace'
+ BZIPDelegateDefault='bzip2'
+-BrowseDelegateDefault='mozilla'
++BrowseDelegateDefault='htmlview'
+ CGMDecodeDelegateDefault='ralcgm'
+ CatDelegateDefault='cat'
+ CRWDecodeDelegateDefault='dcraw'
+--- ImageMagick-6.1.8/configure.local_doc	2005-01-13 20:48:03.000000000 -0600
++++ ImageMagick-6.1.8/configure	2005-01-18 10:43:34.126309568 -0600
+@@ -44627,7 +44627,7 @@
+ # Default delegate definitions
+ AutotraceDecodeDelegateDefault='autotrace'
+ BZIPDelegateDefault='bzip2'
+-BrowseDelegateDefault='mozilla'
++BrowseDelegateDefault='htmlview'
+ CGMDecodeDelegateDefault='ralcgm'
+ CatDelegateDefault='cat'
+ CRWDecodeDelegateDefault='dcraw'
+--- ImageMagick-6.1.8/magick/version.h.in.local_doc	2004-12-17 18:28:02.000000000 -0600
++++ ImageMagick-6.1.8/magick/version.h.in	2005-01-18 10:42:27.712406016 -0600
+@@ -28,7 +28,7 @@
+ #define MagickReleaseDate  "@PACKAGE_RELEASE_DATE@"
+ #define MagickVersion MagickPackageName " " MagickLibVersionText " " \
+   MagickReleaseDate " " MagickQuantumDepth " " MagickHomeURL
+-#define MagickHomeURL  "http://www.imagemagick.org"
++#define MagickHomeURL  "file:/usr/share/ImageMagick-@PACKAGE_VERSION@/doc/index.html"
+ 
+ extern MagickExport char
+   *GetMagickHomeURL(void);

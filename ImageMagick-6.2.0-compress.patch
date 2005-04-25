@@ -1,0 +1,46 @@
+--- ImageMagick-6.2.0/coders/tiff.c.compress	2005-04-21 15:38:37.378516000 -0400
++++ ImageMagick-6.2.0/coders/tiff.c	2005-04-21 15:38:58.804069000 -0400
+@@ -1495,7 +1495,6 @@
+     compress_tag=COMPRESSION_NONE;
+     switch (image->compression)
+     {
+-#if defined(CCITT_SUPPORT)
+       case FaxCompression:
+       {
+         if (IsMonochromeImage(image,&image->exception) != MagickFalse)
+@@ -1508,35 +1507,28 @@
+           compress_tag=COMPRESSION_CCITTFAX4;
+         break;
+       }
+-#endif
+-#if defined(YCBCR_SUPPORT)
+       case JPEGCompression:
+       {
+         compress_tag=COMPRESSION_JPEG;
+         (void) SetImageDepth(image,8);
+         break;
+       }
+-#endif
+-#if defined(LZW_SUPPORT)
+       case LZWCompression:
+       {
+         if (image_info->compression == LZWCompression)
+           compress_tag=COMPRESSION_LZW;  /* LZW compression must be explicit */
+         break;
+       }
+-#endif
+       case RLECompression:
+       {
+         compress_tag=COMPRESSION_PACKBITS;
+         break;
+       }
+-#if defined(ZIP_SUPPORT)
+       case ZipCompression:
+       {
+         compress_tag=COMPRESSION_ADOBE_DEFLATE;
+         break;
+       }
+-#endif
+       default:
+       {
+         compress_tag=COMPRESSION_NONE;

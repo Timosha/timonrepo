@@ -1,6 +1,6 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 6.2.0
+%define VER 6.2.1
 %define Patchlevel 7
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
@@ -9,24 +9,30 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 2
+Release: 1
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
-Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.gz
+Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.bz2
 %else
-Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.gz
+Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
 %endif
 Source1: magick_small.png
-Patch1: ImageMagick-6.2.0-lprhack.patch
-Patch2: ImageMagick-6.2.0-hp2xx.patch
-Patch3: ImageMagick-6.2.0-vsnprintf.patch
+Patch2: ImageMagick-6.2.1-hp2xx.patch
+Patch3: ImageMagick-6.2.0-compress.patch
+Patch4: ImageMagick-6.2.1-local_doc.patch
+Patch6: ImageMagick-6.2.1-pkgconfig.patch
+Patch7: ImageMagick-6.2.1-fixed.patch
+
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
 BuildPrereq: libtiff-devel, libungif-devel, zlib-devel, perl
 BuildRequires: freetype-devel >= 2.0.1
 BuildRequires: automake >= 1.7 autoconf >= 2.58 libtool >= 1.5
+BuildRequires: ghostscript-devel
+BuildRequires: libwmf-devel
+BuildRequires: XFree86-devel
 
 %description
 ImageMagick(TM) is an image display and manipulation tool for the X
@@ -46,25 +52,27 @@ ImageMagick-devel as well.
 %package devel
 Summary: Static libraries and header files for ImageMagick app development.
 Group: Development/Libraries
-Requires: ImageMagick = %{version}-%{release}, bzip2-devel, freetype-devel 
-Requires: libjpeg-devel, libpng-devel, libtiff-devel, zlib-devel, libxml2-devel
-Requires: libexif-devel
+Requires: %{name} = %{version}-%{release}
 Requires: XFree86-devel
+Requires: ghostscript-devel
 
 %description devel
-Image-Magick-devel contains the static libraries and header files you'll
+ImageMagick-devel contains the static libraries and header files you'll
 need to develop ImageMagick applications. ImageMagick is an image
 manipulation program.
 
 If you want to create applications that will use ImageMagick code or
 APIs, you need to install ImageMagick-devel as well as ImageMagick.
-You do noy need to install it if you just want to use ImageMagick,
+You do not need to install it if you just want to use ImageMagick,
 however.
 
 %package perl
 Summary: ImageMagick perl bindings
 Group: System Environment/Libraries
-Requires: ImageMagick = %{version}-%{release}, perl >= 5.6.0
+Requires: %{name} = %{version}-%{release}
+Requires: perl >= 5.6.0
+%define perl_vendorarch %(perl -MConfig -le 'print $Config{installvendorarch}')
+Prereq: %{perl_vendorarch}
 
 %description perl
 Perl bindings to ImageMagick.
@@ -75,7 +83,7 @@ ImageMagick.
 %package c++
 Summary: ImageMagick Magick++ library (C++ bindings)
 Group: System Environment/Libraries
-Requires: ImageMagick = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 
 %description c++
 This package contains the Magick++ library, a C++ binding to the ImageMagick
@@ -86,9 +94,8 @@ Install ImageMagick-c++ if you want to use any applications that use Magick++.
 %package c++-devel
 Summary: C++ bindings for the ImageMagick library
 Group: Development/Libraries
-Requires: ImageMagick = %{version}, ImageMagick-c++ = %{version}
-Requires: ImageMagick-devel = %{version}, bzip2-devel, freetype-devel
-Requires: libjpeg-devel, libpng-devel, libtiff-devel, zlib-devel, libxml2-devel
+Requires: %{name}-c++ = %{version}
+Requires: %{name}-devel = %{version}
 
 %description c++-devel
 ImageMagick-devel contains the static libraries and header files you'll
@@ -104,96 +111,67 @@ however.
 
 %prep
 %setup -q -n %{name}-%{VER}
-%patch1 -p1 -b .lpr
 %patch2 -p1 -b .hp2xx
-%patch3 -p1 -b .vsnprintf
+%patch3 -p1 -b .compress
+%patch4 -p1 -b .local_doc
+%patch6 -p1 -b .pkgconfig
+%patch7 -p1 -b .fixed
 
 %build
-libtoolize --copy --force
-aclocal
-automake || :
-autoconf || :
 %configure --enable-shared \
+           --with-modules \
            --with-perl \
 	   --with-x \
            --with-threads \
-           --with-magick_plus_plus
-make
+           --with-magick_plus_plus \
+	   --with-gslib \
+           --with-wmf \
+           --with-perl-options="INSTALLDIRS=vendor %{?perl_prefix} CC='%__cc -L$PWD/magick/.libs' LD='%__ld -L$PWD/magick/.libs'" \
+           --with-windows-font-dir=%{_datadir}/fonts/default/TrueType
 
-# Link against built not installed library
-%define perl_make_options CC='%__cc -L$PWD/magick/.libs' LD='%__ld -L$PWD/magick/.libs'
-make PERL_MAKE_OPTIONS="%perl_make_options" PerlMagick/Makefile
-make -C PerlMagick
+make
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-perl -pi -e 's,^PREFIX.*,PREFIX = \$(DESTDIR)/usr,g;s,^config :: Makefile,config :: ,g;s,Makefile : ,Foo : ,g;s,^INSTALLSITEARCH = /usr,INSTALLSITEARCH = \$(DESTDIR)/usr,g' PerlMagick/Makefile
-cat >>PerlMagick/Makefile <<EOF
-Makefile:
-	touch Makefile
-EOF
-
-make install DESTDIR=$RPM_BUILD_ROOT PERL_MAKE_OPTIONS="%perl_make_options"
-
-# Generate desktop file
-#mkdir -p $RPM_BUILD_ROOT/usr/share/icons $RPM_BUILD_ROOT/etc/X11/applnk/Graphics
-#cp %{SOURCE1} $RPM_BUILD_ROOT/usr/share/icons
-
-#cat >$RPM_BUILD_ROOT/etc/X11/applnk/Graphics/ImageMagick.desktop <<EOF
-#[Desktop Entry]
-#Name=ImageMagick
-#Comment=The ImageMagick picture viewer and editor
-#Comment[de]=Der ImageMagick-Bilderbetrachter und -editor
-#Exec=%{_prefix}/bin/display
-#Icon=magick_small.png
-#Terminal=0
-#Type=Application
-#EOF
+make install DESTDIR=$RPM_BUILD_ROOT
 
 find $RPM_BUILD_ROOT -name "*.bs" |xargs rm -f
 find $RPM_BUILD_ROOT -name ".packlist" |xargs rm -f
 
-# Grr... Broken makefiles!!
-perlver=`perl -v |grep built |sed -e "s,.*v,,;s, .*,,"`
-perlmajor=`echo $perlver |sed -e "s,\..*,,"`
-if [ -d $RPM_BUILD_ROOT%{_libdir}/$perlver ]; then
-	mkdir -p $RPM_BUILD_ROOT%{_libdir}/perl$perlmajor/site_perl/$perlver
-	mv $RPM_BUILD_ROOT%{_libdir}/$perlver/* $RPM_BUILD_ROOT%{_libdir}/perl$perlmajor/site_perl/$perlver/
-	rm -rf $RPM_BUILD_ROOT%{_libdir}/$perlver
-fi
-if [ -d $RPM_BUILD_ROOT%{_libdir}/site_perl ]; then
-	for i in `find $RPM_BUILD_ROOT%{_libdir}/site_perl/ -type d`; do
-		mkdir -p `echo $i |sed -e "s,site_perl,perl$perlmajor/site_perl,g"` || :
-	done
-	for i in `find $RPM_BUILD_ROOT%{_libdir}/site_perl/ -type f`; do
-		mv -f `echo $i |sed -e "s,site_perl,perl$perlmajor/site_perl,g"` || :
-	done
-fi
+# perlmagick: fix perl path of demo files
+%{__perl} -MExtUtils::MakeMaker -e 'MY->fixin(@ARGV)' PerlMagick/demo/*.pl
 
-pushd $RPM_BUILD_ROOT/%{_bindir}
-for i in %{_target}-redhat-linux-*; do
-	[ -f $i ] && mv $i `echo $i |sed -e "s/^%{_target}-redhat-linux-//"`
-done
-popd
+# perlmagick: remove special files
+find $RPM_BUILD_ROOT%{_libdir}/perl* -name perllocal.pod -o -name .packlist \
+	-o -name "*.bs" | xargs -ri rm -f {}
 
-pushd $RPM_BUILD_ROOT/%{_mandir}
-for i in */%{_target}-redhat-linux-*; do
-	[ -f $i ] && mv $i `echo $i |sed -e "s,/%{_target}-redhat-linux-,/,"`
-done
-popd
+# perlmagick: no empty directories
+find $RPM_BUILD_ROOT%{_libdir}/perl* -depth -type d -a -empty -exec rmdir {} \;
 
-# get the perl file list. We know what we need, so this is easy
-rm -f perl-pkg-files.orig
+# perlmagick: build files list
 echo "%defattr(-,root,root)" > perl-pkg-files
-find $RPM_BUILD_ROOT%{_libdir}/perl$perlmajor/site_perl/$perlver -type d -name Image >> perl-pkg-files.orig
-sed -e s,$RPM_BUILD_ROOT,, perl-pkg-files.orig > perl-pkg-files
+find $RPM_BUILD_ROOT/%{_libdir}/perl* -type f -print \
+	| sed "s@^$RPM_BUILD_ROOT@@g" > perl-pkg-files 
+find $RPM_BUILD_ROOT%{perl_vendorarch} -type d -print \
+	| sed "s@^$RPM_BUILD_ROOT@%dir @g" \
+ 	| grep -v '^%dir %{perl_vendorarch}$' \
+	| grep -v '/auto$' >> perl-pkg-files 
+if [ -z perl-pkg-files ] ; then
+    echo "ERROR: EMPTY FILE LIST"
+    exit -1
+fi
 
-# remove files we aren't shipping 
-rm -f `find $RPM_BUILD_ROOT%{_libdir}/perl$perlmajor/ -name perllocal.pod -type f`
 rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
-rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}/{images,www,ChangeLog,LICENSE,NEWS,index.html}
+# Keep config
+rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}/[a-b,d-z,A-Z]*
 rm -rf $RPM_BUILD_ROOT%{_libdir}/libltdl.*
+rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules/*.a
+rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules/*.la
+rm -f  $RPM_BUILD_ROOT%{_libdir}/*.la
+
+# link docs
+ln -sf %{_docdir}/%{name}-%{version} $RPM_BUILD_ROOT%{_libdir}/ImageMagick-%{VER}/doc
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -208,30 +186,31 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%doc index.html www images QuickStart.txt
+%doc index.html www/ images/ 
+%doc QuickStart.txt ChangeLog Platforms.txt
 %doc README.txt LICENSE NOTICE AUTHORS NEWS
 %attr(755,root,root) %{_libdir}/libMagick.so.*
 %attr(755,root,root) %{_libdir}/libWand.so.*
-%{_libdir}/ImageMagick-%{VER}
-%{_datadir}/ImageMagick-%{VER}/config
 %{_bindir}/[a-z]*
-%{_mandir}/*/*
-#/etc/X11/applnk/Graphics/ImageMagick.desktop
-#/usr/share/icons/magick_small.png
+%{_libdir}/ImageMagick*
+%{_datadir}/ImageMagick*
+%{_mandir}/man[145]/[a-z]*
+%{_mandir}/man1/ImageMagick.*
 
 %files devel
 %defattr(-,root,root)
 %{_bindir}/Magick-config
 %{_bindir}/Wand-config
 %{_libdir}/libMagick.a
-%{_libdir}/libMagick.la
 %{_libdir}/libMagick.so
 %{_libdir}/libWand.a
-%{_libdir}/libWand.la
 %{_libdir}/libWand.so
-%{_libdir}/pkgconfig/*.pc
+%{_libdir}/pkgconfig/ImageMagick.pc
+%{_libdir}/pkgconfig/Wand.pc
 %{_includedir}/magick
 %{_includedir}/wand
+%{_mandir}/man1/Magick-config.*
+%{_mandir}/man1/Wand-config.*
 
 %files c++
 %defattr(-,root,root)
@@ -243,15 +222,25 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/Magick++
 %{_includedir}/Magick++.h
 %{_libdir}/libMagick++.a
-%{_libdir}/libMagick++.la
 %{_libdir}/libMagick++.so
+%{_libdir}/pkgconfig/ImageMagick++.pc
+%{_mandir}/man1/Magick++-config.*
 
 %files perl -f perl-pkg-files
 %defattr(-,root,root)
-#%{_libdir}/perl*/site_perl/*/*/auto/Image
-#%{_libdir}/perl*/site_perl/*/*/Image
+%{_mandir}/man3/*
+%doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Mon Apr 25 2005  <mclasen@redhat.com> - 6.2.1.7-1
+- Update to 6.2.1
+- Include multiple improvements and bugfixes
+  by Rex Dieter et al (111961, 145466, 151196, 149970, 
+  146518, 113951, 145449, 144977, 144570, 139298)
+
+* Sun Apr 24 2005  <mclasen@redhat.com> - 6.2.0.7-3
+- Make zip compression work for tiff (#154045)
+
 * Wed Mar 16 2005  <mclasen@redhat.com> - 6.2.0.7-2
 - Update to 6.2.0 to fix a number of security issues:
   #145112 (CAN-2005-05), #151265 (CAN-2005-0397)
