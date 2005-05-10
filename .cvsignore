@@ -1,8 +1,8 @@
-postgresql-8.0.2.tar.bz2
+postgresql-8.0.3.tar.bz2
 PyGreSQL-3.6.1.tgz
 pgtcl1.5.2.tar.gz
 pgtcldocs-20041108.zip
-postgresql-8.0.309.jdbc2.jar
-postgresql-8.0.309.jdbc2ee.jar
-postgresql-8.0.309.jdbc3.jar
+postgresql-8.0-311.jdbc2.jar
+postgresql-8.0-311.jdbc2ee.jar
+postgresql-8.0-311.jdbc3.jar
 postgresql-8.0-US.pdf

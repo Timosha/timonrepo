@@ -42,7 +42,7 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 8.0.2
+Version: 8.0.3
 
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
@@ -64,16 +64,16 @@ Version: 8.0.2
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 2
+Release: 1
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
 Source3: postgresql.init
 Source4: Makefile.regress
 Source6: README.rpm-dist
-Source8: http://jdbc.postgresql.org/download/postgresql-8.0.309.jdbc2.jar
-Source9: http://jdbc.postgresql.org/download/postgresql-8.0.309.jdbc2ee.jar
-Source10: http://jdbc.postgresql.org/download/postgresql-8.0.309.jdbc3.jar
+Source8: http://jdbc.postgresql.org/download/postgresql-8.0-311.jdbc2.jar
+Source9: http://jdbc.postgresql.org/download/postgresql-8.0-311.jdbc2ee.jar
+Source10: http://jdbc.postgresql.org/download/postgresql-8.0-311.jdbc3.jar
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
 Source17: postgresql-8.0-US.pdf
@@ -569,6 +569,14 @@ groupadd -g 26 -o -r postgres >/dev/null 2>&1 || :
 useradd -M -n -g postgres -o -r -d /var/lib/pgsql -s /bin/bash \
 	-c "PostgreSQL Server" -u 26 postgres >/dev/null 2>&1 || :
 
+# If we're upgrading from rh-postgresql, we have to repeat the above actions
+# after rh-postgresql-server is uninstalled, because its postun script runs
+# after our pre script ...
+%triggerpostun -n postgresql-server -- rh-postgresql-server
+groupadd -g 26 -o -r postgres >/dev/null 2>&1 || :
+useradd -M -n -g postgres -o -r -d /var/lib/pgsql -s /bin/bash \
+	-c "PostgreSQL Server" -u 26 postgres >/dev/null 2>&1 || :
+
 %post server
 chkconfig --add postgresql
 /sbin/ldconfig
@@ -581,6 +589,9 @@ fi
 
 %postun server
 /sbin/ldconfig 
+if [ $1 -ge 1 ] ; then
+	/sbin/service postgresql condrestart >/dev/null 2>&1 || :
+fi
 if [ $1 = 0 ] ; then
 	userdel postgres >/dev/null 2>&1 || :
 	groupdel postgres >/dev/null 2>&1 || : 
@@ -793,7 +804,14 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
-* Thu Apr 14 2005 Florian La Roche <laroche@redhat.com>
+* Tue May 10 2005 Tom Lane <tgl@redhat.com> 8.0.3-1
+- Update to PostgreSQL 8.0.3 (includes security and data-loss fixes; see
+  bz#156727, CAN-2005-1409, CAN-2005-1410)
+- Update to jdbc driver build 311
+- Recreate postgres user after superseding an rh-postgresql install (bug #151911)
+- Ensure postgresql server is restarted if running during an upgrade
+
+* Thu Apr 14 2005 Florian La Roche <laroche@redhat.com> 8.0.2-2
 - rebuild for postgresql-tcl
 
 * Tue Apr 12 2005 Tom Lane <tgl@redhat.com> 8.0.2-1
