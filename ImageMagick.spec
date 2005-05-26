@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 1
+Release: 2
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -23,6 +23,8 @@ Patch3: ImageMagick-6.2.0-compress.patch
 Patch4: ImageMagick-6.2.1-local_doc.patch
 Patch6: ImageMagick-6.2.1-pkgconfig.patch
 Patch7: ImageMagick-6.2.1-fixed.patch
+# 158791
+Patch8: ImageMagick-5.5.6-mask.patch
 
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
@@ -116,6 +118,7 @@ however.
 %patch4 -p1 -b .local_doc
 %patch6 -p1 -b .pkgconfig
 %patch7 -p1 -b .fixed
+%patch8 -p1 -b .mask
 
 %build
 %configure --enable-shared \
@@ -225,6 +228,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Thu May 26 2005  <mclasen@redhat.com> - 6.2.2.0-2
+- fix a denial of service in the xwd coder (#158791, CAN-2005-1739)
+
 * Tue Apr 26 2005 Matthias Clasen <mclasen@redhat.com> - 6.2.2.0-1
 - Update to 6.2.2 to fix a heap corruption issue
   in the pnm coder.
