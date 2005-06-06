@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 2
+Release: 3
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -228,6 +228,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Mon Jun  6 2005 Tim Waugh <twaugh@redhat.com> 6.2.2.0-3
+- Rebuilt for new ghostscript.
+
 * Thu May 26 2005  <mclasen@redhat.com> - 6.2.2.0-2
 - fix a denial of service in the xwd coder (#158791, CAN-2005-1739)
 
