@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 3
+Release: 4
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -228,6 +228,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Thu Jun  9 2005 Tim Waugh <twaugh@redhat.com> 6.2.2.0-4
+- Rebuilt for fixed ghostscript.
+
 * Mon Jun  6 2005 Tim Waugh <twaugh@redhat.com> 6.2.2.0-3
 - Rebuilt for new ghostscript.
 
