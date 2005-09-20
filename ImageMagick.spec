@@ -161,7 +161,7 @@ rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules*/*/*.a
 rm -f  $RPM_BUILD_ROOT%{_libdir}/*.la
 
 # link docs
-ln -sf %{_docdir}/%{name}-%{version} $RPM_BUILD_ROOT%{_libdir}/ImageMagick-%{VER}/doc
+#ln -sf %{_docdir}/%{name}-%{version} $RPM_BUILD_ROOT%{_libdir}/ImageMagick-%{VER}/doc
 
 %clean
 rm -rf $RPM_BUILD_ROOT
