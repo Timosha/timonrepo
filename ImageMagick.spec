@@ -1,7 +1,7 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 6.2.2
-%define Patchlevel 0
+%define VER 6.2.4
+%define Patchlevel 6
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
 %if "%{Patchlevel}" != ""
@@ -18,13 +18,7 @@ Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchleve
 Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
 %endif
 Source1: magick_small.png
-Patch2: ImageMagick-6.2.1-hp2xx.patch
-Patch3: ImageMagick-6.2.0-compress.patch
 Patch4: ImageMagick-6.2.1-local_doc.patch
-Patch6: ImageMagick-6.2.1-pkgconfig.patch
-Patch7: ImageMagick-6.2.1-fixed.patch
-# 158791
-Patch8: ImageMagick-5.5.6-mask.patch
 
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
@@ -57,6 +51,10 @@ Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 Requires: XFree86-devel
 Requires: ghostscript-devel
+Requires: bzip2-devel
+Requires: libtiff-devel
+Requires: libjpeg-devel
+Requires: pkgconfig
 
 %description devel
 ImageMagick-devel contains the static libraries and header files you'll
@@ -113,12 +111,7 @@ however.
 
 %prep
 %setup -q -n %{name}-%{VER}
-%patch2 -p1 -b .hp2xx
-%patch3 -p1 -b .compress
 %patch4 -p1 -b .local_doc
-%patch6 -p1 -b .pkgconfig
-%patch7 -p1 -b .fixed
-%patch8 -p1 -b .mask
 
 %build
 %configure --enable-shared \
@@ -130,7 +123,8 @@ however.
 	   --with-gslib \
            --with-wmf \
            --with-perl-options="INSTALLDIRS=vendor %{?perl_prefix} CC='%__cc -L$PWD/magick/.libs' LD='%__ld -L$PWD/magick/.libs'" \
-           --with-windows-font-dir=%{_datadir}/fonts/default/TrueType
+           --with-windows-font-dir=%{_datadir}/fonts/default/TrueType \
+	   --without-dps
 
 make
 
@@ -228,6 +222,12 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Tue Sep 20 2005 Matthias Clasen <mclasen@redhat.com> 6.2.4.6-1
+- Update to 6.2.4-6
+- Drop upstreamed patches
+- Disable DPS (#158984)
+- Add missing requires (#165931)
+
 * Thu Jun  9 2005 Tim Waugh <twaugh@redhat.com> 6.2.2.0-4
 - Rebuilt for fixed ghostscript.
 
