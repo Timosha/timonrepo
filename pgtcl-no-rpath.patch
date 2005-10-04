@@ -7,6 +7,13 @@ We also remove some direct hacks on LIBOBJS because modern Autoconf
 doesn't like them; not worth fixing properly since they won't be
 invoked on our systems anyway.
 
+Finally, tweak Makefile.in to ensure that the -L switch for libpq appears
+before any -L for the Tcl libraries during the link.  This prevents the
+generated library from being bound to the wrong version of libpq when
+building on a machine that has an older version of libpq already installed
+(bug #166665).
+
+
 diff -Naur Pgtcl.orig/aclocal.m4 Pgtcl/aclocal.m4
 --- Pgtcl.orig/aclocal.m4	2004-02-15 15:15:37.000000000 -0500
 +++ Pgtcl/aclocal.m4	2005-03-11 18:26:44.610459295 -0500
@@ -61,3 +68,17 @@ diff -Naur Pgtcl.orig/aclocal.m4 Pgtcl/aclocal.m4
  	    ;;
  	GNU*)
  	    SHLIB_CFLAGS="-fPIC"
+
+
+diff -Naur Pgtcl.orig/Makefile.in Pgtcl/Makefile.in
+--- Pgtcl.orig/Makefile.in	2004-06-13 17:49:14.000000000 -0400
++++ Pgtcl/Makefile.in	2005-10-04 14:23:37.000000000 -0400
+@@ -121,7 +121,7 @@
+ SHLIB_LD	= @SHLIB_LD@
+ SHLIB_LDFLAGS	= @SHLIB_LDFLAGS@
+ # Added EXTRA_LIBS for special cases like -lssl
+-SHLIB_LD_LIBS	= @SHLIB_LD_LIBS@ $(PG_LIBS) $(TCL_LIBS) @EXTRA_LIBS@
++SHLIB_LD_LIBS	= $(PG_LIBS) @SHLIB_LD_LIBS@ $(TCL_LIBS) @EXTRA_LIBS@
+ STLIB_LD	= @STLIB_LD@
+ TCL_DEFS	= @TCL_DEFS@
+ TCL_BIN_DIR	= @TCL_BIN_DIR@

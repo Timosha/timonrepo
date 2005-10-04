@@ -32,17 +32,17 @@
 %{!?kerberos:%define kerberos 1}
 %{!?nls:%define nls 1}
 %{!?pam:%define pam 1}
+%{!?xml:%define xml 1}
 %{!?pgfts:%define pgfts 1}
 %{!?runselftest:%define runselftest 1}
 
 # Python major version.
 %{expand: %%define pyver %(python -c 'import sys;print(sys.version[0:3])')}
-%{expand: %%define pynextver %(python -c 'import sys;print(float(sys.version[0:3])+0.1)')}
 
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 8.0.3
+Version: 8.0.4
 
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
@@ -71,13 +71,14 @@ Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.t
 Source3: postgresql.init
 Source4: Makefile.regress
 Source6: README.rpm-dist
-Source8: http://jdbc.postgresql.org/download/postgresql-8.0-311.jdbc2.jar
-Source9: http://jdbc.postgresql.org/download/postgresql-8.0-311.jdbc2ee.jar
-Source10: http://jdbc.postgresql.org/download/postgresql-8.0-311.jdbc3.jar
+Source8: http://jdbc.postgresql.org/download/postgresql-8.0-312.jdbc2.jar
+Source9: http://jdbc.postgresql.org/download/postgresql-8.0-312.jdbc2ee.jar
+Source10: http://jdbc.postgresql.org/download/postgresql-8.0-312.jdbc3.jar
+Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
 Source17: postgresql-8.0-US.pdf
-Source18: ftp://ftp.druid.net/pub/distrib/PyGreSQL-3.6.1.tgz
+Source18: ftp://ftp.druid.net/pub/distrib/PyGreSQL-3.6.2.tgz
 Source19: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcl1.5.2.tar.gz
 Source20: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcldocs-20041108.zip
 Patch1: rpm-pgsql.patch
@@ -85,6 +86,7 @@ Patch2: postgresql-src-tutorial.patch
 Patch3: postgresql-logging.patch
 Patch4: postgresql-test.patch
 Patch5: pgtcl-no-rpath.patch
+Patch6: postgresql-perl-rpath.patch
 Buildrequires: perl glibc-devel bison flex
 Prereq: /sbin/ldconfig initscripts
 %if %python
@@ -108,11 +110,13 @@ BuildPrereq: e2fsprogs-devel
 %if %nls
 BuildPrereq: gettext >= 0.10.35
 %endif
-
 %if %pam
 %if %non6xpamdeps
 BuildPrereq: pam-devel
 %endif
+%endif
+%if %xml
+BuildPrereq: libxml2-devel
 %endif
 
 Url: http://www.postgresql.org/ 
@@ -280,7 +284,6 @@ Summary: Development module for Python code to access a PostgreSQL DB.
 Group: Applications/Databases
 Requires: libpq.so
 Requires: python mx
-Conflicts: python < %pyver, python >= %pynextver
 Obsoletes: rh-postgresql-python
 
 %description python
@@ -330,6 +333,8 @@ popd
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+# patch5 is applied later
+%patch6 -p1
 
 #call autoconf 2.53 or greater
 %aconfver
@@ -410,6 +415,9 @@ CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
 
 make %{?_smp_mflags} all
 make %{?_smp_mflags} -C contrib all
+%if %xml
+make %{?_smp_mflags} -C contrib/xml2 all
+%endif
 
 # Have to hack makefile to put correct path into tutorial scripts
 sed "s|C=\`pwd\`;|C=%{_libdir}/pgsql/tutorial;|" < src/tutorial/Makefile > src/tutorial/GNUmakefile
@@ -461,6 +469,9 @@ rm -rf $RPM_BUILD_ROOT
 
 make DESTDIR=$RPM_BUILD_ROOT install
 make -C contrib DESTDIR=$RPM_BUILD_ROOT install
+%if %xml
+make -C contrib/xml2 DESTDIR=$RPM_BUILD_ROOT install
+%endif
 
 install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
 cp src/tutorial/* $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
@@ -494,6 +505,14 @@ then
 	sed 's/^PGVERSION=.*$/PGVERSION=%{version}/' <%{SOURCE3} >postgresql.init
 	install -m 755 postgresql.init $RPM_BUILD_ROOT/etc/rc.d/init.d/postgresql
 fi
+
+%if %pam
+if [ -d /etc/pam.d ]
+then
+	install -d $RPM_BUILD_ROOT/etc/pam.d
+	install -m 644 %{SOURCE14} $RPM_BUILD_ROOT/etc/pam.d/postgresql
+fi
+%endif
 
 # Remove stuff we don't want to ship.
 rm -f $RPM_BUILD_ROOT%{_bindir}/findoidjoins
@@ -684,6 +703,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pgsql/tsearch.so
 %{_libdir}/pgsql/tsearch2.so
 %{_libdir}/pgsql/user_locks.so
+%if %xml
+%{_libdir}/pgsql/pgxml.so
+%endif
 %{_datadir}/pgsql/contrib/
 %{_bindir}/DBMirror.pl
 %{_bindir}/clean_pending.pl
@@ -708,6 +730,9 @@ rm -rf $RPM_BUILD_ROOT
 %files server -f server.lst
 %defattr(-,root,root)
 /etc/rc.d/init.d/postgresql
+%if %pam
+/etc/pam.d/postgresql
+%endif
 %attr (755,root,root) %dir /etc/sysconfig/pgsql
 %{_bindir}/initdb
 %{_bindir}/ipcclean
@@ -804,6 +829,14 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Oct  4 2005 Tom Lane <tgl@redhat.com> 8.0.4-1
+- Update to PostgreSQL 8.0.4, PyGreSQL 3.6.2, and jdbc driver build 312
+- Add rpath to plperl.so (bug #162198)
+- Adjust pgtcl link command to ensure it binds to correct libpq (bug #166665)
+- Remove obsolete Conflicts: against other python versions (bug #166754)
+- Add /etc/pam.d/postgresql (bug #167040)
+- Include contrib/xml2 in build (bug #167492)
+
 * Tue May 10 2005 Tom Lane <tgl@redhat.com> 8.0.3-1
 - Update to PostgreSQL 8.0.3 (includes security and data-loss fixes; see
   bz#156727, CAN-2005-1409, CAN-2005-1410)
