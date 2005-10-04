@@ -64,7 +64,7 @@ Version: 8.0.4
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
 
-Release: 1
+Release: 2
 License: BSD
 Group: Applications/Databases
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -829,9 +829,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Oct  4 2005 Tom Lane <tgl@redhat.com> 8.0.4-2
+- Add rpath to plperl.so (bug #162198)
+
 * Tue Oct  4 2005 Tom Lane <tgl@redhat.com> 8.0.4-1
 - Update to PostgreSQL 8.0.4, PyGreSQL 3.6.2, and jdbc driver build 312
-- Add rpath to plperl.so (bug #162198)
 - Adjust pgtcl link command to ensure it binds to correct libpq (bug #166665)
 - Remove obsolete Conflicts: against other python versions (bug #166754)
 - Add /etc/pam.d/postgresql (bug #167040)
