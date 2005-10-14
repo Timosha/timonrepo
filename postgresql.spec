@@ -829,6 +829,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Fri Oct 14 2005 Tomas Mraz <tmraz@redhat.com>
+- use include instead of pam_stack in pam config
+
 * Tue Oct  4 2005 Tom Lane <tgl@redhat.com> 8.0.4-2
 - Add rpath to plperl.so (bug #162198)
 
