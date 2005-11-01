@@ -1,7 +1,7 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 6.2.4
-%define Patchlevel 6
+%define VER 6.2.5
+%define Patchlevel 4
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
 %if "%{Patchlevel}" != ""
@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 5
+Release: 1
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -176,7 +176,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%doc index.html www/ images/ 
 %doc QuickStart.txt ChangeLog Platforms.txt
 %doc README.txt LICENSE NOTICE AUTHORS NEWS
 %attr(755,root,root) %{_libdir}/libMagick.so.*
@@ -186,6 +185,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/ImageMagick*
 %{_mandir}/man[145]/[a-z]*
 %{_mandir}/man1/ImageMagick.*
+%{_datadir}/doc/ImageMagick*
 
 %files devel
 %defattr(-,root,root)
