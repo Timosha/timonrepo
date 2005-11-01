@@ -222,8 +222,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
-* Tue Nov  1 2005 Matthias Clasen <mclasen@redhat.com> 6.2.4.6-2
+* Tue Nov  1 2005 Matthias Clasen <mclasen@redhat.com> 6.2.5.4-1
 - Switch requires to modular X
+- Update to 6.2.5
 
 * Tue Sep 20 2005 Matthias Clasen <mclasen@redhat.com> 6.2.4.6-1
 - Update to 6.2.4-6
