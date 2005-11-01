@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 4
+Release: 5
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -28,7 +28,7 @@ BuildRequires: freetype-devel >= 2.0.1
 BuildRequires: automake >= 1.7 autoconf >= 2.58 libtool >= 1.5
 BuildRequires: ghostscript-devel
 BuildRequires: libwmf-devel
-BuildRequires: XFree86-devel
+BuildRequires: libX11-devel, libXext-devel, libXt-devel
 
 %description
 ImageMagick(TM) is an image display and manipulation tool for the X
@@ -49,7 +49,7 @@ ImageMagick-devel as well.
 Summary: Static libraries and header files for ImageMagick app development.
 Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
-Requires: XFree86-devel
+Requires: libX11-devel, libXext-devel, libXt-devel
 Requires: ghostscript-devel
 Requires: bzip2-devel
 Requires: libtiff-devel
@@ -222,6 +222,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Tue Nov  1 2005 Matthias Clasen <mclasen@redhat.com> 6.2.4.6-2
+- Switch requires to modular X
+
 * Tue Sep 20 2005 Matthias Clasen <mclasen@redhat.com> 6.2.4.6-1
 - Update to 6.2.4-6
 - Drop upstreamed patches
