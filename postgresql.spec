@@ -1,49 +1,3 @@
-# build6x usage: define to 1 to build for RHL6.x.  Don't define at all for others.
-%{?build6x:%define kerberos 0}
-%{?build6x:%define nls 0}
-%{?build6x:%define ssl 0}
-%{?build6x:%define tcldevel 0}
-%{?build6x:%define aconfver /bin/true}
-#work around the undefined or defined to 1 build 6x interaction with the pam stuff
-%{!?build6x:%define non6xpamdeps 1}
-%{?build6x:%define non6xpamdeps 0}
-#build7x, build8, and build9 similar
-%{?build8:%define build89 1}
-%{?build9:%define build89 1}
-%{?build7x:%define tcldevel 0}
-%{?build8:%define tcldevel 0}
-%{?build7x:%define aconfver autoconf-2.53}
-
-%{!?tcldevel:%define tcldevel 1}
-%{!?aconfver:%define aconfver autoconf}
-
-%define beta 0
-
-%{?beta:%define __os_install_post /usr/lib/rpm/brp-compress}
-
-%{!?tcl:%define tcl 1}
-%{!?jdbc:%define jdbc 1}
-%{!?test:%define test 1}
-%{!?python:%define python 1}
-%{!?pltcl:%define pltcl 1}
-%{!?plperl:%define plperl 1}
-%{!?pls:%define pls 1}
-%{!?ssl:%define ssl 1}
-%{!?kerberos:%define kerberos 1}
-%{!?nls:%define nls 1}
-%{!?pam:%define pam 1}
-%{!?xml:%define xml 1}
-%{!?pgfts:%define pgfts 1}
-%{!?runselftest:%define runselftest 1}
-
-# Python major version.
-%{expand: %%define pyver %(python -c 'import sys;print(sys.version[0:3])')}
-
-
-Summary: PostgreSQL client programs and libraries.
-Name: postgresql
-Version: 8.0.4
-
 # Conventions for PostgreSQL Global Development Group RPM releases:
 
 # Official PostgreSQL Development Group RPMS have a PGDG after the release number.
@@ -63,71 +17,6 @@ Version: 8.0.4
 
 # Pre-release RPM's should not be put up on the public ftp.postgresql.org server
 # -- only test releases or full releases should be.
-
-Release: 2
-License: BSD
-Group: Applications/Databases
-Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
-Source3: postgresql.init
-Source4: Makefile.regress
-Source6: README.rpm-dist
-Source8: http://jdbc.postgresql.org/download/postgresql-8.0-312.jdbc2.jar
-Source9: http://jdbc.postgresql.org/download/postgresql-8.0-312.jdbc2ee.jar
-Source10: http://jdbc.postgresql.org/download/postgresql-8.0-312.jdbc3.jar
-Source14: postgresql.pam
-Source15: postgresql-bashprofile
-Source16: filter-requires-perl-Pg.sh
-Source17: postgresql-8.0-US.pdf
-Source18: ftp://ftp.druid.net/pub/distrib/PyGreSQL-3.6.2.tgz
-Source19: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcl1.5.2.tar.gz
-Source20: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcldocs-20041108.zip
-Patch1: rpm-pgsql.patch
-Patch2: postgresql-src-tutorial.patch
-Patch3: postgresql-logging.patch
-Patch4: postgresql-test.patch
-Patch5: pgtcl-no-rpath.patch
-Patch6: postgresql-perl-rpath.patch
-Buildrequires: perl glibc-devel bison flex
-Prereq: /sbin/ldconfig initscripts
-%if %python
-BuildPrereq: python-devel
-%endif
-%if %tcl || %pltcl
-BuildPrereq: tcl
-%if %tcldevel
-Buildrequires: tcl-devel
-%endif
-%endif
-BuildPrereq: readline-devel
-BuildPrereq: zlib-devel >= 1.0.4
-%if %ssl
-BuildPrereq: openssl-devel
-%endif
-%if %kerberos
-BuildPrereq: krb5-devel
-BuildPrereq: e2fsprogs-devel
-%endif
-%if %nls
-BuildPrereq: gettext >= 0.10.35
-%endif
-%if %pam
-%if %non6xpamdeps
-BuildPrereq: pam-devel
-%endif
-%endif
-%if %xml
-BuildPrereq: libxml2-devel
-%endif
-
-Url: http://www.postgresql.org/ 
-
-Obsoletes: postgresql-clients
-Obsoletes: postgresql-perl
-Obsoletes: postgresql-tk
-Obsoletes: rh-postgresql
-
-Buildroot: %{_tmppath}/%{name}-%{version}-root
-
 # This is the PostgreSQL Global Development Group Official RPMset spec file,
 # or a derivative thereof.
 # Copyright 2003 Lamar Owen <lowen@pari.edu> <lamar.owen@wgcr.org>
@@ -152,12 +41,118 @@ Buildroot: %{_tmppath}/%{name}-%{version}-root
 # This spec file and ancilliary files are licensed in accordance with 
 # The PostgreSQL license.
 
-# On top of this file you can find the default build package list macros.  These can be overridden by defining
+# In this file you can find the default build package list macros.  These can be overridden by defining
 # on the rpm command line:
 # rpm --define 'packagename 1' .... to force the package to build.
 # rpm --define 'packagename 0' .... to force the package NOT to build.
 # The base package, the lib package, the devel package, and the server package always get built.
 
+#build7x, build8, and build9 similar
+%{?build8:%define build89 1}
+%{?build9:%define build89 1}
+%{?build7x:%define tcldevel 0}
+%{?build8:%define tcldevel 0}
+%{?build7x:%define aconfver autoconf-2.53}
+
+%{!?aconfver:%define aconfver autoconf}
+
+%define beta 0
+%{?beta:%define __os_install_post /usr/lib/rpm/brp-compress}
+
+%{!?tcldevel:%define tcldevel 1}
+%{!?jdbc:%define jdbc 1}
+%{!?test:%define test 1}
+%{!?python:%define python 1}
+%{!?pltcl:%define pltcl 1}
+%{!?plperl:%define plperl 1}
+%{!?tcl:%define tcl 1}
+%{!?pls:%define pls 1}
+%{!?ssl:%define ssl 1}
+%{!?kerberos:%define kerberos 1}
+%{!?nls:%define nls 1}
+%{!?xml:%define xml 1}
+%{!?pam:%define pam 1}
+%{!?pgfts:%define pgfts 1}
+%{!?runselftest:%define runselftest 1}
+
+# Python major version.
+%{expand: %%define pyver %(python -c 'import sys;print(sys.version[0:3])')}
+
+
+Summary: PostgreSQL client programs and libraries.
+Name: postgresql
+Version: 8.1.0
+Release: 1
+License: BSD
+Group: Applications/Databases
+Url: http://www.postgresql.org/ 
+
+Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
+Source3: postgresql.init
+Source4: Makefile.regress
+Source6: README.rpm-dist
+Source8: http://jdbc.postgresql.org/download/postgresql-8.1-404.jdbc2.jar
+Source9: http://jdbc.postgresql.org/download/postgresql-8.1-404.jdbc2ee.jar
+Source10: http://jdbc.postgresql.org/download/postgresql-8.1-404.jdbc3.jar
+Source14: postgresql.pam
+Source15: postgresql-bashprofile
+Source16: filter-requires-perl-Pg.sh
+Source17: http://www.postgresql.org/docs/manuals/postgresql-8.0-US.pdf
+Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.7.tgz
+Source19: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcl1.5.2.tar.gz
+Source20: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcldocs-20041108.zip
+
+Patch1: rpm-pgsql.patch
+Patch2: postgresql-src-tutorial.patch
+Patch3: postgresql-logging.patch
+Patch4: postgresql-test.patch
+Patch5: pgtcl-no-rpath.patch
+Patch6: postgresql-perl-rpath.patch
+
+Buildrequires: perl glibc-devel bison flex autoconf
+Prereq: /sbin/ldconfig initscripts
+
+%if %python
+BuildPrereq: python-devel
+%endif
+
+%if %tcl || %pltcl
+BuildPrereq: tcl
+%if %tcldevel
+Buildrequires: tcl-devel
+%endif
+%endif
+
+BuildPrereq: readline-devel
+BuildPrereq: zlib-devel >= 1.0.4
+
+%if %ssl
+BuildPrereq: openssl-devel
+%endif
+
+%if %kerberos
+BuildPrereq: krb5-devel
+BuildPrereq: e2fsprogs-devel
+%endif
+
+%if %nls
+BuildPrereq: gettext >= 0.10.35
+%endif
+
+%if %xml
+BuildPrereq: libxml2-devel libxslt-devel
+%endif
+
+%if %pam
+BuildPrereq: pam-devel
+%endif
+
+Obsoletes: postgresql-clients
+Obsoletes: postgresql-perl
+Obsoletes: postgresql-tk
+Obsoletes: rh-postgresql
+
+Buildroot: %{_tmppath}/%{name}-%{version}-root
 
 %description
 PostgreSQL is an advanced Object-Relational database management system
@@ -243,9 +238,7 @@ The postgresql-devel package contains the header files and libraries
 needed to compile C or C++ applications which will directly interact
 with a PostgreSQL database management server and the ecpg Embedded C
 Postgres preprocessor. You need to install this package if you want to
-develop applications which will interact with a PostgreSQL server. If
-you're installing postgresql-server, you need to install this
-package.
+develop applications which will interact with a PostgreSQL server.
 
 #------------
 %if %pls
@@ -258,7 +251,7 @@ Obsoletes: rh-postgresql-pl
 
 %description pl
 PostgreSQL is an advanced Object-Relational database management
-system.  The postgresql-pl package contains the the PL/Perl, PL/Tcl, and PL/Python
+system.  The postgresql-pl package contains the PL/Perl, PL/Tcl, and PL/Python
 procedural languages for the backend.  PL/Pgsql is part of the core server package.
 %endif
 
@@ -514,12 +507,6 @@ then
 fi
 %endif
 
-# Remove stuff we don't want to ship.
-rm -f $RPM_BUILD_ROOT%{_bindir}/findoidjoins
-rm -f $RPM_BUILD_ROOT%{_bindir}/make_oidjoins_check
-rm -f $RPM_BUILD_ROOT%{_docdir}/pgsql/contrib/README.findoidjoins
-rm -f contrib/findoidjoins/README.findoidjoins
-
 # PGDATA needs removal of group and world permissions due to pg_pwd hole.
 install -d -m 700 $RPM_BUILD_ROOT/var/lib/pgsql/data
 
@@ -648,6 +635,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/pg_dumpall
 %{_bindir}/pg_restore
 %{_bindir}/psql
+%{_bindir}/reindexdb
 %{_bindir}/vacuumdb
 %{_mandir}/man1/clusterdb.*
 %{_mandir}/man1/createdb.*
@@ -660,6 +648,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/pg_dumpall.*
 %{_mandir}/man1/pg_restore.*
 %{_mandir}/man1/psql.*
+%{_mandir}/man1/reindexdb.*
 %{_mandir}/man1/vacuumdb.*
 %{_mandir}/man7/*
 %dir %{_libdir}/pgsql
@@ -678,7 +667,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pgsql/chkpass.so
 %{_libdir}/pgsql/cube.so
 %{_libdir}/pgsql/dblink.so
-%{_libdir}/pgsql/dbsize.so
 %{_libdir}/pgsql/earthdistance.so
 %{_libdir}/pgsql/fti.so
 %{_libdir}/pgsql/fuzzystrmatch.so
@@ -687,20 +675,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pgsql/isbn_issn.so
 %{_libdir}/pgsql/lo.so
 %{_libdir}/pgsql/ltree.so
-%{_libdir}/pgsql/misc_utils.so
 %{_libdir}/pgsql/moddatetime.so
-%{_libdir}/pgsql/noup.so
 %{_libdir}/pgsql/pending.so
 %{_libdir}/pgsql/pgcrypto.so
 %{_libdir}/pgsql/pgstattuple.so
+%{_libdir}/pgsql/pg_buffercache.so
 %{_libdir}/pgsql/pg_trgm.so
 %{_libdir}/pgsql/refint.so
-%{_libdir}/pgsql/rtree_gist.so
 %{_libdir}/pgsql/seg.so
-%{_libdir}/pgsql/string_io.so
 %{_libdir}/pgsql/tablefunc.so
 %{_libdir}/pgsql/timetravel.so
-%{_libdir}/pgsql/tsearch.so
 %{_libdir}/pgsql/tsearch2.so
 %{_libdir}/pgsql/user_locks.so
 %if %xml
@@ -709,15 +693,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/pgsql/contrib/
 %{_bindir}/DBMirror.pl
 %{_bindir}/clean_pending.pl
-%{_bindir}/my2pg.pl
-%{_bindir}/mysql2pgsql
 %{_bindir}/dbf2pg
 %{_bindir}/fti.pl
 %{_bindir}/oid2name
-%{_bindir}/pg_dumplo
 %{_bindir}/pgbench
 %{_bindir}/vacuumlo
-%{_bindir}/pg_autovacuum
 %doc contrib/*/README.* contrib/spi/*.example
 
 %files libs -f libpq.lang
@@ -731,7 +711,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 /etc/rc.d/init.d/postgresql
 %if %pam
-/etc/pam.d/postgresql
+%config(noreplace) /etc/pam.d/postgresql
 %endif
 %attr (755,root,root) %dir /etc/sysconfig/pgsql
 %{_bindir}/initdb
@@ -829,6 +809,12 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Nov  7 2005 Tom Lane <tgl@redhat.com> 8.1.0-1
+- Update to PostgreSQL 8.1.0, PyGreSQL 3.7, and jdbc driver build 404
+- Fix PAM config file (must have account not only auth) (bug #167040)
+- Add BuildPrereq: libxslt-devel (bug #170141)
+- Sync with PGDG SRPM as much as feasible
+
 * Fri Oct 14 2005 Tomas Mraz <tmraz@redhat.com>
 - use include instead of pam_stack in pam config
 

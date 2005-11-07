@@ -1,6 +1,6 @@
-diff -Naur postgresql-8.0.0rc5.orig/src/Makefile.global.in postgresql-8.0.0rc5/src/Makefile.global.in
---- postgresql-8.0.0rc5.orig/src/Makefile.global.in	2004-12-18 21:16:18.000000000 -0500
-+++ postgresql-8.0.0rc5/src/Makefile.global.in	2005-01-11 16:06:30.570550658 -0500
+diff -Naur postgresql-8.1.0.orig/src/Makefile.global.in postgresql-8.1.0/src/Makefile.global.in
+--- postgresql-8.1.0.orig/src/Makefile.global.in	2005-09-27 13:39:32.000000000 -0400
++++ postgresql-8.1.0/src/Makefile.global.in	2005-11-07 14:58:59.000000000 -0500
 @@ -53,7 +53,7 @@
  # Installation directories
  #
@@ -8,17 +8,9 @@ diff -Naur postgresql-8.0.0rc5.orig/src/Makefile.global.in postgresql-8.0.0rc5/s
 -# append "postgresql" to some of them, if the string does not already
 +# append "pgsql" to some of them, if the string does not already
  # contain "pgsql" or "postgres", in order to avoid directory clutter.
- 
- prefix := @prefix@
-@@ -65,21 +65,21 @@
- libexecdir := @libexecdir@
- ifeq "$(findstring pgsql, $(libexecdir))" ""
- ifeq "$(findstring postgres, $(libexecdir))" ""
--override libexecdir := $(libexecdir)/postgresql
-+override libexecdir := $(libexecdir)/pgsql
- endif
- endif
- 
+ #
+ # In a PGXS build, we cannot use the values inserted into Makefile.global
+@@ -73,14 +73,14 @@
  datadir := @datadir@
  ifeq "$(findstring pgsql, $(datadir))" ""
  ifeq "$(findstring postgres, $(datadir))" ""
@@ -35,7 +27,7 @@ diff -Naur postgresql-8.0.0rc5.orig/src/Makefile.global.in postgresql-8.0.0rc5/s
  endif
  endif
  
-@@ -87,7 +87,7 @@
+@@ -89,7 +89,7 @@
  pkglibdir = $(libdir)
  ifeq "$(findstring pgsql, $(pkglibdir))" ""
  ifeq "$(findstring postgres, $(pkglibdir))" ""
@@ -44,7 +36,7 @@ diff -Naur postgresql-8.0.0rc5.orig/src/Makefile.global.in postgresql-8.0.0rc5/s
  endif
  endif
  
-@@ -95,7 +95,7 @@
+@@ -98,7 +98,7 @@
  pkgincludedir = $(includedir)
  ifeq "$(findstring pgsql, $(pkgincludedir))" ""
  ifeq "$(findstring postgres, $(pkgincludedir))" ""
@@ -52,7 +44,7 @@ diff -Naur postgresql-8.0.0rc5.orig/src/Makefile.global.in postgresql-8.0.0rc5/s
 +override pkgincludedir := $(pkgincludedir)/pgsql
  endif
  endif
- includedir_server = $(pkgincludedir)/server
+ 
 @@ -109,7 +109,7 @@
  ifneq (,$(docdir))
  ifeq "$(findstring pgsql, $(docdir))" ""

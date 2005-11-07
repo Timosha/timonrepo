@@ -7,9 +7,9 @@ So work around it by adding an rpath spec to plperl.so (only).
 Per bug #162198.
 
 
-diff -Naur postgresql-8.0.4.orig/src/pl/plperl/GNUmakefile postgresql-8.0.4/src/pl/plperl/GNUmakefile
---- postgresql-8.0.4.orig/src/pl/plperl/GNUmakefile	2005-07-17 00:05:49.000000000 -0400
-+++ postgresql-8.0.4/src/pl/plperl/GNUmakefile	2005-10-04 17:40:51.000000000 -0400
+diff -Naur postgresql-8.1.0.orig/src/pl/plperl/GNUmakefile postgresql-8.1.0/src/pl/plperl/GNUmakefile
+--- postgresql-8.1.0.orig/src/pl/plperl/GNUmakefile	2005-07-13 13:12:56.000000000 -0400
++++ postgresql-8.1.0/src/pl/plperl/GNUmakefile	2005-11-07 15:10:33.000000000 -0500
 @@ -36,6 +36,9 @@
  
  SHLIB_LINK = $(perl_embed_ldflags) $(BE_DLLLIBS)
@@ -17,6 +17,6 @@ diff -Naur postgresql-8.0.4.orig/src/pl/plperl/GNUmakefile postgresql-8.0.4/src/
 +# Force rpath to be used even though we disable it everywhere else
 +SHLIB_LINK += $(rpath)
 +
- include $(top_srcdir)/src/Makefile.shlib
- 
+ REGRESS_OPTS = --dbname=$(PL_TESTDB) --load-language=plperl
+ REGRESS = plperl plperl_trigger plperl_shared plperl_elog
  

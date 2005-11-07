@@ -1,8 +1,8 @@
-381bd337cf703220aafdf1ee24dae78d  postgresql-8.0.4.tar.bz2
-1f2694ea546c852c5a0ba2b17f7c5ce1  PyGreSQL-3.6.2.tgz
+5e1f1a7c5f62170b56a3bf2512fdec2d  postgresql-8.1.0.tar.bz2
+9fa4c2fc1dd0b3b93a3381c048443e16  PyGreSQL-3.7.tgz
 d19dfdcb54c334495d32456a043e0232  pgtcl1.5.2.tar.gz
 3d504b46231914d61fd49175f67e8715  pgtcldocs-20041108.zip
-e51763911fe5ccec81bf4201f25e3f53  postgresql-8.0-312.jdbc2.jar
-ebb4384c3d116482c8ed438ac96461fc  postgresql-8.0-312.jdbc2ee.jar
-41bcf06cdf7a3c84efd2fdd894303b24  postgresql-8.0-312.jdbc3.jar
+441d73f6f3a56c1abf8970ed79f51d28  postgresql-8.1-404.jdbc2.jar
+f506ae68d039bcc820641c1b1a8430c7  postgresql-8.1-404.jdbc2ee.jar
+8d8788f0a8b8d2184b452e3f34d62966  postgresql-8.1-404.jdbc3.jar
 2edd229aa83105175a1212a001dd030a  postgresql-8.0-US.pdf
