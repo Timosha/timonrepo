@@ -82,7 +82,7 @@
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 8.1.0
-Release: 1
+Release: 2
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -809,6 +809,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Nov  9 2005 Tom Lane <tgl@redhat.com> 8.1.0-2
+- Rebuild due to openssl library update.
+
 * Mon Nov  7 2005 Tom Lane <tgl@redhat.com> 8.1.0-1
 - Update to PostgreSQL 8.1.0, PyGreSQL 3.7, and jdbc driver build 404
 - Fix PAM config file (must have account not only auth) (bug #167040)
