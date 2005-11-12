@@ -82,7 +82,7 @@
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 8.1.0
-Release: 3
+Release: 4
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -97,7 +97,7 @@ Source10: http://jdbc.postgresql.org/download/postgresql-8.1-404.jdbc3.jar
 Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
-Source17: http://www.postgresql.org/docs/manuals/postgresql-8.0-US.pdf
+Source17: http://www.postgresql.org/docs/manuals/postgresql-8.1-US.pdf
 Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.7.tgz
 Source19: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcl1.5.2.tar.gz
 Source20: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcldocs-20041108.zip
@@ -809,6 +809,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Nov 12 2005 Tom Lane <tgl@redhat.com> 8.1.0-4
+- Update included PDF-format manual to 8.1.
+
 * Wed Nov  9 2005 Tom Lane <tgl@redhat.com> 8.1.0-3
 - Rebuild due to openssl library update.
 
