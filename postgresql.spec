@@ -82,7 +82,7 @@
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 8.1.0
-Release: 4
+Release: 4.1
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -809,6 +809,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Fri Dec 09 2005 Jesse Keating <jkeating@redhat.com>
+- rebuilt
+
 * Sat Nov 12 2005 Tom Lane <tgl@redhat.com> 8.1.0-4
 - Update included PDF-format manual to 8.1.
 
