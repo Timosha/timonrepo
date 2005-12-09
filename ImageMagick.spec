@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 1
+Release: 1.1
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -222,6 +222,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Fri Dec 09 2005 Jesse Keating <jkeating@redhat.com>
+- rebuilt
+
 * Tue Nov  1 2005 Matthias Clasen <mclasen@redhat.com> 6.2.5.4-1
 - Switch requires to modular X
 - Update to 6.2.5
