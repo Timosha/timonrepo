@@ -48,16 +48,16 @@
 # The base package, the lib package, the devel package, and the server package always get built.
 
 #build7x, build8, and build9 similar
-%{?build8:%define build89 1}
-%{?build9:%define build89 1}
 %{?build7x:%define tcldevel 0}
-%{?build8:%define tcldevel 0}
 %{?build7x:%define aconfver autoconf-2.53}
-
-%{!?aconfver:%define aconfver autoconf}
+%{?build8:%define build89 1}
+%{?build8:%define tcldevel 0}
+%{?build9:%define build89 1}
 
 %define beta 0
 %{?beta:%define __os_install_post /usr/lib/rpm/brp-compress}
+
+%{!?aconfver:%define aconfver autoconf}
 
 %{!?tcldevel:%define tcldevel 1}
 %{!?jdbc:%define jdbc 1}
@@ -81,8 +81,8 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 8.1.0
-Release: 4.1
+Version: 8.1.1
+Release: 1
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -90,6 +90,7 @@ Url: http://www.postgresql.org/
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
 Source3: postgresql.init
 Source4: Makefile.regress
+Source5: pg_config.h
 Source6: README.rpm-dist
 Source8: http://jdbc.postgresql.org/download/postgresql-8.1-404.jdbc2.jar
 Source9: http://jdbc.postgresql.org/download/postgresql-8.1-404.jdbc2ee.jar
@@ -466,6 +467,12 @@ make -C contrib DESTDIR=$RPM_BUILD_ROOT install
 make -C contrib/xml2 DESTDIR=$RPM_BUILD_ROOT install
 %endif
 
+# multilib header hack; note pg_config.h is installed in two places!
+mv $RPM_BUILD_ROOT/usr/include/pg_config.h $RPM_BUILD_ROOT/usr/include/pg_config_`uname -m`.h
+install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/usr/include/
+mv $RPM_BUILD_ROOT/usr/include/pgsql/server/pg_config.h $RPM_BUILD_ROOT/usr/include/pgsql/server/pg_config_`uname -m`.h
+install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/usr/include/pgsql/server/
+
 install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
 cp src/tutorial/* $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
 
@@ -809,6 +816,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Dec 14 2005 Tom Lane <tgl@redhat.com> 8.1.1-1
+- Update to PostgreSQL 8.1.1
+- Make pg_config.h architecture-independent for multilib installs;
+  put the original pg_config.h into pg_config_$ARCH.h
+
 * Fri Dec 09 2005 Jesse Keating <jkeating@redhat.com>
 - rebuilt
 
