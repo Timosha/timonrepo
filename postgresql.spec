@@ -82,7 +82,7 @@
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 8.1.1
-Release: 1
+Release: 2
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -468,9 +468,9 @@ make -C contrib/xml2 DESTDIR=$RPM_BUILD_ROOT install
 %endif
 
 # multilib header hack; note pg_config.h is installed in two places!
-mv $RPM_BUILD_ROOT/usr/include/pg_config.h $RPM_BUILD_ROOT/usr/include/pg_config_`uname -m`.h
+mv $RPM_BUILD_ROOT/usr/include/pg_config.h $RPM_BUILD_ROOT/usr/include/pg_config_`uname -i`.h
 install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/usr/include/
-mv $RPM_BUILD_ROOT/usr/include/pgsql/server/pg_config.h $RPM_BUILD_ROOT/usr/include/pgsql/server/pg_config_`uname -m`.h
+mv $RPM_BUILD_ROOT/usr/include/pgsql/server/pg_config.h $RPM_BUILD_ROOT/usr/include/pgsql/server/pg_config_`uname -i`.h
 install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/usr/include/pgsql/server/
 
 install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
@@ -816,6 +816,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Dec 14 2005 Tom Lane <tgl@redhat.com> 8.1.1-2
+- oops, looks like we want uname -i not uname -m
+
 * Wed Dec 14 2005 Tom Lane <tgl@redhat.com> 8.1.1-1
 - Update to PostgreSQL 8.1.1
 - Make pg_config.h architecture-independent for multilib installs;
