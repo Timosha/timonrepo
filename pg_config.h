@@ -7,24 +7,18 @@
  * Note: this may well fail if user tries to use gcc's -I- option.
  * But that option is deprecated anyway.
  */
-#ifdef __i386__
-#include "pg_config_i386.h"
-#endif
-#ifdef __x86_64__
+#if defined(__x86_64__)
 #include "pg_config_x86_64.h"
-#endif
-#ifdef __ia64__
+#elif defined(__ia64__)
 #include "pg_config_ia64.h"
-#endif
-#ifdef __ppc__
-#include "pg_config_ppc.h"
-#endif
-#ifdef __ppc64__
+#elif defined(__i386__)
+#include "pg_config_i386.h"
+#elif defined(__ppc64__) || defined(__powerpc64__)
 #include "pg_config_ppc64.h"
-#endif
-#ifdef __s390__
-#include "pg_config_s390.h"
-#endif
-#ifdef __s390x__
+#elif defined(__ppc__) || defined(__powerpc__)
+#include "pg_config_ppc.h"
+#elif defined(__s390x__)
 #include "pg_config_s390x.h"
+#elif defined(__s390__)
+#include "pg_config_s390.h"
 #endif

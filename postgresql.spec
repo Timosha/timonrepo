@@ -82,7 +82,7 @@
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 8.1.1
-Release: 2
+Release: 3
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -816,6 +816,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Dec 15 2005 Tom Lane <tgl@redhat.com> 8.1.1-3
+- fix pg_config.h for 64-bit and ppc platforms
+- update Makefile.regress (needs to --load-language=plpgsql)
+
 * Wed Dec 14 2005 Tom Lane <tgl@redhat.com> 8.1.1-2
 - oops, looks like we want uname -i not uname -m
 
