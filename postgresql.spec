@@ -81,8 +81,8 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 8.1.1
-Release: 3
+Version: 8.1.2
+Release: 1
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -816,6 +816,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sun Jan  8 2006 Tom Lane <tgl@redhat.com> 8.1.2-1
+- Update to PostgreSQL 8.1.2
+
 * Thu Dec 15 2005 Tom Lane <tgl@redhat.com> 8.1.1-3
 - fix pg_config.h for 64-bit and ppc platforms
 - update Makefile.regress (needs to --load-language=plpgsql)
