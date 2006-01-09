@@ -109,6 +109,7 @@ Patch3: postgresql-logging.patch
 Patch4: postgresql-test.patch
 Patch5: pgtcl-no-rpath.patch
 Patch6: postgresql-perl-rpath.patch
+Patch7: pgtcl-quote.patch
 
 Buildrequires: perl glibc-devel bison flex autoconf
 Prereq: /sbin/ldconfig initscripts
@@ -329,6 +330,7 @@ popd
 %patch4 -p1
 # patch5 is applied later
 %patch6 -p1
+# patch7 is applied later
 
 #call autoconf 2.53 or greater
 %aconfver
@@ -360,6 +362,7 @@ cp -p %{SOURCE17} .
    mv $PGTCLDOCDIR Pgtcl-docs
 
 %patch5 -p0
+%patch7 -p0
    pushd Pgtcl
 %aconfver
    popd
@@ -816,8 +819,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
-* Sun Jan  8 2006 Tom Lane <tgl@redhat.com> 8.1.2-1
+* Mon Jan  9 2006 Tom Lane <tgl@redhat.com> 8.1.2-1
 - Update to PostgreSQL 8.1.2
+- Repair extraneous quote in pgtcl configure script ... odd that bash
+  didn't use to spit up on this.
 
 * Thu Dec 15 2005 Tom Lane <tgl@redhat.com> 8.1.1-3
 - fix pg_config.h for 64-bit and ppc platforms
