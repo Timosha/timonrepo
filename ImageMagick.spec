@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 1.1
+Release: 2
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -18,7 +18,8 @@ Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchleve
 Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
 %endif
 Source1: magick_small.png
-Patch4: ImageMagick-6.2.1-local_doc.patch
+Patch1: ImageMagick-6.2.1-local_doc.patch
+Patch2: ImageMagick-6.2.5-format-string-again.patch
 
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
@@ -111,7 +112,8 @@ however.
 
 %prep
 %setup -q -n %{name}-%{VER}
-%patch4 -p1 -b .local_doc
+%patch1 -p1 -b .local_doc
+%patch2 -p1 -b .format-string-again
 
 %build
 %configure --enable-shared \
@@ -222,6 +224,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Mon Jan  9 2006 Matthias Clasen <mclasen@redhat.com> 6.2.5.4-2
+- fix a format string vulnerability (CVE-2006-0082)
+
 * Fri Dec 09 2005 Jesse Keating <jkeating@redhat.com>
 - rebuilt
 
