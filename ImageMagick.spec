@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 2
+Release: 3
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -124,7 +124,7 @@ however.
            --with-magick_plus_plus \
 	   --with-gslib \
            --with-wmf \
-           --with-perl-options="INSTALLDIRS=vendor %{?perl_prefix} CC='%__cc -L$PWD/magick/.libs' LD='%__ld -L$PWD/magick/.libs'" \
+           --with-perl-options="INSTALLDIRS=vendor %{?perl_prefix} CC='%__cc -L$PWD/magick/.libs' LDDLFLAGS='-shared -L$PWD/magick/.libs'" \
            --with-windows-font-dir=%{_datadir}/fonts/default/TrueType \
 	   --without-dps
 
@@ -224,6 +224,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Mon Jan 23 2006 Matthias Clasen <mclasen@redhat.com> 6.2.5.4-3
+- Fix linking of DSOs.  (#176695)
+
 * Mon Jan  9 2006 Matthias Clasen <mclasen@redhat.com> 6.2.5.4-2
 - fix a format string vulnerability (CVE-2006-0082)
 
