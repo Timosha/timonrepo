@@ -1,62 +1,6 @@
-diff -r 8a3cbd342315 magick/animate.c
---- a/magick/animate.c	Tue Jan 10 12:11:55 2006 +0100
-+++ b/magick/animate.c	Tue Jan 10 16:55:22 2006 +0100
-@@ -604,7 +604,7 @@
-               /*
-                 Form filename for multi-part images.
-               */
--              (void) FormatMagickString(filename,MaxTextExtent,
-+              (void) FormatMagickStringNumeric(filename,MaxTextExtent,
-                 image_info->filename,scene);
-               if (LocaleCompare(filename,image_info->filename) == 0)
-                 (void) FormatMagickString(filename,MaxTextExtent,"%s[%lu]",
-diff -r 8a3cbd342315 magick/blob.c
---- a/magick/blob.c	Tue Jan 10 12:11:55 2006 +0100
-+++ b/magick/blob.c	Tue Jan 10 16:55:22 2006 +0100
-@@ -2120,25 +2120,8 @@
-       /*
-         Form filename for multi-part images.
-       */
--      (void) CopyMagickString(filename,image->filename,MaxTextExtent);
--      for (p=strchr(filename,'%'); p != (char *) NULL; p=strchr(p+1,'%'))
--      {
--        char
--          *q;
--
--        q=p+1;
--        if (*q == '0')
--          (void) strtol(q,&q,10);
--        if ((*q == '%') || (*q == 'd') || (*q == 'o') || (*q == 'x'))
--          {
--            char
--              format[MaxTextExtent];
--
--            (void) CopyMagickString(format,p,MaxTextExtent);
--            (void) FormatMagickString(p,MaxTextExtent,format,image->scene);
--            break;
--          }
--      }
-+      (void) FormatMagickStringNumeric(filename,MaxTextExtent,image->filename,
-+        image->scene);
-       if (image_info->adjoin == MagickFalse)
-         if ((image->previous != (Image *) NULL) ||
-             (GetNextImageInList(image) != (Image *) NULL))
-diff -r 8a3cbd342315 magick/display.c
---- a/magick/display.c	Tue Jan 10 12:11:55 2006 +0100
-+++ b/magick/display.c	Tue Jan 10 16:55:22 2006 +0100
-@@ -1984,7 +1984,7 @@
-               /*
-                 Form filename for multi-part images.
-               */
--              (void) FormatMagickString(filename,MaxTextExtent,
-+              (void) FormatMagickStringNumeric(filename,MaxTextExtent,
-                 image_info->filename,scene);
-               if (LocaleCompare(filename,image_info->filename) == 0)
-                 (void) FormatMagickString(filename,MaxTextExtent,"%s.%lu",
-diff -r 8a3cbd342315 magick/image.c
---- a/magick/image.c	Tue Jan 10 12:11:55 2006 +0100
-+++ b/magick/image.c	Tue Jan 10 16:55:22 2006 +0100
-@@ -2869,25 +2869,8 @@
+--- ImageMagick-6.2.5/magick/image.c.format-string-again	2005-10-22 12:17:39.000000000 -0400
++++ ImageMagick-6.2.5/magick/image.c	2006-01-23 09:15:40.000000000 -0500
+@@ -2847,25 +2847,8 @@
        /*
          Rectify multi-image file support.
        */
@@ -84,24 +28,39 @@ diff -r 8a3cbd342315 magick/image.c
        if ((LocaleCompare(filename,image_info->filename) != 0) &&
            (strchr(filename,'%') == (char *) NULL))
          image_info->adjoin=MagickFalse;
-diff -r 8a3cbd342315 magick/log.c
---- a/magick/log.c	Tue Jan 10 12:11:55 2006 +0100
-+++ b/magick/log.c	Tue Jan 10 16:55:22 2006 +0100
-@@ -914,8 +914,8 @@
-           char
-             filename[MaxTextExtent];
- 
--          (void) FormatMagickString(filename,MaxTextExtent,log_info->filename,
--            log_info->generation % log_info->generations);
-+          (void) FormatMagickStringNumeric(filename,MaxTextExtent,
-+            log_info->filename,log_info->generation % log_info->generations);
-           log_info->file=fopen(filename,"w");
-           if (log_info->file == (FILE *) NULL)
-             {
-diff -r 8a3cbd342315 magick/montage.c
---- a/magick/montage.c	Tue Jan 10 12:11:55 2006 +0100
-+++ b/magick/montage.c	Tue Jan 10 16:55:22 2006 +0100
-@@ -530,7 +530,7 @@
+--- ImageMagick-6.2.5/magick/blob.c.format-string-again	2005-09-28 15:00:17.000000000 -0400
++++ ImageMagick-6.2.5/magick/blob.c	2006-01-23 09:15:40.000000000 -0500
+@@ -2121,25 +2121,8 @@
+       /*
+         Form filename for multi-part images.
+       */
+-      (void) CopyMagickString(filename,image->filename,MaxTextExtent);
+-      for (p=strchr(filename,'%'); p != (char *) NULL; p=strchr(p+1,'%'))
+-      {
+-        char
+-          *q;
+-
+-        q=p+1;
+-        if (*q == '0')
+-          (void) strtol(q,&q,10);
+-        if ((*q == '%') || (*q == 'd') || (*q == 'o') || (*q == 'x'))
+-          {
+-            char
+-              format[MaxTextExtent];
+-
+-            (void) CopyMagickString(format,p,MaxTextExtent);
+-            (void) FormatMagickString(p,MaxTextExtent,format,image->scene);
+-            break;
+-          }
+-      }
++      (void) FormatMagickStringNumeric(filename,MaxTextExtent,image->filename,
++        image->scene);
+       if (image_info->adjoin == MagickFalse)
+         if ((image->previous != (Image *) NULL) ||
+             (GetNextImageInList(image) != (Image *) NULL))
+--- ImageMagick-6.2.5/magick/montage.c.format-string-again	2005-10-22 12:17:39.000000000 -0400
++++ ImageMagick-6.2.5/magick/montage.c	2006-01-23 09:15:40.000000000 -0500
+@@ -531,7 +531,7 @@
                /*
                  Form filename for multi-part images.
                */
@@ -110,20 +69,33 @@ diff -r 8a3cbd342315 magick/montage.c
                  image_info->filename,scene);
                if (LocaleCompare(filename,image_info->filename) == 0)
                  (void) FormatMagickString(filename,MaxTextExtent,"%s.%lu",
-diff -r 8a3cbd342315 magick/string.c
---- a/magick/string.c	Tue Jan 10 12:11:55 2006 +0100
-+++ b/magick/string.c	Tue Jan 10 16:55:22 2006 +0100
-@@ -953,6 +953,75 @@
-       return((StringInfo *) NULL);
-     }
-   return(string_info);
-+}
-+
-+/*
-+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-+%                                                                             %
-+%                                                                             %
-+%                                                                             %
+--- ImageMagick-6.2.5/magick/animate.c.format-string-again	2005-10-23 22:15:16.000000000 -0400
++++ ImageMagick-6.2.5/magick/animate.c	2006-01-23 09:15:40.000000000 -0500
+@@ -606,7 +606,7 @@
+               /*
+                 Form filename for multi-part images.
+               */
+-              (void) FormatMagickString(filename,MaxTextExtent,
++              (void) FormatMagickStringNumeric(filename,MaxTextExtent,
+                 image_info->filename,scene);
+               if (LocaleCompare(filename,image_info->filename) == 0)
+                 (void) FormatMagickString(filename,MaxTextExtent,"%s[%lu]",
+--- ImageMagick-6.2.5/magick/string_.h.format-string-again	2005-10-12 21:59:20.000000000 -0400
++++ ImageMagick-6.2.5/magick/string_.h	2006-01-23 09:20:47.000000000 -0500
+@@ -62,6 +62,7 @@
+   FormatMagickStringList(char *,const size_t,const char *,va_list)
+     magick_attribute((format (printf,3,0))),
+   FormatMagickTime(const time_t,const size_t,char *),
++  FormatMagickStringNumeric(char *,const size_t,const char *,int),
+   LocaleCompare(const char *,const char *),
+   LocaleNCompare(const char *,const char *,const size_t);
+ 
+--- ImageMagick-6.2.5/magick/string.c.format-string-again	2005-10-13 21:03:09.000000000 -0400
++++ ImageMagick-6.2.5/magick/string.c	2006-01-23 09:15:40.000000000 -0500
+@@ -960,6 +960,75 @@
+ %                                                                             %
+ %                                                                             %
+ %                                                                             %
 +%  F o r m a t M a g i c k S t r i n g N u m e r i c                          %
 +%                                                                             %
 +%                                                                             %
@@ -186,17 +158,24 @@ diff -r 8a3cbd342315 magick/string.c
 +    }
 +  }
 +  return (long)strlen(string);
- }
- 
- /*
-diff -r 8a3cbd342315 magick/string_.h
---- a/magick/string_.h	Tue Jan 10 12:11:55 2006 +0100
-+++ b/magick/string_.h	Tue Jan 10 16:55:22 2006 +0100
-@@ -60,6 +60,7 @@
-     magick_attribute((format (printf,3,4))),
-   FormatMagickStringList(char *,const size_t,const char *,va_list)
-     magick_attribute((format (printf,3,0))),
-+  FormatMagickStringNumeric(char *,const size_t,const char *,int),
-   LocaleCompare(const char *,const char *),
-   LocaleNCompare(const char *,const char *,const size_t);
- 
++}
++
++/*
++%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
++%                                                                             %
++%                                                                             %
++%                                                                             %
+ %  F o r m a t M a g i c k S t r i n g                                        %
+ %                                                                             %
+ %                                                                             %
+--- ImageMagick-6.2.5/magick/display.c.format-string-again	2005-10-24 20:23:14.000000000 -0400
++++ ImageMagick-6.2.5/magick/display.c	2006-01-23 09:15:40.000000000 -0500
+@@ -1989,7 +1989,7 @@
+               /*
+                 Form filename for multi-part images.
+               */
+-              (void) FormatMagickString(filename,MaxTextExtent,
++              (void) FormatMagickStringNumeric(filename,MaxTextExtent,
+                 image_info->filename,scene);
+               if (LocaleCompare(filename,image_info->filename) == 0)
+                 (void) FormatMagickString(filename,MaxTextExtent,"%s.%lu",
