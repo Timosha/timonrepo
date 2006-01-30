@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 3
+Release: 4
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -55,6 +55,7 @@ Requires: ghostscript-devel
 Requires: bzip2-devel
 Requires: libtiff-devel
 Requires: libjpeg-devel
+Requires: lcms-devel
 Requires: pkgconfig
 
 %description devel
@@ -224,6 +225,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Mon Jan 30 2006 Matthias Clasen <mclasen@redhat.com> 6.2.5.4-4
+- Make -devel require lcms-devel (#179200)
+
 * Mon Jan 23 2006 Matthias Clasen <mclasen@redhat.com> 6.2.5.4-3
 - Fix linking of DSOs.  (#176695)
 
