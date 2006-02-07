@@ -82,7 +82,7 @@
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 8.1.2
-Release: 1
+Release: 1.1
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -819,6 +819,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Feb 07 2006 Jesse Keating <jkeating@redhat.com> - 8.1.2-1.1
+- rebuilt for new gcc4.1 snapshot and glibc changes
+
 * Mon Jan  9 2006 Tom Lane <tgl@redhat.com> 8.1.2-1
 - Update to PostgreSQL 8.1.2
 - Repair extraneous quote in pgtcl configure script ... odd that bash
