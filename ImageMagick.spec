@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 4.1
+Release: 4.2
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -225,6 +225,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Fri Feb 10 2006 Jesse Keating <jkeating@redhat.com> - 6.2.5.4-4.2
+- bump again for double-long bug on ppc(64)
+
 * Tue Feb 07 2006 Jesse Keating <jkeating@redhat.com> - 6.2.5.4-4.1
 - rebuilt for new gcc4.1 snapshot and glibc changes
 
