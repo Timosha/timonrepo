@@ -82,7 +82,7 @@
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 8.1.3
-Release: 1
+Release: 1.1
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -826,6 +826,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Feb 13 2006 Jesse Keating <jkeating@redhat.com> - 8.1.3-1.1
+- rebump for build order issues during double-long bump
+
 * Mon Feb 13 2006 Tom Lane <tgl@redhat.com> 8.1.3-1
 - Update to PostgreSQL 8.1.3 (fixes bug #180617, CVE-2006-0553)
 - Update to jdbc driver build 405
