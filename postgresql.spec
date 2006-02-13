@@ -81,8 +81,8 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 8.1.2
-Release: 1.1
+Version: 8.1.3
+Release: 1
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -92,9 +92,9 @@ Source3: postgresql.init
 Source4: Makefile.regress
 Source5: pg_config.h
 Source6: README.rpm-dist
-Source8: http://jdbc.postgresql.org/download/postgresql-8.1-404.jdbc2.jar
-Source9: http://jdbc.postgresql.org/download/postgresql-8.1-404.jdbc2ee.jar
-Source10: http://jdbc.postgresql.org/download/postgresql-8.1-404.jdbc3.jar
+Source8: http://jdbc.postgresql.org/download/postgresql-8.1-405.jdbc2.jar
+Source9: http://jdbc.postgresql.org/download/postgresql-8.1-405.jdbc2ee.jar
+Source10: http://jdbc.postgresql.org/download/postgresql-8.1-405.jdbc3.jar
 Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
@@ -471,10 +471,17 @@ make -C contrib/xml2 DESTDIR=$RPM_BUILD_ROOT install
 %endif
 
 # multilib header hack; note pg_config.h is installed in two places!
-mv $RPM_BUILD_ROOT/usr/include/pg_config.h $RPM_BUILD_ROOT/usr/include/pg_config_`uname -i`.h
-install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/usr/include/
-mv $RPM_BUILD_ROOT/usr/include/pgsql/server/pg_config.h $RPM_BUILD_ROOT/usr/include/pgsql/server/pg_config_`uname -i`.h
-install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/usr/include/pgsql/server/
+# we only apply this to known Red Hat multilib arches, per bug #177564
+case `uname -i` in
+  i386 | x86_64 | ppc | ppc64 | s390 | s390x)
+    mv $RPM_BUILD_ROOT/usr/include/pg_config.h $RPM_BUILD_ROOT/usr/include/pg_config_`uname -i`.h
+    install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/usr/include/
+    mv $RPM_BUILD_ROOT/usr/include/pgsql/server/pg_config.h $RPM_BUILD_ROOT/usr/include/pgsql/server/pg_config_`uname -i`.h
+    install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/usr/include/pgsql/server/
+    ;;
+  *)
+    ;;
+esac
 
 install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
 cp src/tutorial/* $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
@@ -819,6 +826,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Feb 13 2006 Tom Lane <tgl@redhat.com> 8.1.3-1
+- Update to PostgreSQL 8.1.3 (fixes bug #180617, CVE-2006-0553)
+- Update to jdbc driver build 405
+- Modify multilib header hack to not break non-RH arches, per bug #177564
+
 * Tue Feb 07 2006 Jesse Keating <jkeating@redhat.com> - 8.1.2-1.1
 - rebuilt for new gcc4.1 snapshot and glibc changes
 

@@ -4,13 +4,14 @@
  * identical.  Hence, this file is architecture-independent and calls
  * in an arch-dependent file that will appear in just one RPM.
  *
+ * To avoid breaking arches not explicitly supported by Red Hat, we
+ * use this indirection file *only* on known multilib arches.
+ *
  * Note: this may well fail if user tries to use gcc's -I- option.
  * But that option is deprecated anyway.
  */
 #if defined(__x86_64__)
 #include "pg_config_x86_64.h"
-#elif defined(__ia64__)
-#include "pg_config_ia64.h"
 #elif defined(__i386__)
 #include "pg_config_i386.h"
 #elif defined(__ppc64__) || defined(__powerpc64__)
