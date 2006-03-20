@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 4.2.1
+Release: 5
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -160,7 +160,7 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
 # Keep config
 rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}/[a-b,d-z,A-Z]*
 rm -rf $RPM_BUILD_ROOT%{_libdir}/libltdl.*
-rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules*/*/*.a
+rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules*/*/*.{a,la}
 rm -f  $RPM_BUILD_ROOT%{_libdir}/*.la
 
 # link docs
@@ -194,9 +194,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %{_bindir}/Magick-config
 %{_bindir}/Wand-config
-%{_libdir}/libMagick.a
 %{_libdir}/libMagick.so
-%{_libdir}/libWand.a
 %{_libdir}/libWand.so
 %{_libdir}/pkgconfig/ImageMagick.pc
 %{_libdir}/pkgconfig/Wand.pc
@@ -214,7 +212,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/Magick++-config
 %{_includedir}/Magick++
 %{_includedir}/Magick++.h
-%{_libdir}/libMagick++.a
 %{_libdir}/libMagick++.so
 %{_libdir}/pkgconfig/ImageMagick++.pc
 %{_mandir}/man1/Magick++-config.*
@@ -225,6 +222,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Mon Mar 20 2006 Matthias Clasen <mclasen@redhat.com> - 6.2.5.4-5
+- Don't ship .la and .a files (#185237)
+
 * Mon Feb 13 2006 Jesse Keating <jkeating@redhat.com> - 6.2.5.4-4.2.1
 - rebump for build order issues during double-long bump
 
