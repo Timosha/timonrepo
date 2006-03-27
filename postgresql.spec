@@ -60,7 +60,7 @@
 %{!?aconfver:%define aconfver autoconf}
 
 %{!?tcldevel:%define tcldevel 1}
-%{!?jdbc:%define jdbc 1}
+%{!?jdbc:%define jdbc 0}
 %{!?test:%define test 1}
 %{!?python:%define python 1}
 %{!?pltcl:%define pltcl 1}
@@ -82,7 +82,7 @@
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 8.1.3
-Release: 1.1
+Release: 2
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -92,9 +92,11 @@ Source3: postgresql.init
 Source4: Makefile.regress
 Source5: pg_config.h
 Source6: README.rpm-dist
+%if %jdbc
 Source8: http://jdbc.postgresql.org/download/postgresql-8.1-405.jdbc2.jar
 Source9: http://jdbc.postgresql.org/download/postgresql-8.1-405.jdbc2ee.jar
 Source10: http://jdbc.postgresql.org/download/postgresql-8.1-405.jdbc3.jar
+%endif
 Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
@@ -826,6 +828,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Mar 27 2006 Tom Lane <tgl@redhat.com> 8.1.3-2
+- Remove JDBC from this build; we will package it as separate SRPM
+
 * Mon Feb 13 2006 Jesse Keating <jkeating@redhat.com> - 8.1.3-1.1
 - rebump for build order issues during double-long bump
 
