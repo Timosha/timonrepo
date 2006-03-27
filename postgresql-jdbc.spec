@@ -1,16 +1,18 @@
+%define section		devel
 %define upstreamver	8.1-405
 %define gcj_support	1
 
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
 Version:	8.1.405
-Release:	1jpp
+Release:	2jpp
 Epoch:		0
 License:	BSD
 Group:		Applications/Databases
 URL:		http://jdbc.postgresql.org/
 
 Source0:	http://jdbc.postgresql.org/download/%{name}-%{upstreamver}.src.tar.gz
+Patch1:		postgresql-jdbc-unspec-string.patch
 
 %if %{gcj_support}
 %else
@@ -43,6 +45,8 @@ rmdir %{name}-%{upstreamver}.src
 
 # remove any binary libs
 find -name "*.jar" -or -name "*.class" | xargs rm -f
+
+%patch1 -p1
 
 %build
 export OPT_JAR_LIST="ant/ant-junit junit"
@@ -95,6 +99,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Mar 27 2006 Tom Lane <tgl@redhat.com> 8.1.405-2jpp
+- Back-patch upstream fix to support unspecified-type strings.
+
 * Thu Feb 16 2006 Tom Lane <tgl@redhat.com> 8.1.405-1jpp
 - Split postgresql-jdbc into its own SRPM (at last).
 - Build it from source.  Add support for gcj compilation.
