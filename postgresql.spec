@@ -81,8 +81,8 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 8.1.3
-Release: 2
+Version: 8.1.4
+Release: 1
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -101,7 +101,7 @@ Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
 Source17: http://www.postgresql.org/docs/manuals/postgresql-8.1-US.pdf
-Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.7.tgz
+Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.8.tgz
 Source19: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcl1.5.2.tar.gz
 Source20: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcldocs-20041108.zip
 
@@ -349,7 +349,7 @@ cp -p %{SOURCE17} .
    PYGRESQLDIR=`basename %{SOURCE18} .tgz`
    mv $PYGRESQLDIR PyGreSQL
    # Some versions of PyGreSQL.tgz contain wrong file permissions
-   chmod 644 PyGreSQL/Announce PyGreSQL/ChangeLog PyGreSQL/README
+   chmod 644 PyGreSQL/announce.txt PyGreSQL/changelog.txt PyGreSQL/README
    chmod 755 PyGreSQL/tutorial
    chmod 644 PyGreSQL/tutorial/*.py
    chmod 755 PyGreSQL/tutorial/advanced.py PyGreSQL/tutorial/basics.py
@@ -809,7 +809,8 @@ rm -rf $RPM_BUILD_ROOT
 %if %python
 %files python
 %defattr(-,root,root)
-%doc PyGreSQL/tutorial PyGreSQL/Announce PyGreSQL/ChangeLog PyGreSQL/README
+%doc PyGreSQL/announce.txt PyGreSQL/changelog.txt PyGreSQL/README
+%doc PyGreSQL/tutorial
 %{_libdir}/python%{pyver}/site-packages/_pgmodule.so
 %{_libdir}/python%{pyver}/site-packages/*.py
 %endif
@@ -828,6 +829,12 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon May 22 2006 Tom Lane <tgl@redhat.com> 8.1.4-1
+- Update to PostgreSQL 8.1.4 (includes fixes for CVE-2006-2313, CVE-2006-2314;
+  see bug #192173)
+- Update to PyGreSQL 3.8
+- Suppress noise from chcon, per bug #187744
+
 * Mon Mar 27 2006 Tom Lane <tgl@redhat.com> 8.1.3-2
 - Remove JDBC from this build; we will package it as separate SRPM
 

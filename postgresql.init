@@ -129,7 +129,7 @@ start(){
 		touch "$PGLOG" || exit 1
 		chown postgres:postgres "$PGLOG"
 		chmod go-rwx "$PGLOG"
-		[ -x /usr/bin/chcon ] && /usr/bin/chcon -u system_u -r object_r -t postgresql_log_t "$PGLOG"
+		[ -x /usr/bin/chcon ] && /usr/bin/chcon -u system_u -r object_r -t postgresql_log_t "$PGLOG" 2>/dev/null
 	fi
 
 	# Check for the PGDATA structure
