@@ -163,7 +163,7 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
 rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}/[a-b,d-z,A-Z]*
 rm -rf $RPM_BUILD_ROOT%{_libdir}/libltdl.*
 rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules*/*/*.a
-rm -f  $RPM_BUILD_ROOT%{_libdir}/*.la
+rm -f  $RPM_BUILD_ROOT%{_libdir}/*.{a,la}
 
 # link docs
 #ln -sf %{_docdir}/%{name}-%{version} $RPM_BUILD_ROOT%{_libdir}/ImageMagick-%{VER}/doc
