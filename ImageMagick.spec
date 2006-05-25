@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 5
+Release: 6
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -20,6 +20,7 @@ Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
 Source1: magick_small.png
 Patch1: ImageMagick-6.2.1-local_doc.patch
 Patch2: ImageMagick-6.2.5-format-string-again.patch
+Patch3: ImageMagick-6.2.5-yet-another-overflow.patch
 
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
@@ -115,6 +116,7 @@ however.
 %setup -q -n %{name}-%{VER}
 %patch1 -p1 -b .local_doc
 %patch2 -p1 -b .format-string-again
+%patch3 -p1 -b .yet-another-overflow
 
 %build
 %configure --enable-shared \
@@ -160,7 +162,7 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
 # Keep config
 rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}/[a-b,d-z,A-Z]*
 rm -rf $RPM_BUILD_ROOT%{_libdir}/libltdl.*
-rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules*/*/*.{a,la}
+rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules*/*/*.a
 rm -f  $RPM_BUILD_ROOT%{_libdir}/*.la
 
 # link docs
@@ -222,6 +224,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Thu May 25 2006 Matthias Clasen <mclasen@redhat.com> - 6.2.5.4-6
+- Fix a heap overflow CVE-2006-2440 (#192279)
+- Include required .la files  
+
 * Mon Mar 20 2006 Matthias Clasen <mclasen@redhat.com> - 6.2.5.4-5
 - Don't ship .la and .a files (#185237)
 

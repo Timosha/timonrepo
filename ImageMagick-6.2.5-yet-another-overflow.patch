@@ -1,0 +1,38 @@
+--- ImageMagick-6.2.5/magick/display.c.yet-another-overflow	2006-05-24 11:03:37.000000000 -0400
++++ ImageMagick-6.2.5/magick/display.c	2006-05-24 11:03:58.000000000 -0400
+@@ -1845,10 +1845,7 @@
+   image_number=0;
+   last_image=0;
+   last_scene=0;
+-  image_marker=(unsigned long *)
+-    AcquireMagickMemory((argc+1)*sizeof(*image_marker));
+-  for (i=0; i <= argc; i++)
+-    image_marker[i]=(unsigned long) argc;
++  image_marker=(unsigned long *) NULL;
+   option=(char *) NULL;
+   pend=MagickFalse;
+   resource_database=(XrmDatabase) NULL;
+@@ -1856,9 +1853,6 @@
+   server_name=(char *) NULL;
+   state=0;
+   status=MagickTrue;
+-  if (image_marker == (unsigned long *) NULL)
+-    ThrowDisplayException(ResourceLimitError,"MemoryAllocationFailed",
+-      strerror(errno));
+   /*
+     Check for server name specified on the command line.
+   */
+@@ -1867,6 +1861,13 @@
+   if (status == MagickFalse)
+     ThrowDisplayException(ResourceLimitError,"MemoryAllocationFailed",
+       strerror(errno));
++  image_marker=(unsigned long *)
++    AcquireMagickMemory((argc+1)*sizeof(*image_marker));
++  for (i=0; i <= argc; i++)
++    image_marker[i]=(unsigned long) argc;
++  if (image_marker == (unsigned long *) NULL)
++    ThrowDisplayException(ResourceLimitError,"MemoryAllocationFailed",
++      strerror(errno));
+   for (i=1; i < (long) argc; i++)
+   {
+     /*
