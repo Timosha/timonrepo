@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 6
+Release: 7
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -21,6 +21,7 @@ Source1: magick_small.png
 Patch1: ImageMagick-6.2.1-local_doc.patch
 Patch2: ImageMagick-6.2.5-format-string-again.patch
 Patch3: ImageMagick-6.2.5-yet-another-overflow.patch
+Patch4: ImageMagick-6.2.5-multilib.patch
 
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
@@ -117,6 +118,7 @@ however.
 %patch1 -p1 -b .local_doc
 %patch2 -p1 -b .format-string-again
 %patch3 -p1 -b .yet-another-overflow
+%patch4 -p1 -b .multilib
 
 %build
 %configure --enable-shared \
@@ -165,8 +167,33 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/libltdl.*
 rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules*/*/*.a
 rm -f  $RPM_BUILD_ROOT%{_libdir}/*.{a,la}
 
-# link docs
-#ln -sf %{_docdir}/%{name}-%{version} $RPM_BUILD_ROOT%{_libdir}/ImageMagick-%{VER}/doc
+# fix multilib issues
+%ifarch x86_64 s390x ia64 ppc64
+%define wordsize 64
+%else
+%define wordsize 32
+%endif
+
+mv $RPM_BUILD_ROOT%{_includedir}/magick/magick-config.h \
+   $RPM_BUILD_ROOT%{_includedir}/magick/magick-config-%{wordsize}.h
+
+cat >$RPM_BUILD_ROOT%{_includedir}/magick/magick-config.h <<EOF
+#ifndef ORBIT_MULTILIB
+#define ORBIT_MULTILIB
+
+#include <bits/wordsize.h>
+
+#if __WORDSIZE == 32
+# include "magick-config-32.h"
+#elif __WORDSIZE == 64
+# include "magick-config-64.h"
+#else
+# error "unexpected value for __WORDSIZE macro"
+#endif
+
+#endif
+EOF
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -224,6 +251,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Fri Jun  2 2006 Matthias Clasen <mclasen@redhat.com> - 6.2.5.4-7
+- Fix multilib issues
+
 * Thu May 25 2006 Matthias Clasen <mclasen@redhat.com> - 6.2.5.4-6
 - Fix a heap overflow CVE-2006-2440 (#192279)
 - Include required .la files  

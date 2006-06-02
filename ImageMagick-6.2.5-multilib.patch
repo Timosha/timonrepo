@@ -1,0 +1,76 @@
+--- ImageMagick-6.2.5/magick/Magick-config.in.multilib	2006-06-02 11:13:32.000000000 -0400
++++ ImageMagick-6.2.5/magick/Magick-config.in	2006-06-02 11:13:37.000000000 -0400
+@@ -16,28 +16,28 @@
+       exit 1
+ fi
+ 
+-while test $# -gt 0; do
++while btest $# -gt 0; do
+   case $1 in
+     --prefix)
+-      echo @PREFIX_DIR@
++      pkg-config --variable prefix ImageMagick
+       ;;
+     --exec-prefix)
+-      echo @EXEC_PREFIX_DIR@
++      pkg-config --variable exec_prefix ImageMagick
+       ;;
+     --version)
+-      echo @PACKAGE_VERSION@
++      pkg-config --modversion ImageMagick
+       ;;
+     --cflags)
+-      echo '@MAGICK_CFLAGS@'
++      pkg-config --cflags ImageMagick
+       ;;
+     --cppflags)
+-      echo '@MAGICK_CPPFLAGS@'
++      pkg-config --cflags ImageMagick
+       ;;
+     --ldflags)
+-      echo '@MAGICK_LDFLAGS@'
++      pkg-config --libs ImageMagick
+       ;;
+     --libs)
+-      echo '@MAGICK_LIBS@'
++      pkg-config --libs ImageMagick
+       ;;
+     *)
+       echo "${usage}" 1>&2
+--- ImageMagick-6.2.5/wand/Wand-config.in.multilib	2006-06-02 11:13:49.000000000 -0400
++++ ImageMagick-6.2.5/wand/Wand-config.in	2006-06-02 11:13:52.000000000 -0400
+@@ -21,26 +21,25 @@
+ while test $# -gt 0; do
+   case $1 in
+     --prefix)
+-      echo @PREFIX_DIR@
++      pkg-config --variable prefix Wand
+       ;;
+     --exec-prefix)
+-      echo @EXEC_PREFIX_DIR@
++      pkg-config --variable exec_prefix Wand
+       ;;
+     --version)
+-      echo @PACKAGE_VERSION@
++      pkg-config --modversion Wand
+       ;;
+     --cflags)
+-      echo "`Magick-config --cflags`"
++      pkg-config --cflags Wand
+       ;;
+     --cppflags)
+-      echo "`Magick-config --cppflags`"
++      pkg-config --cflags Wand
+       ;;
+     --ldflags)
+-      echo "`Magick-config --ldflags`"
+-      ;;
++      pkg-config --libs Wand
++      ;; 
+     --libs)
+-      LIBS="-lWand `Magick-config --libs`"
+-      echo "$LIBS"
++      pkg-config --lbs Wand
+       ;;
+     *)
+       echo "${usage}" 1>&2
