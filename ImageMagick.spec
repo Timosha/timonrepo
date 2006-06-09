@@ -1,7 +1,7 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 6.2.5
-%define Patchlevel 4
+%define VER 6.2.8
+%define Patchlevel 
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
 %if "%{Patchlevel}" != ""
@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 7
+Release: 1
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -251,6 +251,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Fri Jun  9 2006 Matthias Clasen <mclasen@redhat.com> - 6.2.8-1
+- Update to 6.2.8
+
 * Fri Jun  2 2006 Matthias Clasen <mclasen@redhat.com> - 6.2.5.4-7
 - Fix multilib issues
 
