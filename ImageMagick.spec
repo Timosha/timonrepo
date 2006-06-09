@@ -21,7 +21,7 @@ Source1: magick_small.png
 Patch1: ImageMagick-6.2.1-local_doc.patch
 Patch2: ImageMagick-6.2.5-format-string-again.patch
 Patch3: ImageMagick-6.2.5-yet-another-overflow.patch
-Patch4: ImageMagick-6.2.5-multilib.patch
+Patch4: ImageMagick-6.2.8-multilib.patch
 
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
@@ -116,8 +116,8 @@ however.
 %prep
 %setup -q -n %{name}-%{VER}
 %patch1 -p1 -b .local_doc
-%patch2 -p1 -b .format-string-again
-%patch3 -p1 -b .yet-another-overflow
+#%patch2 -p1 -b .format-string-again
+#%patch3 -p1 -b .yet-another-overflow
 %patch4 -p1 -b .multilib
 
 %build
