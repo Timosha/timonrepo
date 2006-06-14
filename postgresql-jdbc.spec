@@ -1,11 +1,11 @@
 %define section		devel
-%define upstreamver	8.1-405
+%define upstreamver	8.1-407
 %define gcj_support	1
 
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
-Version:	8.1.405
-Release:	2jpp
+Version:	8.1.407
+Release:	1jpp
 Epoch:		0
 License:	BSD
 Group:		Applications/Databases
@@ -99,6 +99,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Jun 14 2006 Tom Lane <tgl@redhat.com> 8.1.407-1jpp
+- Update to build 8.1-407
+
 * Mon Mar 27 2006 Tom Lane <tgl@redhat.com> 8.1.405-2jpp
 - Back-patch upstream fix to support unspecified-type strings.
 
