@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 1
+Release: 1.1
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -247,6 +247,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 6.2.8.0-1.1
+- rebuild
+
 * Fri Jun  9 2006 Matthias Clasen <mclasen@redhat.com> - 6.2.8-1
 - Update to 6.2.8
 
