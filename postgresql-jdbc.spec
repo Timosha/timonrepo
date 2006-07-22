@@ -5,7 +5,7 @@
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
 Version:	8.1.407
-Release:	1jpp.1
+Release:	1jpp.2
 Epoch:		0
 License:	BSD
 Group:		Applications/Databases
@@ -99,6 +99,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Jul 22 2006 Jakub Jelinek <jakub@redhat.com> 8.1.407-1jpp.2
+- Rebuilt
+
 * Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 0:8.1.407-1jpp.1
 - rebuild
 
