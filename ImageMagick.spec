@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 1.1
+Release: 2
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -30,6 +30,7 @@ BuildRequires: automake >= 1.7 autoconf >= 2.58 libtool >= 1.5
 BuildRequires: ghostscript-devel
 BuildRequires: libwmf-devel
 BuildRequires: libX11-devel, libXext-devel, libXt-devel
+BuildRequires: lcms-devel, libxml2-devel, librsvg2-devel
 
 %description
 ImageMagick(TM) is an image display and manipulation tool for the X
@@ -125,6 +126,9 @@ however.
            --with-magick_plus_plus \
 	   --with-gslib \
            --with-wmf \
+           --with-lcms \
+           --with-rsvg \
+	   --with-xml \
            --with-perl-options="INSTALLDIRS=vendor %{?perl_prefix} CC='%__cc -L$PWD/magick/.libs' LDDLFLAGS='-shared -L$PWD/magick/.libs'" \
            --with-windows-font-dir=%{_datadir}/fonts/default/TrueType \
 	   --without-dps
@@ -247,6 +251,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Mon Jul 24 2006 Matthias Clasen <mclasen@redhat.com> - 6.2.8.0-2
+- Add missing BRs
+
 * Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 6.2.8.0-1.1
 - rebuild
 
