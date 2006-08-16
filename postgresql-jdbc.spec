@@ -28,11 +28,12 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+%define _gcj_support 1
+
 %define gcj_support %{?_with_gcj_support:1}%{!?_with_gcj_support:%{?_without_gcj_support:0}%{!?_without_gcj_support:%{?_gcj_support:%{_gcj_support}}%{!?_gcj_support:0}}}
 
 %define section		devel
 %define upstreamver	8.1-407
-%define gcj_support	1
 
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
