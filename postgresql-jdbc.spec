@@ -37,7 +37,7 @@
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
 Version:	8.1.407
-Release:	1jpp.2
+Release:	1jpp.3
 Epoch:		0
 License:	BSD
 Group:		Applications/Databases
