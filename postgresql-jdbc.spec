@@ -38,7 +38,7 @@
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
 Version:	8.1.407
-Release:	1jpp.3
+Release:	1jpp.4
 Epoch:		0
 License:	BSD
 Group:		Applications/Databases
@@ -57,8 +57,8 @@ BuildRequires:  junit >= 0:3.7
 BuildRequires:	findutils gettext
 %if %{gcj_support}
 BuildRequires:	gcc-java
-Requires(post): java-1.4.2-gcj-compat
-Requires(postun): java-1.4.2-gcj-compat
+Requires(post): /usr/bin/rebuild-gcj-db
+Requires(postun): /usr/bin/rebuild-gcj-db
 %endif
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 
@@ -131,6 +131,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Aug 16 2006 Tom Lane <tgl@redhat.com> 8.1.407-1jpp.4
+- Fix Requires: for rebuild-gcj-db (bz #202544)
+
 * Wed Aug 16 2006 Fernando Nasser <fnasser@redhat.com> 8.1.407-1jpp.3
 - Merge with upstream
 
