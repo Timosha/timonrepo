@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 2
+Release: 3%{?dist}
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -20,6 +20,11 @@ Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
 Source1: magick_small.png
 Patch1: ImageMagick-6.2.1-local_doc.patch
 Patch2: ImageMagick-6.2.8-multilib.patch
+# 202193
+Patch3: ImageMagick-6.2.8-cve-2006-3743.patch
+# 202771
+Patch4: ImageMagick-6.2.8-cve-2006-4144.patch
+
 
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
@@ -116,6 +121,8 @@ however.
 %setup -q -n %{name}-%{VER}
 %patch1 -p1 -b .local_doc
 %patch2 -p1 -b .multilib
+%patch3 -p1 -b .cve-2006-3743
+%patch4 -p1 -b .cve-2006-4144
 
 %build
 %configure --enable-shared \
@@ -251,6 +258,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Wed Aug 23 2006 Matthias Clasen <mclasen@redhat.com> - 6.2.8.0-3.fc6
+- fix several integer and buffer overflows (#202193, CVE-2006-3743)
+- fix more integer overflows (#202771, CVE-2006-4144)
+
 * Mon Jul 24 2006 Matthias Clasen <mclasen@redhat.com> - 6.2.8.0-2
 - Add missing BRs
 
