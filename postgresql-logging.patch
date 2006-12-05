@@ -1,36 +1,37 @@
-diff -Naur postgresql-8.1.0.orig/src/backend/utils/misc/postgresql.conf.sample postgresql-8.1.0/src/backend/utils/misc/postgresql.conf.sample
---- postgresql-8.1.0.orig/src/backend/utils/misc/postgresql.conf.sample	2005-10-08 15:32:58.000000000 -0400
-+++ postgresql-8.1.0/src/backend/utils/misc/postgresql.conf.sample	2005-11-07 15:04:13.000000000 -0500
-@@ -211,15 +211,15 @@
+diff -Naur postgresql-8.2.0.orig/src/backend/utils/misc/postgresql.conf.sample postgresql-8.2.0/src/backend/utils/misc/postgresql.conf.sample
+--- postgresql-8.2.0.orig/src/backend/utils/misc/postgresql.conf.sample	2006-11-20 20:23:37.000000000 -0500
++++ postgresql-8.2.0/src/backend/utils/misc/postgresql.conf.sample	2006-12-04 19:54:58.000000000 -0500
+@@ -226,16 +226,16 @@
  					# depending on platform.
  
  # This is used when logging to stderr:
 -#redirect_stderr = off			# Enable capturing of stderr into log 
 +redirect_stderr = on			# Enable capturing of stderr into log 
  					# files
+ 					# (change requires restart)
  
  # These are only used if redirect_stderr is on:
 -#log_directory = 'pg_log'		# Directory where log files are written
 +log_directory = 'pg_log'		# Directory where log files are written
  					# Can be absolute or relative to PGDATA
 -#log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log' # Log file name pattern.
-+log_filename = 'postgresql-%a.log'	# Log file name pattern.
++log_filename = 'postgresql-%a.log'      # Log file name pattern.
  					# Can include strftime() escapes
 -#log_truncate_on_rotation = off # If on, any existing log file of the same 
-+log_truncate_on_rotation = on	# If on, any existing log file of the same 
++log_truncate_on_rotation = on  # If on, any existing log file of the same 
  					# name as the new log file will be
  					# truncated rather than appended to. But
  					# such truncation only occurs on
-@@ -227,10 +227,10 @@
+@@ -243,10 +243,10 @@
  					# or size-driven rotation. Default is
  					# off, meaning append to existing files
  					# in all cases.
--#log_rotation_age = 1440		# Automatic rotation of logfiles will 
-+log_rotation_age = 1440			# Automatic rotation of logfiles will 
- 					# happen after so many minutes.  0 to 
+-#log_rotation_age = 1d			# Automatic rotation of logfiles will 
++log_rotation_age = 1d			# Automatic rotation of logfiles will 
+ 					# happen after that time.  0 to 
  					# disable.
--#log_rotation_size = 10240		# Automatic rotation of logfiles will 
+-#log_rotation_size = 10MB		# Automatic rotation of logfiles will 
 +log_rotation_size = 0			# Automatic rotation of logfiles will 
- 					# happen after so many kilobytes of log
+ 					# happen after that much log
  					# output.  0 to disable.
  

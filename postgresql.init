@@ -61,16 +61,20 @@
 # fooling the postmaster's stale-lockfile check by having too many
 # postgres-owned processes laying about.
 
+# Version 8.1 Devrim Gunduz <devrim@PostgreSQL.org>
+# Increased sleep time from 1 sec to 2 sec.
 
-# PGVERSION is the full package version, e.g., 7.4.7
+# Version 8.2 Devrim Gunduz <devrim@CommandPrompt.com>
+# Set initdb as a seperate option.
+
+# PGVERSION is the full package version, e.g., 8.2.0
 # Note: the specfile ordinarily updates this during install
 PGVERSION=xxxx
-# PGMAJORVERSION is major version, e.g., 7.4 (this should match PG_VERSION)
+# PGMAJORVERSION is major version, e.g., 8.2 (this should match PG_VERSION)
 PGMAJORVERSION=`echo "$PGVERSION" | sed 's/^\([0-9]*\.[0-9]*\).*$/\1/'`
 
 # Source function library.
-INITD=/etc/rc.d/init.d
-. $INITD/functions
+. /etc/rc.d/init.d/functions
 
 # Get function listing for cross-distribution logic.
 TYPESET=`typeset -f|grep "declare"`
@@ -163,28 +167,14 @@ start(){
 			exit 1
 		fi
 
-	# No existing PGDATA! Initdb it.
+	# No existing PGDATA! Warn the user to initdb it.
 
 	else
-		echo -n $"Initializing database: "
-		if [ ! -e "$PGDATA" -a ! -h "$PGDATA" ]
-		then
-			mkdir -p "$PGDATA" || exit 1
-			chown postgres:postgres "$PGDATA"
-			chmod go-rwx "$PGDATA"
-		fi
-		# Clean up SELinux tagging for PGDATA
-		[ -x /sbin/restorecon ] && /sbin/restorecon "$PGDATA"
-		# Initialize the database
-		$SU -l postgres -c "$PGENGINE/initdb --pgdata='$PGDATA' --auth='ident sameuser'" >> "$PGLOG" 2>&1 < /dev/null
-		# Create directory for postmaster log
-		mkdir "$PGDATA/pg_log"
-		chown postgres:postgres "$PGDATA/pg_log"
-		chmod go-rwx "$PGDATA/pg_log"
-
-		[ -f "$PGDATA/PG_VERSION" ] && echo_success
-		[ ! -f "$PGDATA/PG_VERSION" ] && echo_failure
 		echo
+                echo "$PGDATA is missing. Use \"service postgresql initdb\" to initialize the cluster first."
+		echo_failure
+		echo
+		exit 1
  	fi
 
 	echo -n "$PSQL_START"
@@ -237,6 +227,39 @@ reload(){
     $SU -l postgres -c "$PGENGINE/pg_ctl reload -D '$PGDATA' -s" > /dev/null 2>&1 < /dev/null
 }
 
+initdb(){
+    if [ -f "$PGDATA/PG_VERSION" ]
+    then
+	echo "Data directory is not empty!"
+	echo_failure
+	script_result=1
+    else
+	echo -n $"Initializing database: "
+	if [ ! -e "$PGDATA" -a ! -h "$PGDATA" ]
+	then
+		mkdir -p "$PGDATA" || exit 1
+		chown postgres:postgres "$PGDATA"
+		chmod go-rwx "$PGDATA"
+	fi
+	# Clean up SELinux tagging for PGDATA
+	[ -x /sbin/restorecon ] && /sbin/restorecon "$PGDATA"
+	# Initialize the database
+	$SU -l postgres -c "$PGENGINE/initdb --pgdata='$PGDATA' --auth='ident sameuser'" >> "$PGLOG" 2>&1 < /dev/null
+	# Create directory for postmaster log
+	mkdir "$PGDATA/pg_log"
+	chown postgres:postgres "$PGDATA/pg_log"
+	chmod go-rwx "$PGDATA/pg_log"
+
+	if [ -f "$PGDATA/PG_VERSION" ]
+	then
+	    echo_success
+	else
+	    echo_failure
+	    script_result=1
+	fi
+    fi
+}
+
 # This script is slightly unusual in that the name of the daemon (postmaster)
 # is not the same as the name of the subsystem (postgresql)
 
@@ -264,8 +287,11 @@ case "$1" in
   reload|force-reload)
 	reload
 	;;
+  initdb)
+	initdb
+	;;
   *)
-	echo $"Usage: $0 {start|stop|status|restart|condrestart|condstop|reload|force-reload}"
+	echo $"Usage: $0 {start|stop|status|restart|condrestart|condstop|reload|force-reload|initdb}"
 	exit 1
 esac
 

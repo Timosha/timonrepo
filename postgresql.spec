@@ -60,7 +60,6 @@
 %{!?aconfver:%define aconfver autoconf}
 
 %{!?tcldevel:%define tcldevel 1}
-%{!?jdbc:%define jdbc 0}
 %{!?test:%define test 1}
 %{!?python:%define python 1}
 %{!?pltcl:%define pltcl 1}
@@ -81,8 +80,8 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 8.1.4
-Release: 1.1
+Version: 8.2.0
+Release: 1%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -92,21 +91,15 @@ Source3: postgresql.init
 Source4: Makefile.regress
 Source5: pg_config.h
 Source6: README.rpm-dist
-%if %jdbc
-Source8: http://jdbc.postgresql.org/download/postgresql-8.1-405.jdbc2.jar
-Source9: http://jdbc.postgresql.org/download/postgresql-8.1-405.jdbc2ee.jar
-Source10: http://jdbc.postgresql.org/download/postgresql-8.1-405.jdbc3.jar
-%endif
 Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
 Source17: http://www.postgresql.org/docs/manuals/postgresql-8.1-US.pdf
-Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.8.tgz
+Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.8.1.tgz
 Source19: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcl1.5.2.tar.gz
 Source20: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcldocs-20041108.zip
 
 Patch1: rpm-pgsql.patch
-Patch2: postgresql-src-tutorial.patch
 Patch3: postgresql-logging.patch
 Patch4: postgresql-test.patch
 Patch5: pgtcl-no-rpath.patch
@@ -291,19 +284,6 @@ database.
 %endif
 
 #----------
-%if %jdbc
-%package jdbc
-Summary: Files needed for Java programs to access a PostgreSQL database.
-Group: Applications/Databases
-Obsoletes: rh-postgresql-jdbc
-
-%description jdbc
-PostgreSQL is an advanced Object-Relational database management
-system. The postgresql-jdbc package includes the .jar files needed for
-Java programs to access a PostgreSQL database.
-%endif
-
-#------------
 %if %test
 %package test
 Summary: The test suite distributed with PostgreSQL.
@@ -323,11 +303,7 @@ system, including regression tests and benchmarks.
 
 %prep
 %setup -q 
-pushd doc
-tar zxf postgres.tar.gz
-popd
 %patch1 -p1
-%patch2 -p1
 %patch3 -p1
 %patch4 -p1
 # patch5 is applied later
@@ -337,11 +313,6 @@ popd
 #call autoconf 2.53 or greater
 %aconfver
 
-pushd doc
-tar -zcf postgres.tar.gz *.html stylesheet.css
-rm -f *.html stylesheet.css
-popd
-
 cp -p %{SOURCE17} .
 
 %if %python
@@ -349,7 +320,6 @@ cp -p %{SOURCE17} .
    PYGRESQLDIR=`basename %{SOURCE18} .tgz`
    mv $PYGRESQLDIR PyGreSQL
    # Some versions of PyGreSQL.tgz contain wrong file permissions
-   chmod 644 PyGreSQL/announce.txt PyGreSQL/changelog.txt PyGreSQL/README
    chmod 755 PyGreSQL/tutorial
    chmod 644 PyGreSQL/tutorial/*.py
    chmod 755 PyGreSQL/tutorial/advanced.py PyGreSQL/tutorial/basics.py
@@ -487,23 +457,6 @@ esac
 
 install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
 cp src/tutorial/* $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
-
-%if %jdbc
-	# Java/JDBC
-	# Red Hat's standard place to put jarfiles is /usr/share/java
-
-	# JDBC jars 
-	install -d $RPM_BUILD_ROOT/usr/share/java
-	install -m 644 %{SOURCE8} $RPM_BUILD_ROOT/usr/share/java
-	install -m 644 %{SOURCE9} $RPM_BUILD_ROOT/usr/share/java
-	install -m 644 %{SOURCE10} $RPM_BUILD_ROOT/usr/share/java
-	# Versionless symlinks to the versioned jars
-	pushd $RPM_BUILD_ROOT/usr/share/java
-	ln -s `basename %{SOURCE8}` postgresql-jdbc2.jar
-	ln -s `basename %{SOURCE9}` postgresql-jdbc2ee.jar
-	ln -s `basename %{SOURCE10}` postgresql-jdbc3.jar
-	popd
-%endif
 
 %if %tcl
 	install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/Pgtcl
@@ -681,39 +634,37 @@ rm -rf $RPM_BUILD_ROOT
 %files contrib
 %defattr(-,root,root)
 %{_libdir}/pgsql/_int.so
+%{_libdir}/pgsql/adminpack.so
 %{_libdir}/pgsql/autoinc.so
 %{_libdir}/pgsql/btree_gist.so
 %{_libdir}/pgsql/chkpass.so
 %{_libdir}/pgsql/cube.so
 %{_libdir}/pgsql/dblink.so
 %{_libdir}/pgsql/earthdistance.so
-%{_libdir}/pgsql/fti.so
 %{_libdir}/pgsql/fuzzystrmatch.so
+%{_libdir}/pgsql/hstore.so
 %{_libdir}/pgsql/insert_username.so
 %{_libdir}/pgsql/int_aggregate.so
-%{_libdir}/pgsql/isbn_issn.so
+%{_libdir}/pgsql/isn.so
 %{_libdir}/pgsql/lo.so
 %{_libdir}/pgsql/ltree.so
 %{_libdir}/pgsql/moddatetime.so
-%{_libdir}/pgsql/pending.so
-%{_libdir}/pgsql/pgcrypto.so
-%{_libdir}/pgsql/pgstattuple.so
 %{_libdir}/pgsql/pg_buffercache.so
+%{_libdir}/pgsql/pg_freespacemap.so
 %{_libdir}/pgsql/pg_trgm.so
+%{_libdir}/pgsql/pgcrypto.so
+%{_libdir}/pgsql/pgrowlocks.so
+%{_libdir}/pgsql/pgstattuple.so
 %{_libdir}/pgsql/refint.so
 %{_libdir}/pgsql/seg.so
+%{_libdir}/pgsql/sslinfo.so
 %{_libdir}/pgsql/tablefunc.so
 %{_libdir}/pgsql/timetravel.so
 %{_libdir}/pgsql/tsearch2.so
-%{_libdir}/pgsql/user_locks.so
 %if %xml
 %{_libdir}/pgsql/pgxml.so
 %endif
 %{_datadir}/pgsql/contrib/
-%{_bindir}/DBMirror.pl
-%{_bindir}/clean_pending.pl
-%{_bindir}/dbf2pg
-%{_bindir}/fti.pl
 %{_bindir}/oid2name
 %{_bindir}/pgbench
 %{_bindir}/vacuumlo
@@ -749,9 +700,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/postmaster.*
 %{_datadir}/pgsql/postgres.bki
 %{_datadir}/pgsql/postgres.description
+%{_datadir}/pgsql/postgres.shdescription
 %{_datadir}/pgsql/system_views.sql
 %{_datadir}/pgsql/*.sample
 %{_datadir}/pgsql/timezone/
+%{_datadir}/pgsql/timezonesets/
 %{_libdir}/pgsql/plpgsql.so
 %dir %{_datadir}/pgsql
 %attr(700,postgres,postgres) %dir /var/lib/pgsql
@@ -809,16 +762,10 @@ rm -rf $RPM_BUILD_ROOT
 %if %python
 %files python
 %defattr(-,root,root)
-%doc PyGreSQL/announce.txt PyGreSQL/changelog.txt PyGreSQL/README
+%doc PyGreSQL/docs/*.txt
 %doc PyGreSQL/tutorial
 %{_libdir}/python%{pyver}/site-packages/_pgmodule.so
 %{_libdir}/python%{pyver}/site-packages/*.py
-%endif
-
-%if %jdbc
-%files jdbc
-%defattr(-,root,root)
-%{_datadir}/java/*
 %endif
 
 %if %test
@@ -829,6 +776,16 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Dec  4 2006 Tom Lane <tgl@redhat.com> 8.2.0-1
+- Update to PostgreSQL 8.2.0
+- Update to PyGreSQL 3.8.1
+- Fix chcon arguments in test/regress/Makefile
+Related: #201035
+- Adjust init script to not fool /etc/rc.d/rc
+Resolves: #161470
+- Change init script to not do initdb automatically, but require
+  manual "service postgresql initdb" for safety.  Per upstream discussions.
+
 * Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 8.1.4-1.1
 - rebuild
 
