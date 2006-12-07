@@ -75,13 +75,13 @@
 %{!?runselftest:%define runselftest 1}
 
 # Python major version.
-%{expand: %%define pyver %(python -c 'import sys;print(sys.version[0:3])')}
+%{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 8.2.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -516,10 +516,10 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/pgsql
 
 %if %python
    pushd PyGreSQL
-   install -m 0755 -d $RPM_BUILD_ROOT%{_libdir}/python%{pyver}/site-packages
-   install -m 0755 _pgmodule.so $RPM_BUILD_ROOT%{_libdir}/python%{pyver}/site-packages
-   install -m 0644 pg.py $RPM_BUILD_ROOT%{_libdir}/python%{pyver}/site-packages
-   install -m 0644 pgdb.py $RPM_BUILD_ROOT%{_libdir}/python%{pyver}/site-packages
+   install -m 0755 -d $RPM_BUILD_ROOT%{python_sitearch}
+   install -m 0755 _pgmodule.so $RPM_BUILD_ROOT%{python_sitearch}
+   install -m 0644 pg.py $RPM_BUILD_ROOT%{python_sitearch}
+   install -m 0644 pgdb.py $RPM_BUILD_ROOT%{python_sitearch}
    popd
 %endif
 
@@ -764,8 +764,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %doc PyGreSQL/docs/*.txt
 %doc PyGreSQL/tutorial
-%{_libdir}/python%{pyver}/site-packages/_pgmodule.so
-%{_libdir}/python%{pyver}/site-packages/*.py
+%{python_sitearch}/_pgmodule.so
+%{python_sitearch}/*.py
 %endif
 
 %if %test
@@ -776,6 +776,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Dec  7 2006 Jeremy Katz <katzj@redhat.com> - 8.2.0-2
+- rebuild for python 2.5
+
 * Mon Dec  4 2006 Tom Lane <tgl@redhat.com> 8.2.0-1
 - Update to PostgreSQL 8.2.0
 - Update to PyGreSQL 3.8.1
