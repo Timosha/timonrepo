@@ -33,19 +33,18 @@
 %define gcj_support %{?_with_gcj_support:1}%{!?_with_gcj_support:%{?_without_gcj_support:0}%{!?_without_gcj_support:%{?_gcj_support:%{_gcj_support}}%{!?_gcj_support:0}}}
 
 %define section		devel
-%define upstreamver	8.1-407
+%define upstreamver	8.2-504
 
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
-Version:	8.1.407
-Release:	1jpp.4
+Version:	8.2.504
+Release:	1jpp%{?dist}
 Epoch:		0
 License:	BSD
 Group:		Applications/Databases
 URL:		http://jdbc.postgresql.org/
 
 Source0:	http://jdbc.postgresql.org/download/%{name}-%{upstreamver}.src.tar.gz
-Patch1:		postgresql-jdbc-unspec-string.patch
 
 %if ! %{gcj_support}
 BuildArch:	noarch
@@ -77,8 +76,6 @@ rmdir %{name}-%{upstreamver}.src
 
 # remove any binary libs
 find -name "*.jar" -or -name "*.class" | xargs rm -f
-
-%patch1 -p1
 
 %build
 export OPT_JAR_LIST="ant/ant-junit junit"
@@ -122,7 +119,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%doc LICENSE README doc/* example
+%doc LICENSE README doc/*
 %{_javadir}/*
 %if %{gcj_support}
 %dir %{_libdir}/gcj/%{name}
@@ -131,6 +128,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Fri Dec 15 2006 Tom Lane <tgl@redhat.com> 8.2.504-1jpp
+- Update to build 8.2-504
+
 * Wed Aug 16 2006 Tom Lane <tgl@redhat.com> 8.1.407-1jpp.4
 - Fix Requires: for rebuild-gcj-db (bz #202544)
 
