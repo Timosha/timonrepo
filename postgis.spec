@@ -5,7 +5,7 @@
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.2.0
-Release:	3%{?dist}
+Release:	4%{?dist}
 License:	GPL
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
@@ -58,6 +58,7 @@ The postgis-utils package provides the utilities for PostGIS.
 
 %prep
 %setup -q
+# To be removed in 1.2.1
 %patch1 -p0
 %patch2 -p0
 
@@ -67,7 +68,7 @@ make %{?_smp_mflags} LPATH=`pg_config --pkglibdir` shlib="%{name}.so"
 
 %if %javabuild
 export MAKEFILE_DIR=%{_builddir}/%{name}-%{version}/java/jdbc
-JDBC_VERSION_RPM=`rpm -ql postgresql-jdbc| grep 'jdbc.jar$'|awk -F '/' '{print $5}'`
+JDBC_VERSION_RPM=`rpm -ql postgresql-jdbc| grep 'jdbc2.jar$'|awk -F '/' '{print $5}'`
 sed 's/postgresql.jar/'${JDBC_VERSION_RPM}'/g' $MAKEFILE_DIR/Makefile > $MAKEFILE_DIR/Makefile.new
 mv -f $MAKEFILE_DIR/Makefile.new $MAKEFILE_DIR/Makefile
 make -C java/jdbc
@@ -82,6 +83,7 @@ rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
 install -d %{buildroot}%{_libdir}/pgsql/
 install lwgeom/liblwgeom.so* %{buildroot}%{_libdir}/pgsql/
+install lwgeom/postgis.so* %{buildroot}%{_libdir}/pgsql/
 install -d  %{buildroot}%{_datadir}/pgsql/contrib/
 install -m 644 *.sql %{buildroot}%{_datadir}/pgsql/contrib/
 rm -f  %{buildroot}%{_libdir}/liblwgeom.so*
@@ -113,6 +115,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc COPYING CREDITS NEWS TODO README.%{name} TODO doc/html loader/README.* doc/%{name}.xml  doc/ZMSgeoms.txt 
 %attr(755,root,root) %{_bindir}/*
+%attr(755,root,root) %{_libdir}/pgsql/postgis.so*
 %attr(755,root,root) %{_libdir}/pgsql/liblwgeom.so*
 %{_datadir}/pgsql/contrib/*.sql
 
@@ -141,6 +144,10 @@ rm -rf %{buildroot}
 %endif
 
 %changelog
+* Wed Jan 3 2007 - Devrim GUNDUZ <devrim@commandprompt.com> 1.2.0-4
+- Added postgis.so among installed files, per Jon Burgess.
+- Fix jdbc jar dedection problem
+
 * Wed Dec 27 2006 - Devrim GUNDUZ <devrim@commandprompt.com> 1.2.0-3
 - Fix Requires for subpackages per bugzilla review #220743
 
