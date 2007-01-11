@@ -80,8 +80,8 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 8.2.0
-Release: 2%{?dist}
+Version: 8.2.1
+Release: 1%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -94,17 +94,17 @@ Source6: README.rpm-dist
 Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
-Source17: http://www.postgresql.org/docs/manuals/postgresql-8.1-US.pdf
+Source17: http://www.postgresql.org/docs/manuals/postgresql-8.2.1-US.pdf
 Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.8.1.tgz
-Source19: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcl1.5.2.tar.gz
-Source20: ftp://gborg.postgresql.org/pub/pgtclng/stable/pgtcldocs-20041108.zip
+Source19: http://pgfoundry.org/projects/pgtclng/pgtcl1.5.3.tar.gz
+Source20: http://pgfoundry.org/projects/pgtclng/pgtcldocs-20060909.zip
 
 Patch1: rpm-pgsql.patch
 Patch3: postgresql-logging.patch
 Patch4: postgresql-test.patch
 Patch5: pgtcl-no-rpath.patch
 Patch6: postgresql-perl-rpath.patch
-Patch7: pgtcl-quote.patch
+Patch8: postgresql-prefer-ncurses.patch
 
 Buildrequires: perl glibc-devel bison flex autoconf
 Prereq: /sbin/ldconfig initscripts
@@ -308,7 +308,7 @@ system, including regression tests and benchmarks.
 %patch4 -p1
 # patch5 is applied later
 %patch6 -p1
-# patch7 is applied later
+%patch8 -p1
 
 #call autoconf 2.53 or greater
 %aconfver
@@ -333,9 +333,8 @@ cp -p %{SOURCE17} .
    PGTCLDOCDIR=`basename %{SOURCE20} .zip`
    mv $PGTCLDOCDIR Pgtcl-docs
 
-%patch5 -p0
-%patch7 -p0
    pushd Pgtcl
+%patch5 -p1
 %aconfver
    popd
 %endif
@@ -776,6 +775,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Jan 10 2007 Tom Lane <tgl@redhat.com> 8.2.1-1
+- Update to PostgreSQL 8.2.1
+- Update to pgtcl 1.5.3
+- Be sure we link to libncurses, not libtermcap which is disappearing in Fedora
+
 * Thu Dec  7 2006 Jeremy Katz <katzj@redhat.com> - 8.2.0-2
 - rebuild for python 2.5
 
