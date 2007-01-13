@@ -61,11 +61,11 @@
 
 %{!?tcldevel:%define tcldevel 1}
 %{!?test:%define test 1}
-%{!?python:%define python 1}
+%{!?plpython:%define plpython 1}
 %{!?pltcl:%define pltcl 1}
 %{!?plperl:%define plperl 1}
+%{!?python:%define python 1}
 %{!?tcl:%define tcl 1}
-%{!?pls:%define pls 1}
 %{!?ssl:%define ssl 1}
 %{!?kerberos:%define kerberos 1}
 %{!?nls:%define nls 1}
@@ -81,7 +81,7 @@
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
 Version: 8.2.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -109,7 +109,7 @@ Patch8: postgresql-prefer-ncurses.patch
 Buildrequires: perl glibc-devel bison flex autoconf
 Prereq: /sbin/ldconfig initscripts
 
-%if %python
+%if %python || %plpython
 BuildPrereq: python-devel
 %endif
 
@@ -238,18 +238,51 @@ Postgres preprocessor. You need to install this package if you want to
 develop applications which will interact with a PostgreSQL server.
 
 #------------
-%if %pls
-%package pl
-Summary: The PL procedural languages for PostgreSQL.
+%if %plperl
+%package plperl
+Summary: The Perl procedural language for PostgreSQL.
 Group: Applications/Databases
 PreReq: postgresql = %{version}-%{release}
 PreReq: postgresql-server = %{version}-%{release}
 Obsoletes: rh-postgresql-pl
+Obsoletes: postgresql-pl
 
-%description pl
+%description plperl
 PostgreSQL is an advanced Object-Relational database management
-system.  The postgresql-pl package contains the PL/Perl, PL/Tcl, and PL/Python
-procedural languages for the backend.  PL/Pgsql is part of the core server package.
+system.  The postgresql-plperl package contains the PL/Perl
+procedural language for the backend.
+%endif
+
+#------------
+%if %plpython
+%package plpython
+Summary: The Python procedural language for PostgreSQL.
+Group: Applications/Databases
+PreReq: postgresql = %{version}-%{release}
+PreReq: postgresql-server = %{version}-%{release}
+Obsoletes: rh-postgresql-pl
+Obsoletes: postgresql-pl
+
+%description plpython
+PostgreSQL is an advanced Object-Relational database management
+system.  The postgresql-plpython package contains the PL/Python
+procedural language for the backend.
+%endif
+
+#------------
+%if %pltcl
+%package pltcl
+Summary: The Tcl procedural language for PostgreSQL.
+Group: Applications/Databases
+PreReq: postgresql = %{version}-%{release}
+PreReq: postgresql-server = %{version}-%{release}
+Obsoletes: rh-postgresql-pl
+Obsoletes: postgresql-pl
+
+%description pltcl
+PostgreSQL is an advanced Object-Relational database management
+system.  The postgresql-pltcl package contains the PL/Tcl
+procedural language for the backend.
 %endif
 
 #------------
@@ -359,7 +392,7 @@ CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
 	--with-tcl \
 	--with-tclconfig=%{_libdir} \
 %endif
-%if %python
+%if %plpython
 	--with-python \
 %endif
 %if %ssl
@@ -574,9 +607,19 @@ if [ $1 = 0 ] ; then
 	groupdel postgres >/dev/null 2>&1 || : 
 fi
 
-%if %pls
-%post -p /sbin/ldconfig   pl
-%postun -p /sbin/ldconfig   pl
+%if %plperl
+%post -p /sbin/ldconfig   plperl
+%postun -p /sbin/ldconfig   plperl
+%endif
+
+%if %plpython
+%post -p /sbin/ldconfig   plpython
+%postun -p /sbin/ldconfig   plpython
+%endif
+
+%if %pltcl
+%post -p /sbin/ldconfig   pltcl
+%postun -p /sbin/ldconfig   pltcl
 %endif
 
 %if %test
@@ -740,22 +783,26 @@ rm -rf $RPM_BUILD_ROOT
 %doc Pgtcl-docs/*
 %endif
 
-%if %pls
-%files pl
-%defattr(-,root,root)
 %if %plperl
+%files plperl
+%defattr(-,root,root)
 %{_libdir}/pgsql/plperl.so
 %endif
+
 %if %pltcl
+%files pltcl
+%defattr(-,root,root)
 %{_libdir}/pgsql/pltcl.so
 %{_bindir}/pltcl_delmod
 %{_bindir}/pltcl_listmod
 %{_bindir}/pltcl_loadmod
 %{_datadir}/pgsql/unknown.pltcl
 %endif
-%if %python
+
+%if %plpython
+%files plpython
+%defattr(-,root,root)
 %{_libdir}/pgsql/plpython.so
-%endif
 %endif
 
 %if %python
@@ -775,6 +822,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Fri Jan 12 2007 Tom Lane <tgl@redhat.com> 8.2.1-2
+- Split -pl subpackage into three new packages to reduce dependencies
+  and track upstream project's packaging.
+
 * Wed Jan 10 2007 Tom Lane <tgl@redhat.com> 8.2.1-1
 - Update to PostgreSQL 8.2.1
 - Update to pgtcl 1.5.3
