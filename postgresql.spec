@@ -80,8 +80,8 @@
 
 Summary: PostgreSQL client programs and libraries.
 Name: postgresql
-Version: 8.2.1
-Release: 2%{?dist}
+Version: 8.2.2
+Release: 1%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -149,7 +149,7 @@ Obsoletes: postgresql-perl
 Obsoletes: postgresql-tk
 Obsoletes: rh-postgresql
 
-Buildroot: %{_tmppath}/%{name}-%{version}-root
+Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
 PostgreSQL is an advanced Object-Relational database management system
@@ -822,6 +822,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sun Feb  4 2007 Tom Lane <tgl@redhat.com> 8.2.2-1
+- Update to PostgreSQL 8.2.2 to fix CVE-2007-0555, CVE-2007-0556
+Related: #225496
+
 * Fri Jan 12 2007 Tom Lane <tgl@redhat.com> 8.2.1-2
 - Split -pl subpackage into three new packages to reduce dependencies
   and track upstream project's packaging.

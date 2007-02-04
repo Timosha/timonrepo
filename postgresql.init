@@ -118,7 +118,7 @@ export PGPORT
 
 # Check that networking is up.
 # Pretty much need it for postmaster.
-[ "${NETWORKING}" = "no" ] && exit 0
+[ "${NETWORKING}" = "no" ] && exit 1
 
 [ -f "$PGENGINE/postmaster" ] || exit 1
 
