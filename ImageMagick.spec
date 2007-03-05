@@ -1,7 +1,7 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 6.2.8
-%define Patchlevel 0
+%define VER 6.3.2
+%define Patchlevel 9
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
 %if "%{Patchlevel}" != ""
@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 3%{?dist}
+Release: 1%{?dist}
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -20,19 +20,16 @@ Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
 Source1: magick_small.png
 Patch1: ImageMagick-6.2.1-local_doc.patch
 Patch2: ImageMagick-6.2.8-multilib.patch
-# 202193
-Patch3: ImageMagick-6.2.8-cve-2006-3743.patch
-# 202771
-Patch4: ImageMagick-6.2.8-cve-2006-4144.patch
 
 
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
 BuildPrereq: libtiff-devel, libungif-devel, zlib-devel, perl
-BuildRequires: freetype-devel >= 2.0.1
+BuildRequires: freetype-devel >= 2.1
 BuildRequires: automake >= 1.7 autoconf >= 2.58 libtool >= 1.5
 BuildRequires: ghostscript-devel
+BuildRequires: perl-devel
 BuildRequires: libwmf-devel
 BuildRequires: libX11-devel, libXext-devel, libXt-devel
 BuildRequires: lcms-devel, libxml2-devel, librsvg2-devel
@@ -59,6 +56,7 @@ Requires: %{name} = %{version}-%{release}
 Requires: libX11-devel, libXext-devel, libXt-devel
 Requires: ghostscript-devel
 Requires: bzip2-devel
+Requires: freetype-devel
 Requires: libtiff-devel
 Requires: libjpeg-devel
 Requires: lcms-devel
@@ -121,8 +119,6 @@ however.
 %setup -q -n %{name}-%{VER}
 %patch1 -p1 -b .local_doc
 %patch2 -p1 -b .multilib
-%patch3 -p1 -b .cve-2006-3743
-%patch4 -p1 -b .cve-2006-4144
 
 %build
 %configure --enable-shared \
@@ -258,6 +254,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Fri Mar  2 2007 Norm Murray <nmurray@redhat.com> 6.3.2.9-1.fc7.0
+- update to 6.3.2-9
+
 * Wed Aug 23 2006 Matthias Clasen <mclasen@redhat.com> - 6.2.8.0-3.fc6
 - fix several integer and buffer overflows (#202193, CVE-2006-3743)
 - fix more integer overflows (#202771, CVE-2006-4144)
