@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -22,6 +22,9 @@ Patch1: ImageMagick-6.2.1-local_doc.patch
 Patch2: ImageMagick-6.2.8-multilib.patch
 Patch3: ImageMagick-6.3.2-perl-parallel-build.patch
 Patch4: ImageMagick-6.3.2-perl-liblink.patch
+# 235075
+Patch5: ImageMagick-6.2.8-CVE-2007-1797.patch
+
 
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
@@ -122,7 +125,7 @@ however.
 %patch2 -p1 -b .multilib
 %patch3 -p1 -b .perl-build
 %patch4 -p1 -b .perl-link
-
+%patch5 -p1 -b .cve-2007-1797
 
 %build
 %configure --enable-shared \
@@ -258,6 +261,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Thu Apr  5 2007 Norm Murray <nmurray@redhat.com> 6.3.2.9-3.fc7
+- heap overflows (#235075, CVE-2007-1797)
+
 * Fri Mar 30 2007 Norm Murray <nmurray@redhat.com> 6.3.2.9-2.fc7
 - perlmagick build fix (#231259)
 
