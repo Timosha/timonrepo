@@ -33,11 +33,11 @@
 %define gcj_support %{?_with_gcj_support:1}%{!?_with_gcj_support:%{?_without_gcj_support:0}%{!?_without_gcj_support:%{?_gcj_support:%{_gcj_support}}%{!?_gcj_support:0}}}
 
 %define section		devel
-%define upstreamver	8.2-504
+%define upstreamver	8.2-505
 
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
-Version:	8.2.504
+Version:	8.2.505
 Release:	1jpp%{?dist}
 Epoch:		0
 License:	BSD
@@ -128,6 +128,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Apr 23 2007 Tom Lane <tgl@redhat.com> 8.2.505-1jpp
+- Update to build 8.2-505
+
 * Fri Dec 15 2006 Tom Lane <tgl@redhat.com> 8.2.504-1jpp
 - Update to build 8.2-504
 
