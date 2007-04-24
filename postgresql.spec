@@ -78,10 +78,10 @@
 %{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
 
-Summary: PostgreSQL client programs and libraries.
+Summary: PostgreSQL client programs and libraries
 Name: postgresql
-Version: 8.2.3
-Release: 2%{?dist}
+Version: 8.2.4
+Release: 1%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -106,42 +106,42 @@ Patch5: pgtcl-no-rpath.patch
 Patch6: postgresql-perl-rpath.patch
 Patch8: postgresql-prefer-ncurses.patch
 
-Buildrequires: perl glibc-devel bison flex autoconf
+BuildRequires: perl glibc-devel bison flex autoconf
 Prereq: /sbin/ldconfig initscripts
 
 %if %python || %plpython
-BuildPrereq: python-devel
+BuildRequires: python-devel
 %endif
 
 %if %tcl || %pltcl
-BuildPrereq: tcl
+BuildRequires: tcl
 %if %tcldevel
-Buildrequires: tcl-devel
+BuildRequires: tcl-devel
 %endif
 %endif
 
-BuildPrereq: readline-devel
-BuildPrereq: zlib-devel >= 1.0.4
+BuildRequires: readline-devel
+BuildRequires: zlib-devel >= 1.0.4
 
 %if %ssl
-BuildPrereq: openssl-devel
+BuildRequires: openssl-devel
 %endif
 
 %if %kerberos
-BuildPrereq: krb5-devel
-BuildPrereq: e2fsprogs-devel
+BuildRequires: krb5-devel
+BuildRequires: e2fsprogs-devel
 %endif
 
 %if %nls
-BuildPrereq: gettext >= 0.10.35
+BuildRequires: gettext >= 0.10.35
 %endif
 
 %if %xml
-BuildPrereq: libxml2-devel libxslt-devel
+BuildRequires: libxml2-devel libxslt-devel
 %endif
 
 %if %pam
-BuildPrereq: pam-devel
+BuildRequires: pam-devel
 %endif
 
 Obsoletes: postgresql-clients
@@ -170,7 +170,7 @@ server, you need this package. You also need to install this package
 if you're installing the postgresql-server package.
 
 %package libs
-Summary: The shared libraries required for any PostgreSQL clients.
+Summary: The shared libraries required for any PostgreSQL clients
 Group: Applications/Databases
 Provides: libpq.so
 Obsoletes: rh-postgresql-libs
@@ -182,7 +182,7 @@ to use any other PostgreSQL package or any clients that need to connect to a
 PostgreSQL server.
 
 %package server
-Summary: The programs needed to create and run a PostgreSQL server.
+Summary: The programs needed to create and run a PostgreSQL server
 Group: Applications/Databases
 Prereq: /usr/sbin/useradd /sbin/chkconfig 
 Prereq: postgresql = %{version}-%{release} libpq.so
@@ -224,7 +224,7 @@ included in the PostgreSQL distribution.
 
 
 %package devel
-Summary: PostgreSQL development header files and libraries.
+Summary: PostgreSQL development header files and libraries
 Group: Development/Libraries
 Prereq: postgresql = %{version}-%{release}
 Requires: postgresql-libs = %{version}-%{release}
@@ -240,7 +240,7 @@ develop applications which will interact with a PostgreSQL server.
 #------------
 %if %plperl
 %package plperl
-Summary: The Perl procedural language for PostgreSQL.
+Summary: The Perl procedural language for PostgreSQL
 Group: Applications/Databases
 PreReq: postgresql = %{version}-%{release}
 PreReq: postgresql-server = %{version}-%{release}
@@ -256,7 +256,7 @@ procedural language for the backend.
 #------------
 %if %plpython
 %package plpython
-Summary: The Python procedural language for PostgreSQL.
+Summary: The Python procedural language for PostgreSQL
 Group: Applications/Databases
 PreReq: postgresql = %{version}-%{release}
 PreReq: postgresql-server = %{version}-%{release}
@@ -272,7 +272,7 @@ procedural language for the backend.
 #------------
 %if %pltcl
 %package pltcl
-Summary: The Tcl procedural language for PostgreSQL.
+Summary: The Tcl procedural language for PostgreSQL
 Group: Applications/Databases
 PreReq: postgresql = %{version}-%{release}
 PreReq: postgresql-server = %{version}-%{release}
@@ -288,7 +288,7 @@ procedural language for the backend.
 #------------
 %if %tcl
 %package tcl
-Summary: A Tcl client library for PostgreSQL.
+Summary: A Tcl client library for PostgreSQL
 Group: Applications/Databases
 Requires: libpq.so
 Requires: tcl >= 8.3
@@ -303,7 +303,7 @@ and its documentation.
 #------------
 %if %python
 %package python
-Summary: Development module for Python code to access a PostgreSQL DB.
+Summary: Development module for Python code to access a PostgreSQL DB
 Group: Applications/Databases
 Requires: libpq.so
 Requires: python mx
@@ -319,7 +319,7 @@ database.
 #----------
 %if %test
 %package test
-Summary: The test suite distributed with PostgreSQL.
+Summary: The test suite distributed with PostgreSQL
 Group: Applications/Databases
 PreReq: postgresql = %{version}-%{release}
 PreReq: postgresql-server = %{version}-%{release}
@@ -822,6 +822,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Apr 24 2007 Tom Lane <tgl@redhat.com> 8.2.4-1
+- Update to PostgreSQL 8.2.4 for CVE-2007-2138, data loss bugs
+Resolves: #237682
+
 * Wed Feb 14 2007 Karsten Hopp <karsten@redhat.com> 8.2.3-2
 - rebuild with tcl-8.4
 
