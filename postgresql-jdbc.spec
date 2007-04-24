@@ -45,6 +45,7 @@ Group:		Applications/Databases
 URL:		http://jdbc.postgresql.org/
 
 Source0:	http://jdbc.postgresql.org/download/%{name}-%{upstreamver}.src.tar.gz
+Patch1:		postgresql-jdbc-version.patch
 
 %if ! %{gcj_support}
 BuildArch:	noarch
@@ -76,6 +77,8 @@ rmdir %{name}-%{upstreamver}.src
 
 # remove any binary libs
 find -name "*.jar" -or -name "*.class" | xargs rm -f
+
+%patch1 -p1
 
 %build
 export OPT_JAR_LIST="ant/ant-junit junit"
@@ -128,8 +131,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
-* Mon Apr 23 2007 Tom Lane <tgl@redhat.com> 8.2.505-1jpp
+* Tue Apr 24 2007 Tom Lane <tgl@redhat.com> 8.2.505-1jpp
 - Update to build 8.2-505
+- Work around 1.4 vs 1.5 versioning inconsistency
 
 * Fri Dec 15 2006 Tom Lane <tgl@redhat.com> 8.2.504-1jpp
 - Update to build 8.2-504
