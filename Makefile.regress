@@ -17,10 +17,10 @@ srcdir := .
 check: installcheck-parallel
 
 installcheck: cleandirs
-	$(SHELL) ./pg_regress --schedule=$(srcdir)/serial_schedule --multibyte=$(MULTIBYTE) --load-language=plpgsql
+	./pg_regress --schedule=$(srcdir)/serial_schedule --multibyte=$(MULTIBYTE) --load-language=plpgsql
 
 installcheck-parallel: cleandirs
-	$(SHELL) ./pg_regress --schedule=$(srcdir)/parallel_schedule --multibyte=$(MULTIBYTE) --load-language=plpgsql $(MAXCONNOPT)
+	./pg_regress --schedule=$(srcdir)/parallel_schedule --multibyte=$(MULTIBYTE) --load-language=plpgsql $(MAXCONNOPT)
 
 # The tests command the server to write into testtablespace and results.
 # On a SELinux-enabled system this will fail unless we mark those directories
@@ -37,10 +37,10 @@ runtest: installcheck
 runtest-parallel: installcheck-parallel
 
 bigtest: cleandirs
-	$(SHELL) ./pg_regress --schedule=$(srcdir)/serial_schedule --multibyte=$(MULTIBYTE) --load-language=plpgsql numeric_big
+	./pg_regress --schedule=$(srcdir)/serial_schedule --multibyte=$(MULTIBYTE) --load-language=plpgsql numeric_big
 
 bigcheck: cleandirs
-	$(SHELL) ./pg_regress --schedule=$(srcdir)/parallel_schedule --multibyte=$(MULTIBYTE) --load-language=plpgsql $(MAXCONNOPT) numeric_big
+	./pg_regress --schedule=$(srcdir)/parallel_schedule --multibyte=$(MULTIBYTE) --load-language=plpgsql $(MAXCONNOPT) numeric_big
 
 
 ##

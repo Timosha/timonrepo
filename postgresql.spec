@@ -81,7 +81,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.2.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -534,7 +534,7 @@ install -d -m 700 $RPM_BUILD_ROOT/etc/sysconfig/pgsql
 	install -m 0755 contrib/spi/autoinc.so $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress
 	pushd  $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress
 	strip *.so
-	rm -f GNUmakefile Makefile
+	rm -f GNUmakefile Makefile *.o
 	popd
 	cp %{SOURCE4} $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress/Makefile
 	chmod 0644 $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress/Makefile
@@ -822,6 +822,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Jun 20 2007 Tom Lane <tgl@redhat.com> 8.2.4-2
+- Fix oversight in postgresql-test makefile: pg_regress isn't a shell script
+  anymore.  Per upstream bug 3398.
+
 * Tue Apr 24 2007 Tom Lane <tgl@redhat.com> 8.2.4-1
 - Update to PostgreSQL 8.2.4 for CVE-2007-2138, data loss bugs
 Resolves: #237682
