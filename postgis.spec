@@ -4,13 +4,13 @@
 
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
-Version:	1.2.0
-Release:	4%{?dist}
+Version:	1.2.1
+Release:	1%{?dist}
 License:	GPL
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
 Source4:	filter-requires-perl-Pg.sh
-Patch1:		postgis-configure.patch
+Patch1:		postgis-jdbc-makefile.patch
 Patch2:		postgis-javamakefile.patch
 URL:		http://postgis.refractions.net/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -31,7 +31,7 @@ certified as compliant with the "Types and Functions" profile.
 Summary:	The JDBC driver for PostGIS
 Group:		Applications/Databases
 License:	LGPL
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}, postgresql-jdbc
 BuildRequires:  ant >= 0:1.6.2, junit >= 0:3.7
 
 %if %{gcj_support}
@@ -95,9 +95,8 @@ install -m 755 java/jdbc/%{name}_%{version}.jar %{buildroot}%{_javadir}
 %if %{gcj_support}
 aot-compile-rpm
 %endif
-%endif
-
 strip %{buildroot}/%{_libdir}/gcj/%{name}/*.jar.so
+%endif
 
 %if %utils
 install -d %{buildroot}%{_datadir}/%{name}
@@ -107,9 +106,12 @@ install -m 644 utils/*.pl %{buildroot}%{_datadir}/%{name}
 %clean
 rm -rf %{buildroot}
 
+%if %javabuild
+%if %gcj_support
 %post -p %{_bindir}/rebuild-gcj-db
-
 %postun -p %{_bindir}/rebuild-gcj-db
+%endif
+%endif
 
 %files
 %defattr(-,root,root)
@@ -144,6 +146,13 @@ rm -rf %{buildroot}
 %endif
 
 %changelog
+* Mon Feb 19 2007 - Devrim GUNDUZ <devrim@commandprompt.com> 1.2.1-1
+- Update to 1.2.1
+- Added postgresql-jdb as as dependency to -jdbc package, per Guillaume
+- Removed configure patch (it is in the upstream now)
+- move strip to correct place, per Guillaume
+- Fix long-standing post/postun problem, per Guillaume
+
 * Wed Jan 3 2007 - Devrim GUNDUZ <devrim@commandprompt.com> 1.2.0-4
 - Added postgis.so among installed files, per Jon Burgess.
 - Fix jdbc jar dedection problem
