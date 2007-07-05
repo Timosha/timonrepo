@@ -1,0 +1,25 @@
+--- java/jdbc/Makefile.old	2007-01-08 12:12:01.000000000 +0200
++++ java/jdbc/Makefile	2007-06-26 21:41:57.000000000 +0300
+@@ -27,7 +27,7 @@
+ 
+ # Configure the helper executables used during build.
+ 
+-JAVAC?=javac -target 1.2 -source 1.2
++JAVAC?=javac -target 1.5 -source 1.5
+ JAVA?=java
+ JAR?=jar
+ MKDIR?=mkdir -p
+@@ -249,9 +249,11 @@
+ postgis-jdbc-javadoc.zip: javadoc-build
+ 	$(JAR) -cf postgis-jdbc-javadoc.zip -C javadoc-build .
+ 
+-javadoc-build: jtscompile compile
++javadoc-build:
+ 	$(MKDIR) javadoc-build
+-	javadoc -d javadoc-build -sourcepath src:jtssrc \
++	# We use an ugly trick to build on windows and unix - 
++	# javadoc command line options are not portable wr/t path separators
++	javadoc -d javadoc-build -sourcepath "src:jtssrc:;src;jtssrc" \
+ 		org.postgis org.postgis.jts org.postgis.binary org.postgis.java2d examples
+ 
+ # Preliminary JTS support

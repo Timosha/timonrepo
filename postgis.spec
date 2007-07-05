@@ -5,13 +5,13 @@
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.2.1
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	GPL
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
 Source4:	filter-requires-perl-Pg.sh
-Patch1:		postgis-jdbc-makefile.patch
-Patch2:		postgis-javamakefile.patch
+Patch1:		postgis-gnumakefile.patch
+Patch2:		postgis-jdbcmakefile.patch
 URL:		http://postgis.refractions.net/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -58,8 +58,8 @@ The postgis-utils package provides the utilities for PostGIS.
 
 %prep
 %setup -q
-# To be removed in 1.2.1
 %patch1 -p0
+# To be removed in 1.2.2
 %patch2 -p0
 
 %build
@@ -115,7 +115,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%doc COPYING CREDITS NEWS TODO README.%{name} TODO doc/html loader/README.* doc/%{name}.xml  doc/ZMSgeoms.txt 
+%doc COPYING CREDITS NEWS TODO README.%{name} doc/html loader/README.* doc/%{name}.xml  doc/ZMSgeoms.txt 
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_libdir}/pgsql/postgis.so*
 %attr(755,root,root) %{_libdir}/pgsql/liblwgeom.so*
@@ -146,10 +146,13 @@ rm -rf %{buildroot}
 %endif
 
 %changelog
+* Mon Jul 2 2007 - Devrim GUNDUZ <devrim@commandprompt.com> 1.2.1-2
+- Fix build problems (removed template_gis, per discussion with upsteam).
+
 * Mon Feb 19 2007 - Devrim GUNDUZ <devrim@commandprompt.com> 1.2.1-1
 - Update to 1.2.1
-- Added postgresql-jdb as as dependency to -jdbc package, per Guillaume
 - Removed configure patch (it is in the upstream now)
+- Added postgresql-jdbc as as dependency to -jdbc package, per Guillaume
 - move strip to correct place, per Guillaume
 - Fix long-standing post/postun problem, per Guillaume
 
