@@ -147,7 +147,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Mon Jul 2 2007 - Devrim GUNDUZ <devrim@commandprompt.com> 1.2.1-2
-- Fix build problems (removed template_gis, per discussion with upsteam).
+- Fix build problems (removed template_gis, per discussion with upstream).
 
 * Mon Feb 19 2007 - Devrim GUNDUZ <devrim@commandprompt.com> 1.2.1-1
 - Update to 1.2.1
