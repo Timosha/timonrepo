@@ -81,7 +81,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.2.4
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -106,7 +106,7 @@ Patch5: pgtcl-no-rpath.patch
 Patch6: postgresql-perl-rpath.patch
 Patch8: postgresql-prefer-ncurses.patch
 
-BuildRequires: perl glibc-devel bison flex autoconf
+BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf
 Prereq: /sbin/ldconfig initscripts
 
 %if %python || %plpython
@@ -822,6 +822,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sun Aug 12 2007 Tom Lane <tgl@redhat.com> 8.2.4-3
+- Recent perl changes in rawhide mean we need a more specific BuildRequires
+
 * Wed Jun 20 2007 Tom Lane <tgl@redhat.com> 8.2.4-2
 - Fix oversight in postgresql-test makefile: pg_regress isn't a shell script
   anymore.  Per upstream bug 3398.
