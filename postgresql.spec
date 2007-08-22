@@ -81,7 +81,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.2.4
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -105,6 +105,7 @@ Patch4: postgresql-test.patch
 Patch5: pgtcl-no-rpath.patch
 Patch6: postgresql-perl-rpath.patch
 Patch8: postgresql-prefer-ncurses.patch
+Patch9: postgresql-use-zoneinfo.patch
 
 BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf
 Prereq: /sbin/ldconfig initscripts
@@ -342,6 +343,7 @@ system, including regression tests and benchmarks.
 # patch5 is applied later
 %patch6 -p1
 %patch8 -p1
+%patch9 -p1
 
 #call autoconf 2.53 or greater
 %aconfver
@@ -602,10 +604,6 @@ fi
 if [ $1 -ge 1 ] ; then
 	/sbin/service postgresql condrestart >/dev/null 2>&1 || :
 fi
-if [ $1 = 0 ] ; then
-	userdel postgres >/dev/null 2>&1 || :
-	groupdel postgres >/dev/null 2>&1 || : 
-fi
 
 %if %plperl
 %post -p /sbin/ldconfig   plperl
@@ -745,7 +743,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/pgsql/postgres.shdescription
 %{_datadir}/pgsql/system_views.sql
 %{_datadir}/pgsql/*.sample
-%{_datadir}/pgsql/timezone/
+%{_datadir}/pgsql/zoneinfo
 %{_datadir}/pgsql/timezonesets/
 %{_libdir}/pgsql/plpgsql.so
 %dir %{_datadir}/pgsql
@@ -822,6 +820,13 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Aug 22 2007 Tom Lane <tgl@redhat.com> 8.2.4-4
+- Use tzdata package's data files instead of private copy, so that
+  postgresql-server need not be turned for routine timezone updates
+- Don't remove postgres user/group during RPM uninstall, per Fedora
+  packaging guidelines
+- Rebuild to fix Fedora toolchain issues
+
 * Sun Aug 12 2007 Tom Lane <tgl@redhat.com> 8.2.4-3
 - Recent perl changes in rawhide mean we need a more specific BuildRequires
 
