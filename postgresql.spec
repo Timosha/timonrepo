@@ -107,7 +107,7 @@ Patch6: postgresql-perl-rpath.patch
 Patch8: postgresql-prefer-ncurses.patch
 Patch9: postgresql-use-zoneinfo.patch
 
-BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf
+BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf gawk
 Prereq: /sbin/ldconfig initscripts
 
 %if %python || %plpython
@@ -825,6 +825,7 @@ rm -rf $RPM_BUILD_ROOT
   postgresql-server need not be turned for routine timezone updates
 - Don't remove postgres user/group during RPM uninstall, per Fedora
   packaging guidelines
+- Seems we need an explicit BuildRequires on gawk now
 - Rebuild to fix Fedora toolchain issues
 
 * Sun Aug 12 2007 Tom Lane <tgl@redhat.com> 8.2.4-3
