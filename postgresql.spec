@@ -81,7 +81,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.2.4
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -743,7 +743,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/pgsql/postgres.shdescription
 %{_datadir}/pgsql/system_views.sql
 %{_datadir}/pgsql/*.sample
-%{_datadir}/pgsql/zoneinfo
 %{_datadir}/pgsql/timezonesets/
 %{_libdir}/pgsql/plpgsql.so
 %dir %{_datadir}/pgsql
@@ -820,6 +819,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Aug 25 2007 Tom Lane <tgl@redhat.com> 8.2.4-5
+- Use nicer solution for tzdata file substitution: upstream discussion
+  concluded that hardwiring the path was better than a symlink after all.
+
 * Wed Aug 22 2007 Tom Lane <tgl@redhat.com> 8.2.4-4
 - Use tzdata package's data files instead of private copy, so that
   postgresql-server need not be turned for routine timezone updates
