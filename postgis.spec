@@ -5,7 +5,7 @@
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.2.1
-Release:	2%{?dist}
+Release:	3%{?dist}
 License:	GPL
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
@@ -146,6 +146,9 @@ rm -rf %{buildroot}
 %endif
 
 %changelog
+* Tue Aug 28 2007 Fedora Release Engineering <rel-eng at fedoraproject dot org> - 1.2.1-3
+- Rebuild for selinux ppc32 issue.
+
 * Mon Jul 2 2007 - Devrim GUNDUZ <devrim@commandprompt.com> 1.2.1-2
 - Fix build problems (removed template_gis, per discussion with upstream).
 
