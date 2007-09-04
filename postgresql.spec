@@ -81,7 +81,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.2.4
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -91,6 +91,7 @@ Source3: postgresql.init
 Source4: Makefile.regress
 Source5: pg_config.h
 Source6: README.rpm-dist
+Source7: ecpg_config.h
 Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
@@ -484,6 +485,8 @@ case `uname -i` in
     install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/usr/include/
     mv $RPM_BUILD_ROOT/usr/include/pgsql/server/pg_config.h $RPM_BUILD_ROOT/usr/include/pgsql/server/pg_config_`uname -i`.h
     install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/usr/include/pgsql/server/
+    mv $RPM_BUILD_ROOT/usr/include/ecpg_config.h $RPM_BUILD_ROOT/usr/include/ecpg_config_`uname -i`.h
+    install -m 644 %{SOURCE7} $RPM_BUILD_ROOT/usr/include/
     ;;
   *)
     ;;
@@ -819,6 +822,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Sep  4 2007 Tom Lane <tgl@redhat.com> 8.2.4-6
+- Fix multilib problem for /usr/include/ecpg_config.h (which is new in 8.2.x)
+
 * Sat Aug 25 2007 Tom Lane <tgl@redhat.com> 8.2.4-5
 - Use nicer solution for tzdata file substitution: upstream discussion
   concluded that hardwiring the path was better than a symlink after all.
