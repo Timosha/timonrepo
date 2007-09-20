@@ -80,8 +80,8 @@
 
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
-Version: 8.2.4
-Release: 6%{?dist}
+Version: 8.2.5
+Release: 1%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -97,8 +97,8 @@ Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
 Source17: http://www.postgresql.org/docs/manuals/postgresql-8.2.1-US.pdf
 Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.8.1.tgz
-Source19: http://pgfoundry.org/projects/pgtclng/pgtcl1.5.3.tar.gz
-Source20: http://pgfoundry.org/projects/pgtclng/pgtcldocs-20060909.zip
+Source19: http://pgfoundry.org/projects/pgtclng/pgtcl1.6.0.tar.gz
+Source20: http://pgfoundry.org/projects/pgtclng/pgtcldocs-20070115.zip
 
 Patch1: rpm-pgsql.patch
 Patch3: postgresql-logging.patch
@@ -822,6 +822,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Sep 20 2007 Tom Lane <tgl@redhat.com> 8.2.5-1
+- Update to PostgreSQL 8.2.5 and pgtcl 1.6.0
+
 * Tue Sep  4 2007 Tom Lane <tgl@redhat.com> 8.2.4-6
 - Fix multilib problem for /usr/include/ecpg_config.h (which is new in 8.2.x)
 
