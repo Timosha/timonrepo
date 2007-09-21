@@ -1,6 +1,6 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 6.3.2
+%define VER 6.3.5
 %define Patchlevel 9
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 3%{?dist}
+Release: 1%{?dist}
 License: freeware
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -18,12 +18,9 @@ Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchleve
 Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
 %endif
 Source1: magick_small.png
-Patch1: ImageMagick-6.2.1-local_doc.patch
-Patch2: ImageMagick-6.2.8-multilib.patch
-Patch3: ImageMagick-6.3.2-perl-parallel-build.patch
-Patch4: ImageMagick-6.3.2-perl-liblink.patch
-# 235075
-Patch5: ImageMagick-6.2.8-CVE-2007-1797.patch
+Patch1: ImageMagick-6.3.5-multilib.patch
+Patch2: ImageMagick-6.3.5-open.patch
+
 
 
 Url: http://www.imagemagick.org/
@@ -34,7 +31,7 @@ BuildRequires: freetype-devel >= 2.1
 BuildRequires: automake >= 1.7 autoconf >= 2.58 libtool >= 1.5
 BuildRequires: ghostscript-devel
 BuildRequires: perl-devel
-BuildRequires: libwmf-devel
+BuildRequires: libwmf-devel, jasper-devel
 BuildRequires: libX11-devel, libXext-devel, libXt-devel
 BuildRequires: lcms-devel, libxml2-devel, librsvg2-devel
 
@@ -65,6 +62,7 @@ Requires: libtiff-devel
 Requires: libjpeg-devel
 Requires: lcms-devel
 Requires: pkgconfig
+Requires: jasper
 
 %description devel
 ImageMagick-devel contains the static libraries and header files you'll
@@ -121,11 +119,8 @@ however.
 
 %prep
 %setup -q -n %{name}-%{VER}
-%patch1 -p1 -b .local_doc
-%patch2 -p1 -b .multilib
-%patch3 -p1 -b .perl-build
-%patch4 -p1 -b .perl-link
-%patch5 -p1 -b .cve-2007-1797
+%patch1 -p1 -b .multilib
+%patch2 -p1 -b .open_args
 
 %build
 %configure --enable-shared \
@@ -140,7 +135,7 @@ however.
            --with-rsvg \
 	   --with-xml \
            --with-perl-options="INSTALLDIRS=vendor %{?perl_prefix} CC='%__cc -L$PWD/magick/.libs' LDDLFLAGS='-shared -L$PWD/magick/.libs'" \
-           --with-windows-font-dir=%{_datadir}/fonts/default/TrueType \
+           --without-windows-font-dir \
 	   --without-dps
 
 make
@@ -178,7 +173,7 @@ rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules*/*/*.a
 rm -f  $RPM_BUILD_ROOT%{_libdir}/*.{a,la}
 
 # fix multilib issues
-%ifarch x86_64 s390x ia64 ppc64
+%ifarch x86_64 s390x ia64 ppc64 alpha
 %define wordsize 64
 %else
 %define wordsize 32
@@ -261,6 +256,12 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Fri Sep 21 2007 Norm Murray <nmurray@redhat.com> 6.3.5.9-1.fc8
+- rebase to 6.3.5.9
+- fix build with missing open() arg
+- add build require of jasper-devel, remove windows font dir
+- update multilib patch
+
 * Thu Apr  5 2007 Norm Murray <nmurray@redhat.com> 6.3.2.9-3.fc7
 - heap overflows (#235075, CVE-2007-1797)
 
