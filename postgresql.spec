@@ -81,7 +81,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.2.5
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -822,6 +822,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Dec  5 2007 Tom Lane <tgl@redhat.com> 8.2.5-2
+- Rebuild for new openssl
+
 * Thu Sep 20 2007 Tom Lane <tgl@redhat.com> 8.2.5-1
 - Update to PostgreSQL 8.2.5 and pgtcl 1.6.0
 
