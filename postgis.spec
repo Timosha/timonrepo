@@ -4,7 +4,7 @@
 
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
-Version:	1.3.1
+Version:	1.3.2
 Release:	1%{?dist}
 License:	GPL
 Group:		Applications/Databases
@@ -15,7 +15,8 @@ Patch2:		postgis-jdbcmakefile.patch
 URL:		http://postgis.refractions.net/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:	postgresql-devel, proj-devel, geos-devel, byacc, proj-devel, flex, postgresql-jdbc
+BuildRequires:	postgresql-devel, proj-devel, geos-devel, byacc, proj-devel, flex, sinjdoc, eclipse-ecj, libgcj
+
 Requires:	postgresql, geos, proj
 
 %description
@@ -32,7 +33,7 @@ Summary:	The JDBC driver for PostGIS
 Group:		Applications/Databases
 License:	LGPL
 Requires:	%{name} = %{version}-%{release}, postgresql-jdbc
-BuildRequires:  ant >= 0:1.6.2, junit >= 0:3.7
+BuildRequires:  ant >= 0:1.6.2, junit >= 0:3.7, postgresql-jdbc
 
 %if %{gcj_support}
 BuildRequires:		gcc-java
@@ -146,6 +147,13 @@ rm -rf %{buildroot}
 %endif
 
 %changelog
+* Thu Dec 6 2007 Devrim GUNDUZ <devrim@commandprompt.com> - 1.3.2-1
+- Update to 1.3.2
+- Updated patch2
+
+* Wed Nov 21 2007 Devrim GUNDUZ <devrim@commandprompt.com> - 1.3.1-2
+- Move postgresql-jdbc dependency to the correct place, per Rob Nagler.
+
 * Tue Oct 16 2007 Devrim GUNDUZ <devrim@commandprompt.com> - 1.3.1-1
 - Update to 1.3.1
 - Updated patch2
