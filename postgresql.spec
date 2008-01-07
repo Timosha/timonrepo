@@ -80,8 +80,8 @@
 
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
-Version: 8.2.5
-Release: 2%{?dist}
+Version: 8.2.6
+Release: 1%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -101,6 +101,7 @@ Source19: http://pgfoundry.org/projects/pgtclng/pgtcl1.6.0.tar.gz
 Source20: http://pgfoundry.org/projects/pgtclng/pgtcldocs-20070115.zip
 
 Patch1: rpm-pgsql.patch
+Patch2: postgresql-ac-version.patch
 Patch3: postgresql-logging.patch
 Patch4: postgresql-test.patch
 Patch5: pgtcl-no-rpath.patch
@@ -339,6 +340,7 @@ system, including regression tests and benchmarks.
 %prep
 %setup -q 
 %patch1 -p1
+%patch2 -p1
 %patch3 -p1
 %patch4 -p1
 # patch5 is applied later
@@ -822,6 +824,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Jan  7 2008 Tom Lane <tgl@redhat.com> 8.2.6-1
+- Update to PostgreSQL 8.2.6 to fix CVE-2007-4769, CVE-2007-4772,
+  CVE-2007-6067, CVE-2007-6600, CVE-2007-6601
+
 * Wed Dec  5 2007 Tom Lane <tgl@redhat.com> 8.2.5-2
 - Rebuild for new openssl
 
