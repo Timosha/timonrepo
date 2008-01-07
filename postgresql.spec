@@ -503,19 +503,13 @@ cp src/tutorial/* $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
 	cp Pgtcl/libpgtcl*.so $RPM_BUILD_ROOT%{_libdir}/Pgtcl
 %endif
 
-if [ -d /etc/rc.d/init.d ]
-then
-	install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
-	sed 's/^PGVERSION=.*$/PGVERSION=%{version}/' <%{SOURCE3} >postgresql.init
-	install -m 755 postgresql.init $RPM_BUILD_ROOT/etc/rc.d/init.d/postgresql
-fi
+install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
+sed 's/^PGVERSION=.*$/PGVERSION=%{version}/' <%{SOURCE3} >postgresql.init
+install -m 755 postgresql.init $RPM_BUILD_ROOT/etc/rc.d/init.d/postgresql
 
 %if %pam
-if [ -d /etc/pam.d ]
-then
-	install -d $RPM_BUILD_ROOT/etc/pam.d
-	install -m 644 %{SOURCE14} $RPM_BUILD_ROOT/etc/pam.d/postgresql
-fi
+install -d $RPM_BUILD_ROOT/etc/pam.d
+install -m 644 %{SOURCE14} $RPM_BUILD_ROOT/etc/pam.d/postgresql
 %endif
 
 # PGDATA needs removal of group and world permissions due to pg_pwd hole.
@@ -827,6 +821,8 @@ rm -rf $RPM_BUILD_ROOT
 * Mon Jan  7 2008 Tom Lane <tgl@redhat.com> 8.2.6-1
 - Update to PostgreSQL 8.2.6 to fix CVE-2007-4769, CVE-2007-4772,
   CVE-2007-6067, CVE-2007-6600, CVE-2007-6601
+- Make initscript and pam config files be installed unconditionally;
+  seems new buildroots don't necessarily have those directories in place
 
 * Wed Dec  5 2007 Tom Lane <tgl@redhat.com> 8.2.5-2
 - Rebuild for new openssl
