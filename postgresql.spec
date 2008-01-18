@@ -69,6 +69,7 @@
 %{!?ssl:%define ssl 1}
 %{!?kerberos:%define kerberos 1}
 %{!?nls:%define nls 1}
+%{!?uuid:%define uuid 1}
 %{!?xml:%define xml 1}
 %{!?pam:%define pam 1}
 %{!?pgfts:%define pgfts 1}
@@ -80,7 +81,7 @@
 
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
-Version: 8.2.6
+Version: 8.3RC2
 Release: 1%{?dist}
 License: BSD
 Group: Applications/Databases
@@ -95,9 +96,9 @@ Source7: ecpg_config.h
 Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
-Source17: http://www.postgresql.org/docs/manuals/postgresql-8.2.1-US.pdf
+Source17: http://www.postgresql.org/docs/manuals/postgresql-8.3RC2-US.pdf
 Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.8.1.tgz
-Source19: http://pgfoundry.org/projects/pgtclng/pgtcl1.6.0.tar.gz
+Source19: http://pgfoundry.org/projects/pgtclng/pgtcl1.6.2.tar.gz
 Source20: http://pgfoundry.org/projects/pgtclng/pgtcldocs-20070115.zip
 
 Patch1: rpm-pgsql.patch
@@ -107,7 +108,6 @@ Patch4: postgresql-test.patch
 Patch5: pgtcl-no-rpath.patch
 Patch6: postgresql-perl-rpath.patch
 Patch8: postgresql-prefer-ncurses.patch
-Patch9: postgresql-use-zoneinfo.patch
 
 BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf gawk
 Prereq: /sbin/ldconfig initscripts
@@ -137,6 +137,10 @@ BuildRequires: e2fsprogs-devel
 
 %if %nls
 BuildRequires: gettext >= 0.10.35
+%endif
+
+%if %uuid
+BuildRequires: uuid-devel
 %endif
 
 %if %xml
@@ -346,7 +350,6 @@ system, including regression tests and benchmarks.
 # patch5 is applied later
 %patch6 -p1
 %patch8 -p1
-%patch9 -p1
 
 #call autoconf 2.53 or greater
 %aconfver
@@ -409,21 +412,26 @@ CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
 %if %kerberos
 	--with-krb5 \
 %endif
+%if %uuid
+	--with-ossp-uuid \
+%endif
+%if %xml
+	--with-libxml \
+	--with-libxslt \
+%endif
 %if %nls
 	--enable-nls \
 %endif
 %if %pgfts
 	--enable-thread-safety \
 %endif
+	--with-system-tzdata=/usr/share/zoneinfo \
 	--sysconfdir=/etc/sysconfig/pgsql \
 	--datadir=/usr/share/pgsql \
 	--with-docdir=%{_docdir}
 
 make %{?_smp_mflags} all
 make %{?_smp_mflags} -C contrib all
-%if %xml
-make %{?_smp_mflags} -C contrib/xml2 all
-%endif
 
 # Have to hack makefile to put correct path into tutorial scripts
 sed "s|C=\`pwd\`;|C=%{_libdir}/pgsql/tutorial;|" < src/tutorial/Makefile > src/tutorial/GNUmakefile
@@ -433,14 +441,17 @@ rm -f src/tutorial/GNUmakefile
 %if %runselftest
 	pushd src/test/regress
 	make all
+	cp ../../../contrib/spi/refint.so .
+	cp ../../../contrib/spi/autoinc.so .
 	make MAX_CONNECTIONS=5 check
 	make clean
+	rm refint.so autoinc.so
 	popd
 %endif
 
 %if %test
 	pushd src/test/regress
-	make RPMTESTING=1 all
+	make all
 	popd
 %endif
 
@@ -475,9 +486,6 @@ rm -rf $RPM_BUILD_ROOT
 
 make DESTDIR=$RPM_BUILD_ROOT install
 make -C contrib DESTDIR=$RPM_BUILD_ROOT install
-%if %xml
-make -C contrib/xml2 DESTDIR=$RPM_BUILD_ROOT install
-%endif
 
 # multilib header hack; note pg_config.h is installed in two places!
 # we only apply this to known Red Hat multilib arches, per bug #177564
@@ -679,6 +687,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pgsql/chkpass.so
 %{_libdir}/pgsql/cube.so
 %{_libdir}/pgsql/dblink.so
+%{_libdir}/pgsql/dict_int.so
+%{_libdir}/pgsql/dict_xsyn.so
 %{_libdir}/pgsql/earthdistance.so
 %{_libdir}/pgsql/fuzzystrmatch.so
 %{_libdir}/pgsql/hstore.so
@@ -688,6 +698,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pgsql/lo.so
 %{_libdir}/pgsql/ltree.so
 %{_libdir}/pgsql/moddatetime.so
+%{_libdir}/pgsql/pageinspect.so
 %{_libdir}/pgsql/pg_buffercache.so
 %{_libdir}/pgsql/pg_freespacemap.so
 %{_libdir}/pgsql/pg_trgm.so
@@ -698,13 +709,18 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pgsql/seg.so
 %{_libdir}/pgsql/sslinfo.so
 %{_libdir}/pgsql/tablefunc.so
+%{_libdir}/pgsql/test_parser.so
 %{_libdir}/pgsql/timetravel.so
 %{_libdir}/pgsql/tsearch2.so
+%if %uuid
+%{_libdir}/pgsql/uuid-ossp.so
+%endif
 %if %xml
 %{_libdir}/pgsql/pgxml.so
 %endif
 %{_datadir}/pgsql/contrib/
 %{_bindir}/oid2name
+%{_bindir}/pg_standby
 %{_bindir}/pgbench
 %{_bindir}/vacuumlo
 %doc contrib/*/README.* contrib/spi/*.example
@@ -743,6 +759,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/pgsql/system_views.sql
 %{_datadir}/pgsql/*.sample
 %{_datadir}/pgsql/timezonesets/
+%{_datadir}/pgsql/tsearch_data/
+%{_libdir}/pgsql/dict_snowball.so
 %{_libdir}/pgsql/plpgsql.so
 %dir %{_datadir}/pgsql
 %attr(700,postgres,postgres) %dir /var/lib/pgsql
@@ -752,6 +770,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pgsql/*_and_*.so
 %{_datadir}/pgsql/conversion_create.sql
 %{_datadir}/pgsql/information_schema.sql
+%{_datadir}/pgsql/snowball_create.sql
 %{_datadir}/pgsql/sql_features.txt
 
 %files devel -f pg_config.lst
@@ -818,6 +837,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Fri Jan 18 2008 Tom Lane <tgl@redhat.com> 8.3RC2-1
+- Update to PostgreSQL 8.3RC2 (not waiting for 8.3.0 because Fedora 9 alpha
+  should be 8.3-based not 8.2-based).
+- Update to pgtcl 1.6.2
+
 * Mon Jan  7 2008 Tom Lane <tgl@redhat.com> 8.2.6-1
 - Update to PostgreSQL 8.2.6 to fix CVE-2007-4769, CVE-2007-4772,
   CVE-2007-6067, CVE-2007-6600, CVE-2007-6601
