@@ -5,7 +5,7 @@
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.3.2
-Release:	2%{?dist}
+Release:	2%{?dist}.1
 License:	GPL
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
@@ -144,6 +144,9 @@ rm -rf %{buildroot}
 %endif
 
 %changelog
+* Mon Jan 21 2008 - Devrim GUNDUZ <devrim@commandprompt.com> 1.3.2-2.1
+- Rebuilt against PostgreSQL 8.3
+
 * Sat Jan 5 2008 Devrim GUNDUZ <devrim@commandprompt.com> - 1.3.2-2
 - Various fixes from Mark Cave-Ayland
 - Removed patch2: template_gis is no longer built by default.
