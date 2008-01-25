@@ -1,0 +1,86 @@
+diff -up ImageMagick-6.3.8/magick/Magick-config.in.BAD ImageMagick-6.3.8/magick/Magick-config.in
+--- ImageMagick-6.3.8/magick/Magick-config.in.BAD	2008-01-24 20:02:24.000000000 -0500
++++ ImageMagick-6.3.8/magick/Magick-config.in	2008-01-24 20:03:59.000000000 -0500
+@@ -28,31 +28,31 @@ while test $# -gt 0; do
+       prefix=$optarg
+       ;;
+     --prefix)
+-      echo $prefix
++      pkg-config --variable prefix ImageMagick
+       ;;
+     --exec-prefix=*)
+       exec_prefix=$optarg
+       ;;
+     --exec-prefix)
+-      echo $exec_prefix
++      pkg-config --variable exec_prefix ImageMagick
+       ;;
+     --version)
+-      echo '@PACKAGE_VERSION@ Q@QUANTUM_DEPTH@ @MAGICK_HDRI@'
++      pkg-config --modversion ImageMagick
+       ;;
+     --cflags)
+-      echo "-I${includedir} @MAGICK_PCFLAGS@"
++      pkg-config --cflags ImageMagick
+       ;;
+     --cxxflags)
+-      echo '@MAGICK_CXXFLAGS@'
++      pkg-config --cflags ImageMagick
+       ;;
+     --cppflags)
+-      echo '@MAGICK_CPPFLAGS@'
++      pkg-config --cflags ImageMagick
+       ;;
+     --ldflags)
+-      echo '@MAGICK_LDFLAGS@'
++      pkg-config --libs ImageMagick
+       ;;
+     --libs)
+-      echo "-L${libdir} -lWand -lMagick"
++      pkg-config --libs ImageMagick
+       ;;
+     *)
+       echo "${usage}" 1>&2
+diff -up ImageMagick-6.3.8/wand/Wand-config.in.BAD ImageMagick-6.3.8/wand/Wand-config.in
+--- ImageMagick-6.3.8/wand/Wand-config.in.BAD	2008-01-24 20:04:08.000000000 -0500
++++ ImageMagick-6.3.8/wand/Wand-config.in	2008-01-24 20:05:35.000000000 -0500
+@@ -28,31 +28,31 @@ while test $# -gt 0; do
+       prefix=$optarg
+       ;;
+     --prefix)
+-      echo $prefix
++      pkg-config --variable prefix Wand
+       ;;
+     --exec-prefix=*)
+       exec_prefix=$optarg
+       ;;
+     --exec-prefix)
+-      echo $exec_prefix
++      pkg-config --variable exec_prefix Wand
+       ;;
+     --version)
+-      echo '@PACKAGE_VERSION@ Q@QUANTUM_DEPTH@ @MAGICK_HDRI@'
++      pkg-config --modversion Wand
+       ;;
+     --cflags)
+-      echo "-I${includedir} @MAGICK_PCFLAGS@"
++      pkg-config --cflags Wand
+       ;;
+     --cxxflags)
+-      echo '@MAGICK_CXXFLAGS@'
++      pkg-config --cflags Wand
+       ;;
+     --cppflags)
+-      echo '@MAGICK_CPPFLAGS@'
++      pkg-config --cflags Wand
+       ;;
+     --ldflags)
+-      echo '@MAGICK_LDFLAGS@'
++      pkg-config --libs Wand
+       ;;
+     --libs)
+-      echo "-L${libdir} -lWand -lMagick"
++      pkg-config --libs Wand
+       ;;
+     *)
+       echo "${usage}" 1>&2

@@ -1,7 +1,7 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 6.3.5
-%define Patchlevel 9
+%define VER 6.3.8
+%define Patchlevel 1
 Summary: An X application for displaying and manipulating images.
 Name: ImageMagick
 %if "%{Patchlevel}" != ""
@@ -10,7 +10,7 @@ Version: %{VER}.%{Patchlevel}
 Version: %{VER}
 %endif
 Release: 1%{?dist}
-License: freeware
+License: ImageMagick
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
 Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.bz2
@@ -18,7 +18,7 @@ Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchleve
 Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
 %endif
 Source1: magick_small.png
-Patch1: ImageMagick-6.3.5-multilib.patch
+Patch1: ImageMagick-6.3.8-multilib.patch
 Patch2: ImageMagick-6.3.5-open.patch
 
 
@@ -30,7 +30,7 @@ BuildPrereq: libtiff-devel, libungif-devel, zlib-devel, perl
 BuildRequires: freetype-devel >= 2.1
 BuildRequires: automake >= 1.7 autoconf >= 2.58 libtool >= 1.5
 BuildRequires: ghostscript-devel
-BuildRequires: perl-devel
+BuildRequires: perl-devel, perl(ExtUtils::MakeMaker)
 BuildRequires: libwmf-devel, jasper-devel
 BuildRequires: libX11-devel, libXext-devel, libXt-devel
 BuildRequires: lcms-devel, libxml2-devel, librsvg2-devel
@@ -120,7 +120,8 @@ however.
 %prep
 %setup -q -n %{name}-%{VER}
 %patch1 -p1 -b .multilib
-%patch2 -p1 -b .open_args
+# No longer needed.
+# %patch2 -p1 -b .open_args
 
 %build
 %configure --enable-shared \
@@ -137,6 +138,9 @@ however.
            --with-perl-options="INSTALLDIRS=vendor %{?perl_prefix} CC='%__cc -L$PWD/magick/.libs' LDDLFLAGS='-shared -L$PWD/magick/.libs'" \
            --without-windows-font-dir \
 	   --without-dps
+# Disable rpath
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
 make
 
@@ -173,7 +177,7 @@ rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules*/*/*.a
 rm -f  $RPM_BUILD_ROOT%{_libdir}/*.{a,la}
 
 # fix multilib issues
-%ifarch x86_64 s390x ia64 ppc64 alpha
+%ifarch x86_64 s390x ia64 ppc64 alpha sparc64
 %define wordsize 64
 %else
 %define wordsize 32
@@ -256,6 +260,13 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Thu Jan 24 2008 Tom "spot" Callaway <tcallawa@redhat.com> 6.3.8.1-1
+- update to 6.3.8.1
+- rebuild for new perl
+- fix license tag
+- fix rpath issues
+- add sparc64 to 64bit arch list
+
 * Fri Sep 21 2007 Norm Murray <nmurray@redhat.com> 6.3.5.9-1.fc8
 - rebase to 6.3.5.9
 - fix build with missing open() arg
