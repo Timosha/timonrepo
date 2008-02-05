@@ -81,7 +81,7 @@
 
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
-Version: 8.3RC2
+Version: 8.3.0
 Release: 1%{?dist}
 License: BSD
 Group: Applications/Databases
@@ -96,7 +96,7 @@ Source7: ecpg_config.h
 Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
-Source17: http://www.postgresql.org/docs/manuals/postgresql-8.3RC2-US.pdf
+Source17: http://www.postgresql.org/docs/manuals/postgresql-8.3.0-US.pdf
 Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.8.1.tgz
 Source19: http://pgfoundry.org/projects/pgtclng/pgtcl1.6.2.tar.gz
 Source20: http://pgfoundry.org/projects/pgtclng/pgtcldocs-20070115.zip
@@ -837,6 +837,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Feb  4 2008 Tom Lane <tgl@redhat.com> 8.3.0-1
+- Update to PostgreSQL 8.3.0.
+
 * Fri Jan 18 2008 Tom Lane <tgl@redhat.com> 8.3RC2-1
 - Update to PostgreSQL 8.3RC2 (not waiting for 8.3.0 because Fedora 9 alpha
   should be 8.3-based not 8.2-based).
