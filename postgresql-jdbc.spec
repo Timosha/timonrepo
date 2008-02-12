@@ -33,11 +33,11 @@
 %define gcj_support %{?_with_gcj_support:1}%{!?_with_gcj_support:%{?_without_gcj_support:0}%{!?_without_gcj_support:%{?_gcj_support:%{_gcj_support}}%{!?_gcj_support:0}}}
 
 %define section		devel
-%define upstreamver	8.2-506
+%define upstreamver	8.3-603
 
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
-Version:	8.2.506
+Version:	8.3.603
 Release:	1jpp%{?dist}
 Epoch:		0
 License:	BSD
@@ -45,6 +45,7 @@ Group:		Applications/Databases
 URL:		http://jdbc.postgresql.org/
 
 Source0:	http://jdbc.postgresql.org/download/%{name}-%{upstreamver}.src.tar.gz
+Patch1:         postgresql-jdbc-version.patch
 
 %if ! %{gcj_support}
 BuildArch:	noarch
@@ -76,6 +77,8 @@ rmdir %{name}-%{upstreamver}.src
 
 # remove any binary libs
 find -name "*.jar" -or -name "*.class" | xargs rm -f
+
+%patch1 -p1
 
 %build
 export OPT_JAR_LIST="ant/ant-junit junit"
@@ -128,6 +131,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Feb 12 2008 Tom Lane <tgl@redhat.com> 8.3.603-1jpp
+- Update to build 8.3-603
+
 * Sun Aug 12 2007 Tom Lane <tgl@redhat.com> 8.2.506-1jpp
 - Update to build 8.2-506
 
