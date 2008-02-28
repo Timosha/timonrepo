@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: ImageMagick
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -260,6 +260,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Wed Feb 27 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 6.3.8.1-3
+- Rebuild for perl 5.10 (again)
+
 * Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 6.3.8.1-2
 - Autorebuild for GCC 4.3
 
