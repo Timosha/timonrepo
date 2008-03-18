@@ -82,7 +82,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.3.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -110,7 +110,9 @@ Patch6: postgresql-perl-rpath.patch
 Patch8: postgresql-prefer-ncurses.patch
 
 BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf gawk
-Prereq: /sbin/ldconfig initscripts
+BuildRequires: perl(ExtUtils::Embed), perl-devel
+# for /sbin/ldconfig
+Prereq: glibc initscripts
 
 %if %python || %plpython
 BuildRequires: python-devel
@@ -253,6 +255,7 @@ PreReq: postgresql = %{version}-%{release}
 PreReq: postgresql-server = %{version}-%{release}
 Obsoletes: rh-postgresql-pl
 Obsoletes: postgresql-pl
+Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description plperl
 PostgreSQL is an advanced Object-Relational database management
@@ -838,6 +841,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Mar 18 2008 Tom "spot" Callaway <tcallawa@redhat.com> 8.3.0-3
+- add Requires for versioned perl (libperl.so)
+
 * Wed Feb  6 2008 Tom Lane <tgl@redhat.com> 8.3.0-2
 - Enable the new GSSAPI support in 8.3.0.
 
