@@ -82,7 +82,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.3.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -153,6 +153,9 @@ BuildRequires: libxml2-devel libxslt-devel
 BuildRequires: pam-devel
 %endif
 
+# main package requires -libs subpackage
+Requires: postgresql-libs = %{version}-%{release}
+
 Obsoletes: postgresql-clients
 Obsoletes: postgresql-perl
 Obsoletes: postgresql-tk
@@ -194,7 +197,7 @@ PostgreSQL server.
 Summary: The programs needed to create and run a PostgreSQL server
 Group: Applications/Databases
 Prereq: /usr/sbin/useradd /sbin/chkconfig 
-Prereq: postgresql = %{version}-%{release} libpq.so
+Requires: postgresql = %{version}-%{release}
 Obsoletes: rh-postgresql-server
 
 %description server
@@ -212,7 +215,7 @@ to install the postgresql package.
 %package docs
 Summary: Extra documentation for PostgreSQL
 Group: Applications/Databases
-Prereq: postgresql = %{version}-%{release}
+Requires: postgresql = %{version}-%{release}
 Obsoletes: rh-postgresql-docs
 
 %description docs
@@ -224,7 +227,7 @@ the FAQ, and source files for the PostgreSQL tutorial.
 %package contrib
 Summary: Contributed source and binaries distributed with PostgreSQL
 Group: Applications/Databases
-Prereq: postgresql = %{version}-%{release}
+Requires: postgresql = %{version}-%{release}
 Obsoletes: rh-postgresql-contrib
 
 %description contrib
@@ -235,8 +238,7 @@ included in the PostgreSQL distribution.
 %package devel
 Summary: PostgreSQL development header files and libraries
 Group: Development/Libraries
-Prereq: postgresql = %{version}-%{release}
-Requires: postgresql-libs = %{version}-%{release}
+Requires: postgresql = %{version}-%{release}
 Obsoletes: rh-postgresql-devel
 
 %description devel
@@ -251,8 +253,7 @@ develop applications which will interact with a PostgreSQL server.
 %package plperl
 Summary: The Perl procedural language for PostgreSQL
 Group: Applications/Databases
-PreReq: postgresql = %{version}-%{release}
-PreReq: postgresql-server = %{version}-%{release}
+Requires: postgresql-server = %{version}-%{release}
 Obsoletes: rh-postgresql-pl
 Obsoletes: postgresql-pl
 Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
@@ -268,8 +269,7 @@ procedural language for the backend.
 %package plpython
 Summary: The Python procedural language for PostgreSQL
 Group: Applications/Databases
-PreReq: postgresql = %{version}-%{release}
-PreReq: postgresql-server = %{version}-%{release}
+Requires: postgresql-server = %{version}-%{release}
 Obsoletes: rh-postgresql-pl
 Obsoletes: postgresql-pl
 
@@ -284,8 +284,7 @@ procedural language for the backend.
 %package pltcl
 Summary: The Tcl procedural language for PostgreSQL
 Group: Applications/Databases
-PreReq: postgresql = %{version}-%{release}
-PreReq: postgresql-server = %{version}-%{release}
+Requires: postgresql-server = %{version}-%{release}
 Obsoletes: rh-postgresql-pl
 Obsoletes: postgresql-pl
 
@@ -300,6 +299,7 @@ procedural language for the backend.
 %package tcl
 Summary: A Tcl client library for PostgreSQL
 Group: Applications/Databases
+# this is intentionally not a version-specific Requires:
 Requires: libpq.so
 Requires: tcl >= 8.3
 Obsoletes: rh-postgresql-tcl
@@ -315,6 +315,7 @@ and its documentation.
 %package python
 Summary: Development module for Python code to access a PostgreSQL DB
 Group: Applications/Databases
+# this is intentionally not a version-specific Requires:
 Requires: libpq.so
 Requires: python mx
 Obsoletes: rh-postgresql-python
@@ -331,8 +332,7 @@ database.
 %package test
 Summary: The test suite distributed with PostgreSQL
 Group: Applications/Databases
-PreReq: postgresql = %{version}-%{release}
-PreReq: postgresql-server = %{version}-%{release}
+Requires: postgresql-server = %{version}-%{release}
 Obsoletes: rh-postgresql-test
 
 %description test
@@ -841,6 +841,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Apr 26 2008 Tom Lane <tgl@redhat.com> 8.3.1-2
+- Clean up cross-subpackage Requires: to ensure that updating any one
+  subpackage brings in the matching versions of others.
+Resolves: #444271
+
 * Tue Mar 25 2008 Tom Lane <tgl@redhat.com> 8.3.1-1
 - Update to PostgreSQL 8.3.1.
 
