@@ -1,0 +1,27 @@
+diff -up ImageMagick-6.4.0/coders/svg.c~ ImageMagick-6.4.0/coders/svg.c
+--- ImageMagick-6.4.0/coders/svg.c~	2008-04-26 11:32:26.000000000 +0200
++++ ImageMagick-6.4.0/coders/svg.c	2008-04-26 11:32:26.000000000 +0200
+@@ -2777,12 +2777,20 @@ static Image *ReadSVGImage(const ImageIn
+       rsvg_handle_set_dpi_x_y(svg_info,
+         image->x_resolution == 0.0 ? 72.0 : image->x_resolution,
+         image->y_resolution == 0.0 ? 72.0 : image->y_resolution);
+-      error=(GError *) NULL;
+-      while ((n=ReadBlob(image,MaxTextExtent,message)) != 0)
++      while ((n=ReadBlob(image,MaxTextExtent,message)) != 0) {
++        error=(GError *) NULL;
+         (void) rsvg_handle_write(svg_info,message,n,&error);
++        if (error != (GError *) NULL) {
++          /* FIXME actually do something with the error */
++          g_error_free(error);
++        }
++      }
++      error=(GError *) NULL;
+       rsvg_handle_close(svg_info,&error);
+-      if (error != (GError *) NULL)
++      if (error != (GError *) NULL) {
++        /* FIXME actually do something with the error */
+         g_error_free(error);
++      }
+ #if defined(MAGICKCORE_CAIRO_DELEGATE)
+       rsvg_handle_get_dimensions(svg_info,&dimension_info);
+       image->columns=dimension_info.width*image->x_resolution/72.0;

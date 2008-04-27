@@ -1,0 +1,185 @@
+diff -up ImageMagick-6.4.0/Magick++/bin/Magick++-config.in~ ImageMagick-6.4.0/Magick++/bin/Magick++-config.in
+--- ImageMagick-6.4.0/Magick++/bin/Magick++-config.in~	2008-04-27 16:25:14.000000000 +0200
++++ ImageMagick-6.4.0/Magick++/bin/Magick++-config.in	2008-04-27 16:25:14.000000000 +0200
+@@ -7,8 +7,6 @@
+ 
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+-libdir=@libdir@
+-includedir=@includedir@
+ 
+ usage='Usage: Magick++-config [--cppflags] [--cxxflags] [--exec-prefix] [--ldflags] [--libs] [--prefix] [--version]
+ 
+@@ -43,19 +41,19 @@ while test $# -gt 0; do
+       echo '@PACKAGE_VERSION@ Q@QUANTUM_DEPTH@ @MAGICK_HDRI@'
+       ;;
+     --cflags)
+-      echo "-I${includedir} @MAGICK_PCFLAGS@"
++      pkg-config --cflags Magick++
+       ;;
+     --cxxflags)
+-      echo '@MAGICK_CXXFLAGS@'
++      pkg-config --cflags Magick++
+       ;;
+     --cppflags)
+-      echo '@MAGICK_CPPFLAGS@'
++      pkg-config --cflags Magick++
+       ;;
+     --ldflags)
+-      echo '@MAGICK_LDFLAGS@'
++      pkg-config --libs Magick++
+       ;;
+     --libs)
+-      echo "-L${libdir} -lMagick++ -lMagickWand -lMagickCore"
++      pkg-config --libs Magick++
+       ;;
+     *)
+       echo "${usage}" 1>&2
+diff -up ImageMagick-6.4.0/magick/Magick-config.in~ ImageMagick-6.4.0/magick/Magick-config.in
+--- ImageMagick-6.4.0/magick/Magick-config.in~	2008-04-27 16:25:15.000000000 +0200
++++ ImageMagick-6.4.0/magick/Magick-config.in	2008-04-27 16:25:15.000000000 +0200
+@@ -6,8 +6,6 @@
+ 
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+-libdir=@libdir@
+-includedir=@includedir@/ImageMagick
+ 
+ usage="\
+ Usage: Magick-config [--cflags] [--cppflags] [--exec-prefix] [--ldflags] [--libs] [--prefix] [--version]"
+@@ -40,19 +38,19 @@ while test $# -gt 0; do
+       echo '@PACKAGE_VERSION@ Q@QUANTUM_DEPTH@ @MAGICK_HDRI@'
+       ;;
+     --cflags)
+-      echo "-I${includedir} @MAGICK_PCFLAGS@"
++      pkg-config --cflags MagickCore
+       ;;
+     --cxxflags)
+-      echo '@MAGICK_CXXFLAGS@'
++      pkg-config --cflags MagickCore
+       ;;
+     --cppflags)
+-      echo '@MAGICK_CPPFLAGS@'
++      pkg-config --cflags MagickCore
+       ;;
+     --ldflags)
+-      echo '@MAGICK_LDFLAGS@'
++      pkg-config --libs MagickCore
+       ;;
+     --libs)
+-      echo "-L${libdir} -lMagickWand -lMagickCore"
++      pkg-config --libs MagickCore
+       ;;
+     *)
+       echo "${usage}" 1>&2
+diff -up ImageMagick-6.4.0/magick/MagickCore-config.in~ ImageMagick-6.4.0/magick/MagickCore-config.in
+--- ImageMagick-6.4.0/magick/MagickCore-config.in~	2008-04-27 16:25:14.000000000 +0200
++++ ImageMagick-6.4.0/magick/MagickCore-config.in	2008-04-27 16:25:14.000000000 +0200
+@@ -6,8 +6,6 @@
+ 
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+-libdir=@libdir@
+-includedir=@includedir@/ImageMagick
+ 
+ usage="\
+ Usage: MagickCore-config [--cflags] [--cppflags] [--exec-prefix] [--ldflags] [--libs] [--prefix] [--version]"
+@@ -40,19 +38,19 @@ while test $# -gt 0; do
+       echo '@PACKAGE_VERSION@ Q@QUANTUM_DEPTH@ @MAGICK_HDRI@'
+       ;;
+     --cflags)
+-      echo "-I${includedir} @MAGICK_PCFLAGS@"
++      pkg-config --cflags MagickCore
+       ;;
+     --cxxflags)
+-      echo '@MAGICK_CXXFLAGS@'
++      pkg-config --cflags MagickCore
+       ;;
+     --cppflags)
+-      echo '@MAGICK_CPPFLAGS@'
++      pkg-config --cflags MagickCore
+       ;;
+     --ldflags)
+-      echo '@MAGICK_LDFLAGS@'
++      pkg-config --libs MagickCore
+       ;;
+     --libs)
+-      echo "-L${libdir} -lMagickWand -lMagickCore"
++      pkg-config --libs MagickCore
+       ;;
+     *)
+       echo "${usage}" 1>&2
+diff -up ImageMagick-6.4.0/wand/MagickWand-config.in~ ImageMagick-6.4.0/wand/MagickWand-config.in
+--- ImageMagick-6.4.0/wand/MagickWand-config.in~	2008-04-27 16:25:15.000000000 +0200
++++ ImageMagick-6.4.0/wand/MagickWand-config.in	2008-04-27 16:25:15.000000000 +0200
+@@ -6,8 +6,6 @@
+ 
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+-libdir=@libdir@
+-includedir=@includedir@/ImageMagick
+ 
+ usage="\
+ Usage: MagickWand-config [--cflags] [--cppflags] [--exec-prefix] [--ldflags] [--libs] [--prefix] [--version]"
+@@ -40,19 +38,19 @@ while test $# -gt 0; do
+       echo '@PACKAGE_VERSION@ Q@QUANTUM_DEPTH@ @MAGICK_HDRI@'
+       ;;
+     --cflags)
+-      echo "-I${includedir} @MAGICK_PCFLAGS@"
++      pkg-config --cflags MagickWand
+       ;;
+     --cxxflags)
+-      echo '@MAGICK_CXXFLAGS@'
++      pkg-config --cflags MagickWand
+       ;;
+     --cppflags)
+-      echo '@MAGICK_CPPFLAGS@'
++      pkg-config --cflags MagickWand
+       ;;
+     --ldflags)
+-      echo '@MAGICK_LDFLAGS@'
++      pkg-config --libs MagickWand
+       ;;
+     --libs)
+-      echo "-L${libdir} -lMagickWand -lMagickCore"
++      pkg-config --libs MagickWand
+       ;;
+     *)
+       echo "${usage}" 1>&2
+diff -up ImageMagick-6.4.0/wand/Wand-config.in~ ImageMagick-6.4.0/wand/Wand-config.in
+--- ImageMagick-6.4.0/wand/Wand-config.in~	2008-04-27 16:25:15.000000000 +0200
++++ ImageMagick-6.4.0/wand/Wand-config.in	2008-04-27 16:25:15.000000000 +0200
+@@ -6,8 +6,6 @@
+ 
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+-libdir=@libdir@
+-includedir=@includedir@/ImageMagick
+ 
+ usage="\
+ Usage: Wand-config [--cflags] [--cppflags] [--exec-prefix] [--ldflags] [--libs] [--prefix] [--version]"
+@@ -40,19 +38,19 @@ while test $# -gt 0; do
+       echo '@PACKAGE_VERSION@ Q@QUANTUM_DEPTH@ @MAGICK_HDRI@'
+       ;;
+     --cflags)
+-      echo "-I${includedir} @MAGICK_PCFLAGS@"
++      pkg-config --cflags MagickWand
+       ;;
+     --cxxflags)
+-      echo '@MAGICK_CXXFLAGS@'
++      pkg-config --cflags MagickWand
+       ;;
+     --cppflags)
+-      echo '@MAGICK_CPPFLAGS@'
++      pkg-config --cflags MagickWand
+       ;;
+     --ldflags)
+-      echo '@MAGICK_LDFLAGS@'
++      pkg-config --libs MagickWand
+       ;;
+     --libs)
+-      echo "-L${libdir} -lMagickWand -lMagickCore"
++      pkg-config --libs MagickWand
+       ;;
+     *)
+       echo "${usage}" 1>&2

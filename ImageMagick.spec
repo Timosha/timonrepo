@@ -1,15 +1,15 @@
 # ImageMagick has adopted a new Version.Patchlevel version numbering system...
 # 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 6.3.8
-%define Patchlevel 1
-Summary: An X application for displaying and manipulating images.
+%define VER 6.4.0
+%define Patchlevel 10
+Summary: An X application for displaying and manipulating images
 Name: ImageMagick
 %if "%{Patchlevel}" != ""
 Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 3%{?dist}
+Release: 1%{?dist}
 License: ImageMagick
 Group: Applications/Multimedia
 %if "%{Patchlevel}" != ""
@@ -18,20 +18,19 @@ Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchleve
 Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
 %endif
 Source1: magick_small.png
-Patch1: ImageMagick-6.3.8-multilib.patch
-Patch2: ImageMagick-6.3.5-open.patch
-
-
+Patch1: ImageMagick-6.4.0-multilib.patch
+Patch2: ImageMagick-6.3.8-invalid-gerror-use.patch
+Patch3: ImageMagick-6.4.0-xdg-open.patch
 
 Url: http://www.imagemagick.org/
 Buildroot: %{_tmppath}/%{name}-%{version}-root
-BuildPrereq: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
-BuildPrereq: libtiff-devel, libungif-devel, zlib-devel, perl
+BuildRequires: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
+BuildRequires: libtiff-devel, libungif-devel, zlib-devel, perl
 BuildRequires: freetype-devel >= 2.1
 BuildRequires: automake >= 1.7 autoconf >= 2.58 libtool >= 1.5
 BuildRequires: ghostscript-devel
 BuildRequires: perl-devel, perl(ExtUtils::MakeMaker)
-BuildRequires: libwmf-devel, jasper-devel
+BuildRequires: libwmf-devel, jasper-devel, libtool-ltdl-devel
 BuildRequires: libX11-devel, libXext-devel, libXt-devel
 BuildRequires: lcms-devel, libxml2-devel, librsvg2-devel
 
@@ -51,7 +50,7 @@ which use ImageMagick code or APIs, you need to install
 ImageMagick-devel as well.
 
 %package devel
-Summary: Static libraries and header files for ImageMagick app development.
+Summary: Library links and header files for ImageMagick app development
 Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 Requires: libX11-devel, libXext-devel, libXt-devel
@@ -61,11 +60,11 @@ Requires: freetype-devel
 Requires: libtiff-devel
 Requires: libjpeg-devel
 Requires: lcms-devel
+Requires: jasper-devel
 Requires: pkgconfig
-Requires: jasper
 
 %description devel
-ImageMagick-devel contains the static libraries and header files you'll
+ImageMagick-devel contains the library links and header files you'll
 need to develop ImageMagick applications. ImageMagick is an image
 manipulation program.
 
@@ -78,9 +77,7 @@ however.
 Summary: ImageMagick perl bindings
 Group: System Environment/Libraries
 Requires: %{name} = %{version}-%{release}
-Requires: perl >= 5.6.0
-%define perl_vendorarch %(perl -MConfig -le 'print $Config{installvendorarch}')
-Prereq: %{perl_vendorarch}
+Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description perl
 Perl bindings to ImageMagick.
@@ -117,37 +114,46 @@ You don't need to install it if you just want to use ImageMagick, or if you
 want to develop/compile applications using the ImageMagick C interface,
 however.
 
+
 %prep
 %setup -q -n %{name}-%{VER}
 %patch1 -p1 -b .multilib
-# No longer needed.
-# %patch2 -p1 -b .open_args
+%patch2 -p1
+%patch3 -p1
+iconv -f ISO-8859-1 -t UTF-8 README.txt > README.txt.tmp
+touch -r README.txt README.txt.tmp
+mv README.txt.tmp README.txt
+
 
 %build
 %configure --enable-shared \
            --with-modules \
            --with-perl \
-	   --with-x \
+           --with-x \
            --with-threads \
            --with-magick_plus_plus \
-	   --with-gslib \
+           --with-gslib \
            --with-wmf \
            --with-lcms \
            --with-rsvg \
-	   --with-xml \
+           --with-xml \
            --with-perl-options="INSTALLDIRS=vendor %{?perl_prefix} CC='%__cc -L$PWD/magick/.libs' LDDLFLAGS='-shared -L$PWD/magick/.libs'" \
            --without-windows-font-dir \
-	   --without-dps
+           --without-dps \
+           --without-included-ltdl --with-ltdl-include=%{_includedir} \
+           --with-ltdl-lib=%{_libdir}
 # Disable rpath
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-
 make
+
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-make install DESTDIR=$RPM_BUILD_ROOT
+make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
+# fix weird perl Magick.so permissions
+chmod 755 $RPM_BUILD_ROOT%{perl_vendorarch}/auto/Image/Magick/Magick.so
 
 # perlmagick: fix perl path of demo files
 %{__perl} -MExtUtils::MakeMaker -e 'MY->fixin(@ARGV)' PerlMagick/demo/*.pl
@@ -159,11 +165,11 @@ find $RPM_BUILD_ROOT -name "perllocal.pod" |xargs rm -f
 # perlmagick: build files list
 echo "%defattr(-,root,root)" > perl-pkg-files
 find $RPM_BUILD_ROOT/%{_libdir}/perl* -type f -print \
-	| sed "s@^$RPM_BUILD_ROOT@@g" > perl-pkg-files 
+        | sed "s@^$RPM_BUILD_ROOT@@g" > perl-pkg-files 
 find $RPM_BUILD_ROOT%{perl_vendorarch} -type d -print \
-	| sed "s@^$RPM_BUILD_ROOT@%dir @g" \
- 	| grep -v '^%dir %{perl_vendorarch}$' \
-	| grep -v '/auto$' >> perl-pkg-files 
+        | sed "s@^$RPM_BUILD_ROOT@%dir @g" \
+        | grep -v '^%dir %{perl_vendorarch}$' \
+        | grep -v '/auto$' >> perl-pkg-files 
 if [ -z perl-pkg-files ] ; then
     echo "ERROR: EMPTY FILE LIST"
     exit -1
@@ -183,12 +189,12 @@ rm -f  $RPM_BUILD_ROOT%{_libdir}/*.{a,la}
 %define wordsize 32
 %endif
 
-mv $RPM_BUILD_ROOT%{_includedir}/magick/magick-config.h \
-   $RPM_BUILD_ROOT%{_includedir}/magick/magick-config-%{wordsize}.h
+mv $RPM_BUILD_ROOT%{_includedir}/ImageMagick/magick/magick-config.h \
+   $RPM_BUILD_ROOT%{_includedir}/ImageMagick/magick/magick-config-%{wordsize}.h
 
-cat >$RPM_BUILD_ROOT%{_includedir}/magick/magick-config.h <<EOF
-#ifndef ORBIT_MULTILIB
-#define ORBIT_MULTILIB
+cat >$RPM_BUILD_ROOT%{_includedir}/ImageMagick/magick/magick-config.h <<EOF
+#ifndef IMAGEMAGICK_MULTILIB
+#define IMAGEMAGICK_MULTILIB
 
 #include <bits/wordsize.h>
 
@@ -207,6 +213,7 @@ EOF
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+
 %post -p /sbin/ldconfig
 
 %post c++ -p /sbin/ldconfig
@@ -215,12 +222,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %postun c++ -p /sbin/ldconfig
 
+
 %files
 %defattr(-,root,root)
 %doc QuickStart.txt ChangeLog Platforms.txt
-%doc README.txt LICENSE NOTICE AUTHORS NEWS
-%attr(755,root,root) %{_libdir}/libMagick.so.*
-%attr(755,root,root) %{_libdir}/libWand.so.*
+%doc README.txt LICENSE NOTICE AUTHORS.txt NEWS.txt
+%attr(755,root,root) %{_libdir}/libMagickCore.so.*
+%attr(755,root,root) %{_libdir}/libMagickWand.so.*
 %{_bindir}/[a-z]*
 %{_libdir}/ImageMagick*
 %{_datadir}/ImageMagick*
@@ -230,16 +238,22 @@ rm -rf $RPM_BUILD_ROOT
 
 %files devel
 %defattr(-,root,root)
+%{_bindir}/MagickCore-config
 %{_bindir}/Magick-config
+%{_bindir}/MagickWand-config
 %{_bindir}/Wand-config
-%{_libdir}/libMagick.so
-%{_libdir}/libWand.so
+%{_libdir}/libMagickCore.so
+%{_libdir}/libMagickWand.so
+%{_libdir}/pkgconfig/MagickCore.pc
 %{_libdir}/pkgconfig/ImageMagick.pc
+%{_libdir}/pkgconfig/MagickWand.pc
 %{_libdir}/pkgconfig/Wand.pc
-%{_includedir}/magick
-%{_includedir}/wand
+%{_includedir}/ImageMagick/magick
+%{_includedir}/ImageMagick/wand
 %{_mandir}/man1/Magick-config.*
+%{_mandir}/man1/MagickCore-config.*
 %{_mandir}/man1/Wand-config.*
+%{_mandir}/man1/MagickWand-config.*
 
 %files c++
 %defattr(-,root,root)
@@ -248,9 +262,10 @@ rm -rf $RPM_BUILD_ROOT
 %files c++-devel
 %defattr(-,root,root)
 %{_bindir}/Magick++-config
-%{_includedir}/Magick++
-%{_includedir}/Magick++.h
+%{_includedir}/ImageMagick/Magick++
+%{_includedir}/ImageMagick/Magick++.h
 %{_libdir}/libMagick++.so
+%{_libdir}/pkgconfig/Magick++.pc
 %{_libdir}/pkgconfig/ImageMagick++.pc
 %{_mandir}/man1/Magick++-config.*
 
@@ -259,7 +274,17 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/*
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
+
 %changelog
+* Sat Apr 26 2008 Hans de Goede <jwrdegoede@fedoraproject.org> 6.4.0.10-1
+- New upstream release 6.4.0.10
+- This fixes conversion of 24 bpp windows icons (bz 440136)
+- Don't reuse GError structs, that upsets glib2 (bz 325211)
+- Use the system ltdl, not the included copy (bz 237475)
+- Fix various multilib conflicts (bz 341561)
+- Use xdg-open instead of htmlview (bz 388451)
+- Some small specfile cleanups (utf-8 stuff & others) fixing rpmlint warnings
+
 * Wed Feb 27 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 6.3.8.1-3
 - Rebuild for perl 5.10 (again)
 
@@ -433,7 +458,7 @@ rm -rf $RPM_BUILD_ROOT
 * Wed Jun 04 2003 Elliot Lee <sopwith@redhat.com>
 - rebuilt
 
-* Thu May 29 2003 Tim Powers <timp@redhat.com> %{nil}-4
+* Thu May 29 2003 Tim Powers <timp@redhat.com> 5.5.6-4
 - rebuild for RHEL to fix broken deps
 
 * Thu May 15 2003 Tim Powers <timp@redhat.com> 5.5.6-3
@@ -540,7 +565,7 @@ rm -rf $RPM_BUILD_ROOT
 * Mon Oct 22 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.4.0-1
 - 5.4.0
 - work around build system breakage causing applications to be named
-  %{_arch}-redhat-linux-foo rather than foo
+  %%{_arch}-redhat-linux-foo rather than foo
 
 * Wed Sep 19 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.9-1
 - 5.3.9
@@ -640,7 +665,7 @@ rm -rf $RPM_BUILD_ROOT
 - bootstrap rebuilt to nuke broken libbz2 deps
 - add Prefix: tag such that the FHS macros work properly
 
-* Wed May 17 2000 Trond Eivind Glomsrød <teg@redhat.com>
+* Wed May 17 2000 Trond Eivind GlomsrÃ¸d <teg@redhat.com>
 - now compiles with bzip2 1.0
 - changed buildroot to include version
 
