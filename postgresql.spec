@@ -82,7 +82,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.3.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -108,6 +108,7 @@ Patch4: postgresql-test.patch
 Patch5: pgtcl-no-rpath.patch
 Patch6: postgresql-perl-rpath.patch
 Patch8: postgresql-prefer-ncurses.patch
+Patch9: postgresql-xslt.patch
 
 BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf gawk
 BuildRequires: perl(ExtUtils::Embed), perl-devel
@@ -353,6 +354,7 @@ system, including regression tests and benchmarks.
 # patch5 is applied later
 %patch6 -p1
 %patch8 -p1
+%patch9 -p0
 
 #call autoconf 2.53 or greater
 %aconfver
@@ -841,6 +843,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Apr 28 2008 Tom Lane <tgl@redhat.com> 8.3.1-3
+- Fix build breakage on PPC due to incorrect configure test
+Related: #444317
+
 * Sat Apr 26 2008 Tom Lane <tgl@redhat.com> 8.3.1-2
 - Clean up cross-subpackage Requires: to ensure that updating any one
   subpackage brings in the matching versions of others.
