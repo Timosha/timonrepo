@@ -68,6 +68,7 @@
 %{!?tcl:%define tcl 1}
 %{!?ssl:%define ssl 1}
 %{!?kerberos:%define kerberos 1}
+%{!?ldap:%define ldap 1}
 %{!?nls:%define nls 1}
 %{!?uuid:%define uuid 1}
 %{!?xml:%define xml 1}
@@ -82,7 +83,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.3.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -136,6 +137,10 @@ BuildRequires: openssl-devel
 %if %kerberos
 BuildRequires: krb5-devel
 BuildRequires: e2fsprogs-devel
+%endif
+
+%if %ldap
+BuildRequires: openldap-devel
 %endif
 
 %if %nls
@@ -393,6 +398,10 @@ CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS
 # Strip out -ffast-math from CFLAGS....
 CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
 
+# Use --as-needed to eliminate unnecessary link dependencies.
+# Hopefully upstream will do this for itself in some future release.
+LDFLAGS="-Wl,--as-needed"; export LDFLAGS
+
 %configure --disable-rpath \
 %if %beta
 	--enable-debug \
@@ -407,6 +416,9 @@ CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
 %endif
 %if %plpython
 	--with-python \
+%endif
+%if %ldap
+	--with-ldap \
 %endif
 %if %ssl
 	--with-openssl \
@@ -843,6 +855,12 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat May 17 2008 Tom Lane <tgl@redhat.com> 8.3.1-4
+- Enable LDAP support
+Resolves: #445315
+- Use -Wl,--as-needed to suppress bogus dependencies for libraries that
+  are really only needed by some of the subpackages
+
 * Mon Apr 28 2008 Tom Lane <tgl@redhat.com> 8.3.1-3
 - Fix build breakage on PPC due to incorrect configure test
 Related: #444317
