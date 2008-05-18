@@ -83,7 +83,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.3.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -855,6 +855,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat May 17 2008 Tom Lane <tgl@redhat.com> 8.3.1-5
+- rebuild because of buildsystem hiccup
+
 * Sat May 17 2008 Tom Lane <tgl@redhat.com> 8.3.1-4
 - Enable LDAP support
 Resolves: #445315
