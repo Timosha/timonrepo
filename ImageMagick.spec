@@ -45,7 +45,7 @@ animated or transparent .gifs, creating composite images, creating
 thumbnail images, and more.
 
 ImageMagick is one of your choices if you need a program to manipulate
-and dis play images. If you want to develop your own applications
+and display images. If you want to develop your own applications
 which use ImageMagick code or APIs, you need to install
 ImageMagick-devel as well.
 
