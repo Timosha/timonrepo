@@ -5,8 +5,8 @@
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.3.3
-Release:	1%{?dist}
-License:	GPL
+Release:	2%{?dist}
+License:	GPLv2+
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
 Source4:	filter-requires-perl-Pg.sh
@@ -29,7 +29,7 @@ certified as compliant with the "Types and Functions" profile.
 %package jdbc
 Summary:	The JDBC driver for PostGIS
 Group:		Applications/Databases
-License:	LGPL
+License:	LGPLv2+
 Requires:	%{name} = %{version}-%{release}, postgresql-jdbc
 BuildRequires:  ant >= 0:1.6.2, junit >= 0:3.7, postgresql-jdbc
 
@@ -144,6 +144,9 @@ rm -rf %{buildroot}
 %endif
 
 %changelog
+* Thu May 29 2008 Todd Zullinger <tmz@pobox.com> - 1.3.3-2
+- fix license tags
+
 * Sun Apr 13 2008 Devrim GUNDUZ <devrim@commandprompt.com> - 1.3.3-1
 - Update to 1.3.3
 
