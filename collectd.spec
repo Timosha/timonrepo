@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.4.0
-Release: 2%{?dist}
+Version: 4.4.1
+Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -108,7 +108,7 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 %build
 %configure \
     --without-libiptc \
-    --disable-iptables \
+    --disable-ascent \
     --disable-static \
     --enable-mysql \
     --enable-sensors \
@@ -262,6 +262,10 @@ fi
 
 
 %changelog
+* Mon Jun 09 2008 Alan Pevec <apevec@redhat.com> 4.4.1-1
+- New upstream version 4.4.1.
+- plugin changes: reenable iptables, disable ascent
+
 * Tue May 27 2008 Alan Pevec <apevec@redhat.com> 4.4.0-2
 - disable iptables/libiptc
 
