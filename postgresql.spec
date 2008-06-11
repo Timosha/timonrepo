@@ -82,8 +82,8 @@
 
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
-Version: 8.3.1
-Release: 5%{?dist}
+Version: 8.3.3
+Release: 1%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -97,7 +97,7 @@ Source7: ecpg_config.h
 Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
-Source17: http://www.postgresql.org/docs/manuals/postgresql-8.3.1-US.pdf
+Source17: http://www.postgresql.org/docs/manuals/postgresql-8.3.3-US.pdf
 Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.8.1.tgz
 Source19: http://pgfoundry.org/projects/pgtclng/pgtcl1.6.2.tar.gz
 Source20: http://pgfoundry.org/projects/pgtclng/pgtcldocs-20070115.zip
@@ -108,8 +108,6 @@ Patch3: postgresql-logging.patch
 Patch4: postgresql-test.patch
 Patch5: pgtcl-no-rpath.patch
 Patch6: postgresql-perl-rpath.patch
-Patch8: postgresql-prefer-ncurses.patch
-Patch9: postgresql-xslt.patch
 
 BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf gawk
 BuildRequires: perl(ExtUtils::Embed), perl-devel
@@ -358,8 +356,6 @@ system, including regression tests and benchmarks.
 %patch4 -p1
 # patch5 is applied later
 %patch6 -p1
-%patch8 -p1
-%patch9 -p0
 
 #call autoconf 2.53 or greater
 %aconfver
@@ -855,6 +851,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Jun 11 2008 Tom Lane <tgl@redhat.com> 8.3.3-1
+- Update to PostgreSQL 8.3.3.
+- Remove postgresql-prefer-ncurses.patch, no longer needed in recent
+  Fedora releases because libtermcap is gone.
+
 * Sat May 17 2008 Tom Lane <tgl@redhat.com> 8.3.1-5
 - rebuild because of buildsystem hiccup
 
