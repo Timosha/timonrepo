@@ -83,7 +83,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.3.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -305,7 +305,7 @@ Summary: A Tcl client library for PostgreSQL
 Group: Applications/Databases
 # this is intentionally not a version-specific Requires:
 Requires: libpq.so
-Requires: tcl >= 8.3
+Requires: tcl >= 8.5
 Obsoletes: rh-postgresql-tcl
 
 %description tcl
@@ -520,9 +520,17 @@ install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
 cp src/tutorial/* $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
 
 %if %tcl
-	install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/Pgtcl
-	cp Pgtcl/pkgIndex.tcl $RPM_BUILD_ROOT%{_libdir}/Pgtcl
-	cp Pgtcl/libpgtcl*.so $RPM_BUILD_ROOT%{_libdir}/Pgtcl
+	TCL_VERSION=`echo 'puts $tcl_version' | tclsh`
+	TCLLIBDIR="%{_libdir}/tcl$TCL_VERSION"
+	# check the target directory is a dir, not a symlink
+	if [ -h "$TCLLIBDIR" ] ; then
+		echo "$TCLLIBDIR must not be a symlink"
+		exit 1
+	fi
+	PGTCL_DIR="${RPM_BUILD_ROOT}${TCLLIBDIR}/Pgtcl"
+	install -d -m 755 "$PGTCL_DIR"
+	cp Pgtcl/pkgIndex.tcl "$PGTCL_DIR"
+	cp Pgtcl/libpgtcl*.so "$PGTCL_DIR"
 %endif
 
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
@@ -808,7 +816,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %tcl
 %files tcl
 %defattr(-,root,root)
-%{_libdir}/Pgtcl/
+%{_libdir}/tcl*/Pgtcl/
 %doc Pgtcl-docs/*
 %endif
 
@@ -851,6 +859,14 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Fri Jun 20 2008 Tom Lane <tgl@redhat.com> 8.3.3-2
+- Install Pgtcl in /usr/lib/tcl$TCL_VERSION, not directly in /usr/lib.
+  Needed because tcl 8.5 no longer puts /usr/lib into its package search path.
+  NOTE: do not back-port this change into branches using pre-8.5 tcl, because
+  /usr/lib/tcl8.4 had been a symlink to /usr/share/tcl8.4, and /usr/share
+  is exactly where we must not put Pgtcl.
+Resolves: #228263
+
 * Wed Jun 11 2008 Tom Lane <tgl@redhat.com> 8.3.3-1
 - Update to PostgreSQL 8.3.3.
 - Remove postgresql-prefer-ncurses.patch, no longer needed in recent
