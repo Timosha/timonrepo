@@ -5,7 +5,7 @@
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.3.3
-Release:	2%{?dist}
+Release:	3%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
@@ -144,6 +144,9 @@ rm -rf %{buildroot}
 %endif
 
 %changelog
+* Thu Jun 26 2008 Devrim GUNDUZ <devrim@commandprompt.com> - 1.3.3-3
+- Rebuilt against geos 3.0.0
+
 * Thu May 29 2008 Todd Zullinger <tmz@pobox.com> - 1.3.3-2
 - fix license tags
 
