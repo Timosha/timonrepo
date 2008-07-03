@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.4.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -17,7 +17,7 @@ BuildRequires: curl-devel
 %if 0%{?fedora} >= 8
 BuildRequires: perl-libs, perl-devel
 %else
-BuildRequires: perl-libs, perl-devel
+BuildRequires: perl
 %endif
 BuildRequires: perl(ExtUtils::MakeMaker)
 BuildRequires: perl(ExtUtils::Embed)
@@ -335,6 +335,9 @@ fi
 
 
 %changelog
+* Thu Jul 03 2008 Lubomir Rintel <lkundrak@v3.sk> 4.4.1-4
+- Fix a typo introduced by previous change that prevented building in el5
+
 * Thu Jul 03 2008 Lubomir Rintel <lkundrak@v3.sk> 4.4.1-3
 - Make this compile with older perl package
 - Turn dependencies on packages to dependencies on Perl modules
