@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.4.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -14,9 +14,13 @@ BuildRequires: libvirt-devel, libxml2-devel
 BuildRequires: rrdtool-devel
 BuildRequires: lm_sensors-devel
 BuildRequires: curl-devel
+%if 0%{?fedora} >= 8
 BuildRequires: perl-libs, perl-devel
-BuildRequires: perl-ExtUtils-MakeMaker
-BuildRequires: perl-ExtUtils-Embed
+%else
+BuildRequires: perl-libs, perl-devel
+%endif
+BuildRequires: perl(ExtUtils::MakeMaker)
+BuildRequires: perl(ExtUtils::Embed)
 BuildRequires: net-snmp-devel
 BuildRequires: libpcap-devel
 BuildRequires: mysql-devel
@@ -258,37 +262,44 @@ fi
 
 
 %files apache
+%defattr(-, root, root, -)
 %{_libdir}/collectd/apache.so*
 %config(noreplace) %{_sysconfdir}/collectd.d/apache.conf
 
 
 %files dns
+%defattr(-, root, root, -)
 %{_libdir}/collectd/dns.so*
 %config(noreplace) %{_sysconfdir}/collectd.d/dns.conf
 
 
 %files email
+%defattr(-, root, root, -)
 %{_libdir}/collectd/email.so*
 %config(noreplace) %{_sysconfdir}/collectd.d/email.conf
 %doc %{_mandir}/man5/collectd-email.5*
 
 
 %files ipmi
+%defattr(-, root, root, -)
 %{_libdir}/collectd/ipmi.so*
 %config(noreplace) %{_sysconfdir}/collectd.d/ipmi.conf
 
 
 %files mysql
+%defattr(-, root, root, -)
 %{_libdir}/collectd/mysql.so*
 %config(noreplace) %{_sysconfdir}/collectd.d/mysql.conf
 
 
 %files nginx
+%defattr(-, root, root, -)
 %{_libdir}/collectd/nginx.so*
 %config(noreplace) %{_sysconfdir}/collectd.d/nginx.conf
 
 
 %files -n perl-Collectd
+%defattr(-, root, root, -)
 %doc perl-examples/*
 %{_libdir}/collectd/perl.so*
 %{perl_vendorlib}/Collectd.pm
@@ -299,27 +310,36 @@ fi
 
 
 %files rrdtool
+%defattr(-, root, root, -)
 %{_libdir}/collectd/rrdtool.so*
 %config(noreplace) %{_sysconfdir}/collectd.d/rrdtool.conf
 
 
 %files sensors
+%defattr(-, root, root, -)
 %{_libdir}/collectd/sensors.so*
 %config(noreplace) %{_sysconfdir}/collectd.d/sensors.conf
 
 
 %files snmp
+%defattr(-, root, root, -)
 %{_libdir}/collectd/snmp.so*
 %config(noreplace) %{_sysconfdir}/collectd.d/snmp.conf
 %doc %{_mandir}/man5/collectd-snmp.5*
 
 
 %files virt
+%defattr(-, root, root, -)
 %{_libdir}/collectd/libvirt.so*
 %config(noreplace) %{_sysconfdir}/collectd.d/libvirt.conf
 
 
 %changelog
+* Thu Jul 03 2008 Lubomir Rintel <lkundrak@v3.sk> 4.4.1-3
+- Make this compile with older perl package
+- Turn dependencies on packages to dependencies on Perl modules
+- Add default attributes for files
+
 * Wed Jun 12 2008 Alan Pevec <apevec@redhat.com> 4.4.1-2
 - Split rrdtool into a subpackage (Chris Lalancette)
 - cleanup subpackages, split dns plugin, enable ipmi
