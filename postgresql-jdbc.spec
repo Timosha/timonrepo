@@ -38,7 +38,7 @@
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
 Version:	8.3.603
-Release:	1jpp%{?dist}
+Release:	1.1%{?dist}
 Epoch:		0
 License:	BSD
 Group:		Applications/Databases
@@ -131,6 +131,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Jul  9 2008 Tom "spot" Callaway <tcallawa@redhat.com> 8.3.603-1.1
+- drop repotag
+
 * Tue Feb 12 2008 Tom Lane <tgl@redhat.com> 8.3.603-1jpp
 - Update to build 8.3-603
 
