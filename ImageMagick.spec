@@ -4,15 +4,15 @@
 %define Patchlevel 10
 Summary: An X application for displaying and manipulating images
 Name: ImageMagick
-%if "%{Patchlevel}" != ""
+%if 0%{?Patchlevel}
 Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ImageMagick
 Group: Applications/Multimedia
-%if "%{Patchlevel}" != ""
+%if 0%{?Patchlevel}
 Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.bz2
 %else
 Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
@@ -99,8 +99,8 @@ Install ImageMagick-c++ if you want to use any applications that use Magick++.
 %package c++-devel
 Summary: C++ bindings for the ImageMagick library
 Group: Development/Libraries
-Requires: %{name}-c++ = %{version}
-Requires: %{name}-devel = %{version}
+Requires: %{name}-c++ = %{version}-%{release}
+Requires: %{name}-devel = %{version}-%{release}
 
 %description c++-devel
 ImageMagick-devel contains the static libraries and header files you'll
@@ -248,6 +248,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/ImageMagick.pc
 %{_libdir}/pkgconfig/MagickWand.pc
 %{_libdir}/pkgconfig/Wand.pc
+%dir %{_includedir}/ImageMagick
 %{_includedir}/ImageMagick/magick
 %{_includedir}/ImageMagick/wand
 %{_mandir}/man1/Magick-config.*
@@ -276,6 +277,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Jul 27 2008 Hans de Goede <jwrdegoede@fedoraproject.org> 6.4.0.10-2
+- Fix ownership of /usr/include/ImageMagick (bz 444647)
+
 * Sat Apr 26 2008 Hans de Goede <jwrdegoede@fedoraproject.org> 6.4.0.10-1
 - New upstream release 6.4.0.10
 - This fixes conversion of 24 bpp windows icons (bz 440136)
