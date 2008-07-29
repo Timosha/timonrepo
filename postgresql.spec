@@ -83,7 +83,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.3.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -351,7 +351,8 @@ system, including regression tests and benchmarks.
 %prep
 %setup -q 
 %patch1 -p1
-%patch2 -p1
+# intentionally allowing fuzz here because of adjacent version number
+%patch2 -p1 -F2
 %patch3 -p1
 %patch4 -p1
 # patch5 is applied later
@@ -859,6 +860,12 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Jul 28 2008 Tom Lane <tgl@redhat.com> 8.3.3-3
+- Fix build failure caused by new default patch fuzz = 0 policy in rawhide.
+  The only patch that actually broke was postgresql-ac-version.patch, and
+  for that it seems better to allow fuzz than to have a guaranteed patch
+  failure on every upstream minor version update.
+
 * Fri Jun 20 2008 Tom Lane <tgl@redhat.com> 8.3.3-2
 - Install Pgtcl in /usr/lib/tcl$TCL_VERSION, not directly in /usr/lib.
   Needed because tcl 8.5 no longer puts /usr/lib into its package search path.
