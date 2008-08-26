@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.4.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -25,6 +25,9 @@ BuildRequires: net-snmp-devel
 BuildRequires: libpcap-devel
 BuildRequires: mysql-devel
 BuildRequires: OpenIPMI-devel
+
+# Only required until libvirt-devel is fixed (rhbz#460138)
+BuildRequires: xen-devel
 
 %description
 collectd is a small daemon written in C for performance.  It reads various
@@ -145,7 +148,6 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
     --enable-unixsock \
     --enable-ipmi \
     --with-perl-bindings=INSTALLDIRS=vendor
-cat config.log
 %{__make} %{?_smp_mflags}
 
 
@@ -336,8 +338,8 @@ fi
 
 
 %changelog
-* Mon Aug 25 2008 Richard W.M. Jones <rjones@redhat.com> 4.4.1-6
-- Capture config.log to diagnose build error.
+* Mon Aug 25 2008 Richard W.M. Jones <rjones@redhat.com> 4.4.1-7
+- +BR xen-devel (explicit dep required because of rhbz#460138).
 
 * Mon Aug 25 2008 Richard W.M. Jones <rjones@redhat.com> 4.4.1-5
 - Force rebuild.
