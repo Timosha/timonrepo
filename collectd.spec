@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.4.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -10,7 +10,10 @@ Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
 Patch0: %{name}-4.4.1-include-collectd.d.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
-BuildRequires: libvirt-devel, libxml2-devel
+%ifnarch ppc
+BuildRequires: libvirt-devel
+%endif
+BuildRequires: libxml2-devel
 BuildRequires: rrdtool-devel
 BuildRequires: lm_sensors-devel
 BuildRequires: curl-devel
@@ -26,8 +29,10 @@ BuildRequires: libpcap-devel
 BuildRequires: mysql-devel
 BuildRequires: OpenIPMI-devel
 
+%ifnarch ppc
 # Only required until libvirt-devel is fixed (rhbz#460138)
 BuildRequires: xen-devel
+%endif
 
 %description
 collectd is a small daemon written in C for performance.  It reads various
@@ -120,12 +125,14 @@ Requires:       collectd = %{version}-%{release}, net-snmp
 This plugin for collectd provides querying of net-snmp.
 
 
+%ifnarch ppc
 %package virt
 Summary:       Libvirt plugin for collectd
 Group:         System Environment/Daemons
 Requires:      collectd = %{version}-%{release}, libvirt
 %description virt
 This plugin collects information from virtualized guests.
+%endif
 
 
 %prep
@@ -186,7 +193,11 @@ cp contrib/redhat/sensors.conf %{buildroot}/etc/collectd.d/sensors.conf
 cp contrib/redhat/snmp.conf %{buildroot}/etc/collectd.d/snmp.conf
 
 # configs for subpackaged plugins
-for p in dns ipmi libvirt perl rrdtool
+subpkgs="dns ipmi perl rrdtool"
+%ifnarch ppc
+subpkgs="$subpkgs libvirt"
+%endif
+for p in $subpkgs
 do
 %{__cat} > %{buildroot}/etc/collectd.d/$p.conf <<EOF
 LoadPlugin $p
@@ -226,7 +237,9 @@ fi
 %exclude %{_sysconfdir}/collectd.d/dns.conf
 %exclude %{_sysconfdir}/collectd.d/email.conf
 %exclude %{_sysconfdir}/collectd.d/ipmi.conf
+%ifnarch ppc
 %exclude %{_sysconfdir}/collectd.d/libvirt.conf
+%endif
 %exclude %{_sysconfdir}/collectd.d/mysql.conf
 %exclude %{_sysconfdir}/collectd.d/nginx.conf
 %exclude %{_sysconfdir}/collectd.d/perl.conf
@@ -246,7 +259,9 @@ fi
 %exclude %{_libdir}/collectd/dns.so*
 %exclude %{_libdir}/collectd/email.so*
 %exclude %{_libdir}/collectd/ipmi.so*
+%ifnarch ppc
 %exclude %{_libdir}/collectd/libvirt.so*
+%endif
 %exclude %{_libdir}/collectd/mysql.so*
 %exclude %{_libdir}/collectd/nginx.so*
 %exclude %{_libdir}/collectd/perl.so*
@@ -331,13 +346,18 @@ fi
 %doc %{_mandir}/man5/collectd-snmp.5*
 
 
+%ifnarch ppc
 %files virt
 %defattr(-, root, root, -)
 %{_libdir}/collectd/libvirt.so*
 %config(noreplace) %{_sysconfdir}/collectd.d/libvirt.conf
+%endif
 
 
 %changelog
+* Thu Aug 28 2008 Richard W.M. Jones <rjones@redhat.com> 4.4.1-8
+- Exclude libvirt module, Xen deps, on PPC.
+
 * Mon Aug 25 2008 Richard W.M. Jones <rjones@redhat.com> 4.4.1-7
 - +BR xen-devel (explicit dep required because of rhbz#460138).
 
