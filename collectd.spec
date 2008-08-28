@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.4.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -12,10 +12,10 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 %ifnarch ppc
 BuildRequires: libvirt-devel
+BuildRequires: lm_sensors-devel
 %endif
 BuildRequires: libxml2-devel
 BuildRequires: rrdtool-devel
-BuildRequires: lm_sensors-devel
 BuildRequires: curl-devel
 %if 0%{?fedora} >= 8
 BuildRequires: perl-libs, perl-devel
@@ -108,6 +108,7 @@ Requires:      collectd = %{version}-%{release}, rrdtool
 This plugin for collectd provides rrdtool support.
 
 
+%ifnarch ppc
 %package sensors
 Summary:       Libsensors module for collectd
 Group:         System Environment/Daemons
@@ -115,6 +116,7 @@ Requires:      collectd = %{version}-%{release}, lm_sensors
 %description sensors
 This plugin for collectd provides querying of sensors supported by
 lm_sensors.
+%endif
 
 
 %package snmp
@@ -148,7 +150,9 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
     --disable-ascent \
     --disable-static \
     --enable-mysql \
+%ifnarch ppc
     --enable-sensors \
+%endif
     --enable-email \
     --enable-apache \
     --enable-perl \
@@ -189,7 +193,9 @@ cp contrib/redhat/apache.conf %{buildroot}/etc/collectd.d/apache.conf
 cp contrib/redhat/email.conf %{buildroot}/etc/collectd.d/email.conf
 cp contrib/redhat/mysql.conf %{buildroot}/etc/collectd.d/mysql.conf
 cp contrib/redhat/nginx.conf %{buildroot}/etc/collectd.d/nginx.conf
+%ifnarch ppc
 cp contrib/redhat/sensors.conf %{buildroot}/etc/collectd.d/sensors.conf
+%endif
 cp contrib/redhat/snmp.conf %{buildroot}/etc/collectd.d/snmp.conf
 
 # configs for subpackaged plugins
@@ -244,7 +250,9 @@ fi
 %exclude %{_sysconfdir}/collectd.d/nginx.conf
 %exclude %{_sysconfdir}/collectd.d/perl.conf
 %exclude %{_sysconfdir}/collectd.d/rrdtool.conf
+%ifnarch ppc
 %exclude %{_sysconfdir}/collectd.d/sensors.conf
+%endif
 %exclude %{_sysconfdir}/collectd.d/snmp.conf
 
 %{_initrddir}/collectd
@@ -266,7 +274,9 @@ fi
 %exclude %{_libdir}/collectd/nginx.so*
 %exclude %{_libdir}/collectd/perl.so*
 %exclude %{_libdir}/collectd/rrdtool.so*
+%ifnarch ppc
 %exclude %{_libdir}/collectd/sensors.so*
+%endif
 %exclude %{_libdir}/collectd/snmp.so*
 
 %doc AUTHORS ChangeLog COPYING INSTALL README
@@ -333,10 +343,12 @@ fi
 %config(noreplace) %{_sysconfdir}/collectd.d/rrdtool.conf
 
 
+%ifnarch ppc
 %files sensors
 %defattr(-, root, root, -)
 %{_libdir}/collectd/sensors.so*
 %config(noreplace) %{_sysconfdir}/collectd.d/sensors.conf
+%endif
 
 
 %files snmp
@@ -355,8 +367,9 @@ fi
 
 
 %changelog
-* Thu Aug 28 2008 Richard W.M. Jones <rjones@redhat.com> 4.4.1-8
+* Thu Aug 28 2008 Richard W.M. Jones <rjones@redhat.com> 4.4.1-9
 - Exclude libvirt module, Xen deps, on PPC.
+- Exclude sensors module also on PPC.
 
 * Mon Aug 25 2008 Richard W.M. Jones <rjones@redhat.com> 4.4.1-7
 - +BR xen-devel (explicit dep required because of rhbz#460138).
