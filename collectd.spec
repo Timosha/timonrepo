@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.4.1
-Release: 9%{?dist}
+Version: 4.4.2
+Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -367,6 +367,9 @@ fi
 
 
 %changelog
+* Mon Sep 01 2008 Alan Pevec <apevec@redhat.com> 4.4.2-1
+- New upstream release 4.4.2.
+
 * Thu Aug 28 2008 Richard W.M. Jones <rjones@redhat.com> 4.4.1-9
 - Exclude libvirt module, Xen deps, on PPC.
 - Exclude sensors module also on PPC.
