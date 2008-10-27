@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.4.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -169,6 +169,7 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 %install
 %{__rm} -rf %{buildroot}
 %{__rm} -rf contrib/SpamAssassin
+%{__rm} -rf contrib/collection3
 %{__make} install DESTDIR="%{buildroot}"
 
 %{__install} -Dp -m0644 src/collectd.conf %{buildroot}%{_sysconfdir}/collectd.conf
@@ -371,6 +372,9 @@ fi
 
 
 %changelog
+* Mon Oct 27 2008 Alan Pevec <apevec@redhat.com> 4.4.4-2
+- remove contrib/collection3 because of missing Perl dependencies in EL-5
+
 * Wed Oct 22 2008 Alan Pevec <apevec@redhat.com> 4.4.4-1
 - new upstream bugfix release 4.4.4
   http://collectd.org/news.shtml#news59
