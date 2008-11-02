@@ -230,8 +230,9 @@ reload(){
 initdb(){
     if [ -f "$PGDATA/PG_VERSION" ]
     then
-	echo "Data directory is not empty!"
+	echo -n "Data directory is not empty!"
 	echo_failure
+	echo
 	script_result=1
     else
 	echo -n $"Initializing database: "
@@ -257,6 +258,7 @@ initdb(){
 	    echo_failure
 	    script_result=1
 	fi
+	echo
     fi
 }
 
