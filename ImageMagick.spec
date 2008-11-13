@@ -9,7 +9,7 @@ Version: %{VER}.%{Patchlevel}
 %else
 Version: %{VER}
 %endif
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: ImageMagick
 Group: Applications/Multimedia
 %if 0%{?Patchlevel}
@@ -277,6 +277,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Nov 13 2008 Hans de Goede <hdegoede@redhat.com> 6.4.0.10-3
+- Rebuild for new libtool (rh 471468)
+
 * Sun Jul 27 2008 Hans de Goede <jwrdegoede@fedoraproject.org> 6.4.0.10-2
 - Fix ownership of /usr/include/ImageMagick (bz 444647)
 
