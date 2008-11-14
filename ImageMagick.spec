@@ -1,38 +1,24 @@
-# ImageMagick has adopted a new Version.Patchlevel version numbering system...
-# 5.4.0.3 is actually version 5.4.0, Patchlevel 3.
-%define VER 6.4.0
-%define Patchlevel 10
-Summary: An X application for displaying and manipulating images
-Name: ImageMagick
-%if 0%{?Patchlevel}
-Version: %{VER}.%{Patchlevel}
-%else
-Version: %{VER}
-%endif
-Release: 3%{?dist}
-License: ImageMagick
-Group: Applications/Multimedia
-%if 0%{?Patchlevel}
-Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{VER}-%{Patchlevel}.tar.bz2
-%else
-Source: ftp://ftp.ImageMagick.org/pub/ImageMagick/ImageMagick-%{version}.tar.bz2
-%endif
-Source1: magick_small.png
-Patch1: ImageMagick-6.4.0-multilib.patch
-Patch2: ImageMagick-6.3.8-invalid-gerror-use.patch
-Patch3: ImageMagick-6.4.0-xdg-open.patch
+%define VER 6.4.5
+%define Patchlevel 5
 
-Url: http://www.imagemagick.org/
-Buildroot: %{_tmppath}/%{name}-%{version}-root
-BuildRequires: bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
-BuildRequires: libtiff-devel, libungif-devel, zlib-devel, perl
-BuildRequires: freetype-devel >= 2.1
-BuildRequires: automake >= 1.7 autoconf >= 2.58 libtool >= 1.5
-BuildRequires: ghostscript-devel
-BuildRequires: perl-devel, perl(ExtUtils::MakeMaker)
-BuildRequires: libwmf-devel, jasper-devel, libtool-ltdl-devel
-BuildRequires: libX11-devel, libXext-devel, libXt-devel
-BuildRequires: lcms-devel, libxml2-devel, librsvg2-devel
+Name:           ImageMagick
+Version:        %{VER}.%{Patchlevel}
+Release:        1%{?dist}
+Summary:        An X application for displaying and manipulating images
+Group:          Applications/Multimedia
+License:        ImageMagick
+Url:            http://www.imagemagick.org/
+Source0:        ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.bz2
+Patch1:         ImageMagick-6.4.0-multilib.patch
+Patch2:         ImageMagick-6.3.8-invalid-gerror-use.patch
+
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRequires:  bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
+BuildRequires:  libtiff-devel, giflib-devel, zlib-devel, perl-devel
+BuildRequires:  ghostscript-devel
+BuildRequires:  libwmf-devel, jasper-devel, libtool-ltdl-devel
+BuildRequires:  libX11-devel, libXext-devel, libXt-devel
+BuildRequires:  lcms-devel, libxml2-devel, librsvg2-devel
 
 %description
 ImageMagick(TM) is an image display and manipulation tool for the X
@@ -48,6 +34,7 @@ ImageMagick is one of your choices if you need a program to manipulate
 and display images. If you want to develop your own applications
 which use ImageMagick code or APIs, you need to install
 ImageMagick-devel as well.
+
 
 %package devel
 Summary: Library links and header files for ImageMagick app development
@@ -73,6 +60,18 @@ APIs, you need to install ImageMagick-devel as well as ImageMagick.
 You do not need to install it if you just want to use ImageMagick,
 however.
 
+
+%package doc
+Summary: ImageMagick html documentation
+Group: Documentation
+
+%description doc
+ImageMagick documentation, this package contains usage (for the
+commandline tools) and API (for the libraries) documentation in html format.
+Note this documentation can also be found on the ImageMagick website:
+http://www.imagemagick.org/
+
+
 %package perl
 Summary: ImageMagick perl bindings
 Group: System Environment/Libraries
@@ -85,6 +84,7 @@ Perl bindings to ImageMagick.
 Install ImageMagick-perl if you want to use any perl scripts that use
 ImageMagick.
 
+
 %package c++
 Summary: ImageMagick Magick++ library (C++ bindings)
 Group: System Environment/Libraries
@@ -95,6 +95,7 @@ This package contains the Magick++ library, a C++ binding to the ImageMagick
 graphics manipulation library.
 
 Install ImageMagick-c++ if you want to use any applications that use Magick++.
+
 
 %package c++-devel
 Summary: C++ bindings for the ImageMagick library
@@ -119,14 +120,18 @@ however.
 %setup -q -n %{name}-%{VER}
 %patch1 -p1 -b .multilib
 %patch2 -p1
-%patch3 -p1
+sed -i 's/libltdl.la/libltdl.so/g' configure
 iconv -f ISO-8859-1 -t UTF-8 README.txt > README.txt.tmp
 touch -r README.txt README.txt.tmp
 mv README.txt.tmp README.txt
+# for %doc
+mkdir Magick++/examples
+cp -p Magick++/demo/*.cpp Magick++/demo/*.miff Magick++/examples
 
 
 %build
 %configure --enable-shared \
+           --disable-static \
            --with-modules \
            --with-perl \
            --with-x \
@@ -145,25 +150,28 @@ mv README.txt.tmp README.txt
 # Disable rpath
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-make
+make %{?_smp_mflags}
 
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
+rm $RPM_BUILD_ROOT%{_libdir}/*.la
+
 # fix weird perl Magick.so permissions
 chmod 755 $RPM_BUILD_ROOT%{perl_vendorarch}/auto/Image/Magick/Magick.so
 
 # perlmagick: fix perl path of demo files
 %{__perl} -MExtUtils::MakeMaker -e 'MY->fixin(@ARGV)' PerlMagick/demo/*.pl
 
+# perlmagick: cleanup various perl tempfiles from the build which get installed
 find $RPM_BUILD_ROOT -name "*.bs" |xargs rm -f
 find $RPM_BUILD_ROOT -name ".packlist" |xargs rm -f
 find $RPM_BUILD_ROOT -name "perllocal.pod" |xargs rm -f
 
 # perlmagick: build files list
-echo "%defattr(-,root,root)" > perl-pkg-files
+echo "%defattr(-,root,root,-)" > perl-pkg-files
 find $RPM_BUILD_ROOT/%{_libdir}/perl* -type f -print \
         | sed "s@^$RPM_BUILD_ROOT@@g" > perl-pkg-files 
 find $RPM_BUILD_ROOT%{perl_vendorarch} -type d -print \
@@ -175,12 +183,8 @@ if [ -z perl-pkg-files ] ; then
     exit -1
 fi
 
-rm -rf $RPM_BUILD_ROOT%{_libdir}/ImageMagick
-# Keep config
-rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}/[a-b,d-z,A-Z]*
-rm -rf $RPM_BUILD_ROOT%{_libdir}/libltdl.*
-rm -f  $RPM_BUILD_ROOT%{_libdir}/ImageMagick-*/modules*/*/*.a
-rm -f  $RPM_BUILD_ROOT%{_libdir}/*.{a,la}
+# These don't belong here, we include them in %%doc
+rm $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}/{ChangeLog,LICENSE,NEWS.txt}
 
 # fix multilib issues
 %ifarch x86_64 s390x ia64 ppc64 alpha sparc64
@@ -189,10 +193,10 @@ rm -f  $RPM_BUILD_ROOT%{_libdir}/*.{a,la}
 %define wordsize 32
 %endif
 
-mv $RPM_BUILD_ROOT%{_includedir}/ImageMagick/magick/magick-config.h \
-   $RPM_BUILD_ROOT%{_includedir}/ImageMagick/magick/magick-config-%{wordsize}.h
+mv $RPM_BUILD_ROOT%{_includedir}/%{name}/magick/magick-config.h \
+   $RPM_BUILD_ROOT%{_includedir}/%{name}/magick/magick-config-%{wordsize}.h
 
-cat >$RPM_BUILD_ROOT%{_includedir}/ImageMagick/magick/magick-config.h <<EOF
+cat >$RPM_BUILD_ROOT%{_includedir}/%{name}/magick/magick-config.h <<EOF
 #ifndef IMAGEMAGICK_MULTILIB
 #define IMAGEMAGICK_MULTILIB
 
@@ -224,20 +228,19 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %files
-%defattr(-,root,root)
+%defattr(-,root,root,-)
 %doc QuickStart.txt ChangeLog Platforms.txt
 %doc README.txt LICENSE NOTICE AUTHORS.txt NEWS.txt
-%attr(755,root,root) %{_libdir}/libMagickCore.so.*
-%attr(755,root,root) %{_libdir}/libMagickWand.so.*
+%{_libdir}/libMagickCore.so.*
+%{_libdir}/libMagickWand.so.*
 %{_bindir}/[a-z]*
-%{_libdir}/ImageMagick*
-%{_datadir}/ImageMagick*
+%{_libdir}/%{name}*
+%{_datadir}/%{name}*
 %{_mandir}/man[145]/[a-z]*
-%{_mandir}/man1/ImageMagick.*
-%{_datadir}/doc/ImageMagick*
+%{_mandir}/man1/%{name}.*
 
 %files devel
-%defattr(-,root,root)
+%defattr(-,root,root,-)
 %{_bindir}/MagickCore-config
 %{_bindir}/Magick-config
 %{_bindir}/MagickWand-config
@@ -248,35 +251,46 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/ImageMagick.pc
 %{_libdir}/pkgconfig/MagickWand.pc
 %{_libdir}/pkgconfig/Wand.pc
-%dir %{_includedir}/ImageMagick
-%{_includedir}/ImageMagick/magick
-%{_includedir}/ImageMagick/wand
+%dir %{_includedir}/%{name}
+%{_includedir}/%{name}/magick
+%{_includedir}/%{name}/wand
 %{_mandir}/man1/Magick-config.*
 %{_mandir}/man1/MagickCore-config.*
 %{_mandir}/man1/Wand-config.*
 %{_mandir}/man1/MagickWand-config.*
 
+%files doc
+%defattr(-,root,root,-)
+%doc %{_datadir}/doc/%{name}-%{VER}
+
 %files c++
-%defattr(-,root,root)
+%defattr(-,root,root,-)
+%doc Magick++/AUTHORS Magick++/ChangeLog Magick++/NEWS Magick++/README
 %{_libdir}/libMagick++.so.*
 
 %files c++-devel
-%defattr(-,root,root)
+%defattr(-,root,root,-)
+%doc Magick++/examples
 %{_bindir}/Magick++-config
-%{_includedir}/ImageMagick/Magick++
-%{_includedir}/ImageMagick/Magick++.h
+%{_includedir}/%{name}/Magick++
+%{_includedir}/%{name}/Magick++.h
 %{_libdir}/libMagick++.so
 %{_libdir}/pkgconfig/Magick++.pc
 %{_libdir}/pkgconfig/ImageMagick++.pc
 %{_mandir}/man1/Magick++-config.*
 
 %files perl -f perl-pkg-files
-%defattr(-,root,root)
+%defattr(-,root,root,-)
 %{_mandir}/man3/*
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 
 %changelog
+* Fri Nov 14 2008 Hans de Goede <hdegoede@redhat.com> 6.4.5.5-1
+- New upstream release 6.4.5-5
+- Various specfile fixes from merge review (rh 225897)
+- Fix building with new libtool (rh 471468)
+
 * Thu Nov 13 2008 Hans de Goede <hdegoede@redhat.com> 6.4.0.10-3
 - Rebuild for new libtool (rh 471468)
 

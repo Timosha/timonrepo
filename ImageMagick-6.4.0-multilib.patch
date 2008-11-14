@@ -1,6 +1,6 @@
-diff -up ImageMagick-6.4.0/Magick++/bin/Magick++-config.in~ ImageMagick-6.4.0/Magick++/bin/Magick++-config.in
---- ImageMagick-6.4.0/Magick++/bin/Magick++-config.in~	2008-04-27 16:25:14.000000000 +0200
-+++ ImageMagick-6.4.0/Magick++/bin/Magick++-config.in	2008-04-27 16:25:14.000000000 +0200
+diff -up ImageMagick-6.4.5/Magick++/bin/Magick++-config.in.multilib ImageMagick-6.4.5/Magick++/bin/Magick++-config.in
+--- ImageMagick-6.4.5/Magick++/bin/Magick++-config.in.multilib	2008-02-17 19:10:46.000000000 +0100
++++ ImageMagick-6.4.5/Magick++/bin/Magick++-config.in	2008-11-14 15:19:15.000000000 +0100
 @@ -7,8 +7,6 @@
  
  prefix=@prefix@
@@ -35,9 +35,9 @@ diff -up ImageMagick-6.4.0/Magick++/bin/Magick++-config.in~ ImageMagick-6.4.0/Ma
        ;;
      *)
        echo "${usage}" 1>&2
-diff -up ImageMagick-6.4.0/magick/Magick-config.in~ ImageMagick-6.4.0/magick/Magick-config.in
---- ImageMagick-6.4.0/magick/Magick-config.in~	2008-04-27 16:25:15.000000000 +0200
-+++ ImageMagick-6.4.0/magick/Magick-config.in	2008-04-27 16:25:15.000000000 +0200
+diff -up ImageMagick-6.4.5/magick/Magick-config.in.multilib ImageMagick-6.4.5/magick/Magick-config.in
+--- ImageMagick-6.4.5/magick/Magick-config.in.multilib	2008-04-28 00:35:32.000000000 +0200
++++ ImageMagick-6.4.5/magick/Magick-config.in	2008-11-14 15:19:15.000000000 +0100
 @@ -6,8 +6,6 @@
  
  prefix=@prefix@
@@ -67,14 +67,14 @@ diff -up ImageMagick-6.4.0/magick/Magick-config.in~ ImageMagick-6.4.0/magick/Mag
 +      pkg-config --libs MagickCore
        ;;
      --libs)
--      echo "-L${libdir} -lMagickWand -lMagickCore"
+-      echo "-L${libdir} -lMagickCore"
 +      pkg-config --libs MagickCore
        ;;
      *)
        echo "${usage}" 1>&2
-diff -up ImageMagick-6.4.0/magick/MagickCore-config.in~ ImageMagick-6.4.0/magick/MagickCore-config.in
---- ImageMagick-6.4.0/magick/MagickCore-config.in~	2008-04-27 16:25:14.000000000 +0200
-+++ ImageMagick-6.4.0/magick/MagickCore-config.in	2008-04-27 16:25:14.000000000 +0200
+diff -up ImageMagick-6.4.5/magick/MagickCore-config.in.multilib ImageMagick-6.4.5/magick/MagickCore-config.in
+--- ImageMagick-6.4.5/magick/MagickCore-config.in.multilib	2008-08-16 19:34:36.000000000 +0200
++++ ImageMagick-6.4.5/magick/MagickCore-config.in	2008-11-14 15:42:54.000000000 +0100
 @@ -6,8 +6,6 @@
  
  prefix=@prefix@
@@ -84,7 +84,7 @@ diff -up ImageMagick-6.4.0/magick/MagickCore-config.in~ ImageMagick-6.4.0/magick
  
  usage="\
  Usage: MagickCore-config [--cflags] [--cppflags] [--exec-prefix] [--ldflags] [--libs] [--prefix] [--version]"
-@@ -40,19 +38,19 @@ while test $# -gt 0; do
+@@ -40,25 +38,19 @@ while test $# -gt 0; do
        echo '@PACKAGE_VERSION@ Q@QUANTUM_DEPTH@ @MAGICK_HDRI@'
        ;;
      --cflags)
@@ -104,14 +104,20 @@ diff -up ImageMagick-6.4.0/magick/MagickCore-config.in~ ImageMagick-6.4.0/magick
 +      pkg-config --libs MagickCore
        ;;
      --libs)
--      echo "-L${libdir} -lMagickWand -lMagickCore"
+-      echo "-L${libdir} -lMagickCore"
+-      ;;
+-    --coder-path)
+-      echo "@CODER_PATH@"
+-      ;;
+-    --filter-path)
+-      echo "@FILTER_PATH@"
 +      pkg-config --libs MagickCore
        ;;
      *)
        echo "${usage}" 1>&2
-diff -up ImageMagick-6.4.0/wand/MagickWand-config.in~ ImageMagick-6.4.0/wand/MagickWand-config.in
---- ImageMagick-6.4.0/wand/MagickWand-config.in~	2008-04-27 16:25:15.000000000 +0200
-+++ ImageMagick-6.4.0/wand/MagickWand-config.in	2008-04-27 16:25:15.000000000 +0200
+diff -up ImageMagick-6.4.5/wand/MagickWand-config.in.multilib ImageMagick-6.4.5/wand/MagickWand-config.in
+--- ImageMagick-6.4.5/wand/MagickWand-config.in.multilib	2008-02-05 19:50:44.000000000 +0100
++++ ImageMagick-6.4.5/wand/MagickWand-config.in	2008-11-14 15:19:15.000000000 +0100
 @@ -6,8 +6,6 @@
  
  prefix=@prefix@
@@ -146,9 +152,9 @@ diff -up ImageMagick-6.4.0/wand/MagickWand-config.in~ ImageMagick-6.4.0/wand/Mag
        ;;
      *)
        echo "${usage}" 1>&2
-diff -up ImageMagick-6.4.0/wand/Wand-config.in~ ImageMagick-6.4.0/wand/Wand-config.in
---- ImageMagick-6.4.0/wand/Wand-config.in~	2008-04-27 16:25:15.000000000 +0200
-+++ ImageMagick-6.4.0/wand/Wand-config.in	2008-04-27 16:25:15.000000000 +0200
+diff -up ImageMagick-6.4.5/wand/Wand-config.in.multilib ImageMagick-6.4.5/wand/Wand-config.in
+--- ImageMagick-6.4.5/wand/Wand-config.in.multilib	2008-02-05 19:50:44.000000000 +0100
++++ ImageMagick-6.4.5/wand/Wand-config.in	2008-11-14 15:19:15.000000000 +0100
 @@ -6,8 +6,6 @@
  
  prefix=@prefix@
