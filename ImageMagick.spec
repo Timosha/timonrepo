@@ -3,7 +3,7 @@
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -15,7 +15,7 @@ Patch2:         ImageMagick-6.3.8-invalid-gerror-use.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
 BuildRequires:  libtiff-devel, giflib-devel, zlib-devel, perl-devel
-BuildRequires:  ghostscript-devel
+BuildRequires:  ghostscript-devel, djvulibre-devel
 BuildRequires:  libwmf-devel, jasper-devel, libtool-ltdl-devel
 BuildRequires:  libX11-devel, libXext-devel, libXt-devel
 BuildRequires:  lcms-devel, libxml2-devel, librsvg2-devel
@@ -59,6 +59,16 @@ If you want to create applications that will use ImageMagick code or
 APIs, you need to install ImageMagick-devel as well as ImageMagick.
 You do not need to install it if you just want to use ImageMagick,
 however.
+
+
+%package djvu
+Summary: DjVu plugin for ImageMagick
+Group: Applications/Multimedia
+Requires: %{name} = %{version}-%{release}
+
+%description djvu
+This packages contains a plugin for ImageMagick which makes it possible to
+save and load DjvU files from ImageMagick and libMagickCore using applications.
 
 
 %package doc
@@ -157,6 +167,7 @@ make %{?_smp_mflags}
 rm -rf $RPM_BUILD_ROOT
 
 make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
+cp -a www/source $RPM_BUILD_ROOT%{_datadir}/doc/%{name}-%{VER}
 rm $RPM_BUILD_ROOT%{_libdir}/*.la
 
 # fix weird perl Magick.so permissions
@@ -234,10 +245,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libMagickCore.so.*
 %{_libdir}/libMagickWand.so.*
 %{_bindir}/[a-z]*
-%{_libdir}/%{name}*
-%{_datadir}/%{name}*
+%{_libdir}/%{name}-%{VER}
+%{_datadir}/%{name}-%{VER}
 %{_mandir}/man[145]/[a-z]*
 %{_mandir}/man1/%{name}.*
+%exclude %{_libdir}/%{name}-%{VER}/modules-Q16/coders/djvu.*
 
 %files devel
 %defattr(-,root,root,-)
@@ -259,6 +271,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/Wand-config.*
 %{_mandir}/man1/MagickWand-config.*
 
+%files djvu
+%defattr(-,root,root,-)
+%{_libdir}/%{name}-%{VER}/modules-Q16/coders/djvu.*
+
 %files doc
 %defattr(-,root,root,-)
 %doc %{_datadir}/doc/%{name}-%{VER}
@@ -266,6 +282,7 @@ rm -rf $RPM_BUILD_ROOT
 %files c++
 %defattr(-,root,root,-)
 %doc Magick++/AUTHORS Magick++/ChangeLog Magick++/NEWS Magick++/README
+%doc www/Magick++/COPYING
 %{_libdir}/libMagick++.so.*
 
 %files c++-devel
@@ -286,6 +303,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Nov 14 2008 Hans de Goede <hdegoede@redhat.com> 6.4.5.5-2
+- Enable djvu support, put the new djvu plugin into a separate -djvu
+  subpackage because of deps (rh 225897)
+
 * Fri Nov 14 2008 Hans de Goede <hdegoede@redhat.com> 6.4.5.5-1
 - New upstream release 6.4.5-5
 - Various specfile fixes from merge review (rh 225897)
