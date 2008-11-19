@@ -3,7 +3,7 @@
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -153,7 +153,6 @@ cp -p Magick++/demo/*.cpp Magick++/demo/*.miff Magick++/examples
            --with-rsvg \
            --with-xml \
            --with-perl-options="INSTALLDIRS=vendor %{?perl_prefix} CC='%__cc -L$PWD/magick/.libs' LDDLFLAGS='-shared -L$PWD/magick/.libs'" \
-           --without-windows-font-dir \
            --without-dps \
            --without-included-ltdl --with-ltdl-include=%{_includedir} \
            --with-ltdl-lib=%{_libdir}
@@ -303,6 +302,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Nov 19 2008 Hans de Goede <hdegoede@redhat.com> 6.4.5.5-3
+- Remove --without-windows-font-dir from configure args, specifying it
+  makes ImageMagick search for windows fonts in the "no/" dir (rh 472244)
+
 * Fri Nov 14 2008 Hans de Goede <hdegoede@redhat.com> 6.4.5.5-2
 - Enable djvu support, put the new djvu plugin into a separate -djvu
   subpackage because of deps (rh 225897)
