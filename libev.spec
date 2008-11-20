@@ -1,5 +1,5 @@
 Name:		libev
-Version:	3.48
+Version:	3.49
 Release:	1%{?dist}
 Summary:	High-performance event loop/event model with lots of features
 
@@ -82,6 +82,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Nov 20 2008 Michal Nowak <mnowak@redhat.com> - 3.49-1
+- version bump: 3.49
+
 * Sun Nov  9 2008 Michal Nowak <mnowak@redhat.com> - 3.48-1
 - version bump: 3.48
 
