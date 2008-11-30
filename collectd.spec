@@ -1,13 +1,15 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.5.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
 
 Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
 Patch0: %{name}-%{version}-include-collectd.d.patch
+# bug 468067 "pkg-config --libs OpenIPMIpthread" fails
+Patch1: %{name}-%{version}-configure-OpenIPMI.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: libvirt-devel, libxml2-devel
@@ -84,12 +86,14 @@ Requires:      collectd = %{version}-%{release}
 %description nginx
 This plugin gets data provided by nginx.
 
+
 %package nut
 Summary:       Network UPS Tools module for collectd
 Group:         System Environment/Daemons
 Requires:      collectd = %{version}-%{release}
 %description nut
 This plugin for collectd provides Network UPS Tools support.
+
 
 %package -n perl-Collectd
 Summary:       Perl bindings for collectd
@@ -107,6 +111,7 @@ Requires:      collectd = %{version}-%{release}
 %description postgresql
 PostgreSQL querying plugin. This plugins provides data of issued commands,
 called handlers and database traffic.
+
 
 %package rrdtool
 Summary:       RRDTool module for collectd
@@ -144,6 +149,7 @@ This plugin collects information from virtualized guests.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p0
 
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
@@ -338,11 +344,13 @@ fi
 %doc %{_mandir}/man5/collectd-perl.5*
 %doc %{_mandir}/man3/Collectd::Unixsock.3pm*
 
+
 %files postgresql
 %defattr(-, root, root, -)
 %{_libdir}/collectd/postgresql.so*
 %config(noreplace) %{_sysconfdir}/collectd.d/postgresql.conf
 %doc src/postgresql_default.conf
+
 
 %files rrdtool
 %defattr(-, root, root, -)
@@ -370,6 +378,9 @@ fi
 
 
 %changelog
+* Sun Nov 30 2008 Alan Pevec <apevec@redhat.com> 4.5.1-2
+- workaround for https://bugzilla.redhat.com/show_bug.cgi?id=468067
+
 * Sun Oct 22 2008 Alan Pevec <apevec@redhat.com> 4.5.1-1
 - New upstream version 4.5.1, bz# 470943
   http://collectd.org/news.shtml#news59
