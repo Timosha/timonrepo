@@ -3,7 +3,7 @@
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -159,7 +159,8 @@ cp -p Magick++/demo/*.cpp Magick++/demo/*.miff Magick++/examples
 # Disable rpath
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-make %{?_smp_mflags}
+# Do *NOT* use %%{?_smp_mflags}, this causes PerlMagick to be silently misbuild
+make
 
 
 %install
@@ -302,6 +303,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Dec 10 2008 Hans de Goede <hdegoede@redhat.com> 6.4.5.5-4
+- Do not pass -jX to make when building, this breaks PerlMagick (rh 475554)
+
 * Wed Nov 19 2008 Hans de Goede <hdegoede@redhat.com> 6.4.5.5-3
 - Remove --without-windows-font-dir from configure args, specifying it
   makes ImageMagick search for windows fonts in the "no/" dir (rh 472244)
