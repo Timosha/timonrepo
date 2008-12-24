@@ -1,5 +1,5 @@
 Name:		libev
-Version:	3.49
+Version:	3.51
 Release:	1%{?dist}
 Summary:	High-performance event loop/event model with lots of features
 
@@ -21,7 +21,7 @@ featureful. And also smaller.
 Summary:	High-performance event loop/event model with lots of features
 Group:		System Environment/Libraries
 Requires: 	%{name} = %{version}-%{release}
-Requires:       pkgconfig
+Requires: 	pkgconfig
 
 %description 	devel
 Libev is modelled (very losely) after libevent and the Event perl
@@ -82,6 +82,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Dec 24 2008 Michal Nowak <mnowak@redhat.com> - 3.51-1
+- 3.51
+
 * Thu Nov 20 2008 Michal Nowak <mnowak@redhat.com> - 3.49-1
 - version bump: 3.49
 
