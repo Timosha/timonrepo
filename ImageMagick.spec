@@ -3,12 +3,16 @@
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
 Url:            http://www.imagemagick.org/
-Source0:        ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.bz2
+# This is: ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.bz2
+# With the 2 included copies of the non free ArtBrush font removed:
+# PerlMagick/t/ttf/input.ttf
+# PerlMagick/demo/Generic.ttf
+Source0:        %{name}-%{version}-clean.tar.bz2
 Patch1:         ImageMagick-6.4.0-multilib.patch
 Patch2:         ImageMagick-6.3.8-invalid-gerror-use.patch
 
@@ -303,6 +307,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sat Dec 27 2008 Hans de Goede <hdegoede@redhat.com> 6.4.5.5-5
+- Remove 2 included copies of the non Free artbrush font (rh 477399)
+
 * Wed Dec 10 2008 Hans de Goede <hdegoede@redhat.com> 6.4.5.5-4
 - Do not pass -jX to make when building, this breaks PerlMagick (rh 475554)
 
