@@ -3,7 +3,7 @@
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        5%{?dist}
+Release:        1%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -307,6 +307,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sat Jan 17 2009 Rakesh Pandit <rakesh@fedoraproject.org> 6.4.5.5-6
+- Rebuild with new djvulibre
+
 * Sat Dec 27 2008 Hans de Goede <hdegoede@redhat.com> 6.4.5.5-5
 - Remove 2 included copies of the non Free artbrush font (rh 477399)
 
