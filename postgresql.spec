@@ -83,7 +83,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.3.5
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -859,6 +859,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Jan 17 2009 Tomas Mraz <tmraz@redhat.com> - 8.3.5-3
+- rebuild with new openssl
+
 * Sat Nov 29 2008 Ignacio Vazquez-Abrams <ivazqueznet+rpm@gmail.com> - 8.3.5-2
 - Rebuild for Python 2.6
 
