@@ -3,7 +3,7 @@
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -25,7 +25,7 @@ BuildRequires:  libX11-devel, libXext-devel, libXt-devel
 BuildRequires:  lcms-devel, libxml2-devel, librsvg2-devel
 
 %description
-ImageMagick(TM) is an image display and manipulation tool for the X
+ImageMagick is an image display and manipulation tool for the X
 Window System. ImageMagick can read and write JPEG, TIFF, PNM, GIF,
 and Photo CD image formats. It can resize, rotate, sharpen, color
 reduce, or add special effects to an image, and when finished you can
@@ -307,6 +307,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Jan 30 2009 Hans de Goede <hdegoede@redhat.com> 6.4.5.5-8
+- Remove (TM) from description as per new guidelines
+
 * Sat Jan 17 2009 Rakesh Pandit <rakesh@fedoraproject.org> 6.4.5.5-7
 - Corrected the wrong release and bumped
 
