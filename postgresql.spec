@@ -82,8 +82,8 @@
 
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
-Version: 8.3.5
-Release: 4%{?dist}
+Version: 8.3.6
+Release: 1%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -97,7 +97,7 @@ Source7: ecpg_config.h
 Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
-Source17: http://www.postgresql.org/docs/manuals/postgresql-8.3.5-US.pdf
+Source17: http://www.postgresql.org/docs/manuals/postgresql-8.3.6-US.pdf
 Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.8.1.tgz
 Source19: http://pgfoundry.org/projects/pgtclng/pgtcl1.6.2.tar.gz
 Source20: http://pgfoundry.org/projects/pgtclng/pgtcldocs-20070115.zip
@@ -399,7 +399,7 @@ CFLAGS=`echo $CFLAGS| sed -e "s|-O2|-O1|g" `
 %endif
 
 # Use --as-needed to eliminate unnecessary link dependencies.
-# Hopefully upstream will do this for itself in some future release.
+# NB: Postgres 8.4 will do this for itself.
 LDFLAGS="-Wl,--as-needed"; export LDFLAGS
 
 %configure --disable-rpath \
@@ -863,6 +863,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Feb  7 2009 Tom Lane <tgl@redhat.com> 8.3.6-1
+- Update to PostgreSQL 8.3.6, for various fixes described at
+  http://www.postgresql.org/docs/8.3/static/release-8-3-6.html
+
 * Wed Jan 21 2009 Dennis Gilmore <dennis@ausil.us> 8.3.5-4
 - use -O1 on sparc64
 
