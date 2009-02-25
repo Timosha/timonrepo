@@ -1,6 +1,6 @@
 Name:		libev
 Version:	3.52
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	High-performance event loop/event model with lots of features
 
 Group:		System Environment/Libraries
@@ -82,6 +82,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Feb 25 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.52-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
 * Wed Jan 07 2009 Michal Nowak <mnowak@redhat.com> - 3.52-1
 - 3.52
 
