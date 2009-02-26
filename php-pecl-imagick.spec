@@ -7,7 +7,7 @@
 Summary:		Provides a wrapper to the ImageMagick library
 Name:		php-pecl-%peclName
 Version:		2.2.1
-Release:		3%{?dist}
+Release:		4%{?dist}
 License:		PHP
 Group:		Development/Libraries
 Source0:		http://pecl.php.net/get/%peclName-%{version}.tgz
@@ -79,6 +79,9 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.d/%peclName.ini
 
 %changelog
+* Thu Feb 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.2.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
 * Sun Jan 11 2009 Pavel Alexeev <Pahan [ at ] Hubbitus [ DOT ] spb [ dOt.] su> - 2.2.1-3
 - All modifications in this release inspired by Fedora review by Remi Collet.
 - Add versions to BR for php-devel and ImageMagick-devel
