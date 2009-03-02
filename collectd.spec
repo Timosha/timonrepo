@@ -1,15 +1,16 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.5.1
-Release: 4%{?dist}
+Version: 4.5.3
+Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
 
 Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
-Patch0: %{name}-%{version}-include-collectd.d.patch
+Patch0: %{name}-4.5.1-include-collectd.d.patch
 # bug 468067 "pkg-config --libs OpenIPMIpthread" fails
-Patch1: %{name}-%{version}-configure-OpenIPMI.patch
+Patch1: %{name}-4.5.1-configure-OpenIPMI.patch
+
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: libvirt-devel, libxml2-devel
@@ -156,7 +157,6 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
 %build
 %configure \
-    --without-libiptc \
     --disable-ascent \
     --disable-static \
     --enable-mysql \
@@ -168,6 +168,7 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
     --enable-ipmi \
     --enable-nut \
     --enable-postgresql \
+    --enable-iptables \
     --with-perl-bindings=INSTALLDIRS=vendor
 %{__make} %{?_smp_mflags}
 
@@ -267,21 +268,47 @@ fi
 %dir %{_localstatedir}/lib/collectd/
 
 %dir %{_libdir}/collectd
-%{_libdir}/collectd/*.so*
+%{_libdir}/collectd/apcups.so
+%{_libdir}/collectd/battery.so
+%{_libdir}/collectd/cpu.so
+%{_libdir}/collectd/cpufreq.so
+%{_libdir}/collectd/csv.so
+%{_libdir}/collectd/df.so
+%{_libdir}/collectd/disk.so
+%{_libdir}/collectd/entropy.so
+%{_libdir}/collectd/exec.so
+%{_libdir}/collectd/filecount.so
+%{_libdir}/collectd/hddtemp.so
+%{_libdir}/collectd/interface.so
+%{_libdir}/collectd/iptables.so
+%{_libdir}/collectd/ipvs.so
+%{_libdir}/collectd/irq.so
+%{_libdir}/collectd/load.so
+%{_libdir}/collectd/logfile.so
+%{_libdir}/collectd/mbmon.so
+%{_libdir}/collectd/memcached.so
+%{_libdir}/collectd/memory.so
+%{_libdir}/collectd/multimeter.so
+%{_libdir}/collectd/network.so
+%{_libdir}/collectd/nfs.so
+%{_libdir}/collectd/ntpd.so
+%{_libdir}/collectd/ping.so
+%{_libdir}/collectd/powerdns.so
+%{_libdir}/collectd/processes.so
+%{_libdir}/collectd/serial.so
+%{_libdir}/collectd/swap.so
+%{_libdir}/collectd/syslog.so
+%{_libdir}/collectd/tail.so
+%{_libdir}/collectd/tcpconns.so
+%{_libdir}/collectd/teamspeak2.so
+%{_libdir}/collectd/thermal.so
+%{_libdir}/collectd/unixsock.so
+%{_libdir}/collectd/users.so
+%{_libdir}/collectd/uuid.so
+%{_libdir}/collectd/vmem.so
+%{_libdir}/collectd/vserver.so
+%{_libdir}/collectd/wireless.so
 %{_libdir}/collectd/types.db
-%exclude %{_libdir}/collectd/apache.so*
-%exclude %{_libdir}/collectd/dns.so*
-%exclude %{_libdir}/collectd/email.so*
-%exclude %{_libdir}/collectd/ipmi.so*
-%exclude %{_libdir}/collectd/libvirt.so*
-%exclude %{_libdir}/collectd/nut.so*
-%exclude %{_libdir}/collectd/mysql.so*
-%exclude %{_libdir}/collectd/nginx.so*
-%exclude %{_libdir}/collectd/perl.so*
-%exclude %{_libdir}/collectd/postgresql.so*
-%exclude %{_libdir}/collectd/rrdtool.so*
-%exclude %{_libdir}/collectd/sensors.so*
-%exclude %{_libdir}/collectd/snmp.so*
 
 %doc AUTHORS ChangeLog COPYING INSTALL README
 %doc %{_mandir}/man1/collectd.1*
@@ -295,51 +322,51 @@ fi
 
 %files apache
 %defattr(-, root, root, -)
-%{_libdir}/collectd/apache.so*
+%{_libdir}/collectd/apache.so
 %config(noreplace) %{_sysconfdir}/collectd.d/apache.conf
 
 
 %files dns
 %defattr(-, root, root, -)
-%{_libdir}/collectd/dns.so*
+%{_libdir}/collectd/dns.so
 %config(noreplace) %{_sysconfdir}/collectd.d/dns.conf
 
 
 %files email
 %defattr(-, root, root, -)
-%{_libdir}/collectd/email.so*
+%{_libdir}/collectd/email.so
 %config(noreplace) %{_sysconfdir}/collectd.d/email.conf
 %doc %{_mandir}/man5/collectd-email.5*
 
 
 %files ipmi
 %defattr(-, root, root, -)
-%{_libdir}/collectd/ipmi.so*
+%{_libdir}/collectd/ipmi.so
 %config(noreplace) %{_sysconfdir}/collectd.d/ipmi.conf
 
 
 %files mysql
 %defattr(-, root, root, -)
-%{_libdir}/collectd/mysql.so*
+%{_libdir}/collectd/mysql.so
 %config(noreplace) %{_sysconfdir}/collectd.d/mysql.conf
 
 
 %files nginx
 %defattr(-, root, root, -)
-%{_libdir}/collectd/nginx.so*
+%{_libdir}/collectd/nginx.so
 %config(noreplace) %{_sysconfdir}/collectd.d/nginx.conf
 
 
 %files nut
 %defattr(-, root, root, -)
-%{_libdir}/collectd/nut.so*
+%{_libdir}/collectd/nut.so
 %config(noreplace) %{_sysconfdir}/collectd.d/nut.conf
 
 
 %files -n perl-Collectd
 %defattr(-, root, root, -)
 %doc perl-examples/*
-%{_libdir}/collectd/perl.so*
+%{_libdir}/collectd/perl.so
 %{perl_vendorlib}/Collectd.pm
 %{perl_vendorlib}/Collectd/
 %config(noreplace) %{_sysconfdir}/collectd.d/perl.conf
@@ -349,37 +376,42 @@ fi
 
 %files postgresql
 %defattr(-, root, root, -)
-%{_libdir}/collectd/postgresql.so*
+%{_libdir}/collectd/postgresql.so
 %config(noreplace) %{_sysconfdir}/collectd.d/postgresql.conf
 %doc src/postgresql_default.conf
 
 
 %files rrdtool
 %defattr(-, root, root, -)
-%{_libdir}/collectd/rrdtool.so*
+%{_libdir}/collectd/rrdtool.so
 %config(noreplace) %{_sysconfdir}/collectd.d/rrdtool.conf
 
 
 %files sensors
 %defattr(-, root, root, -)
-%{_libdir}/collectd/sensors.so*
+%{_libdir}/collectd/sensors.so
 %config(noreplace) %{_sysconfdir}/collectd.d/sensors.conf
 
 
 %files snmp
 %defattr(-, root, root, -)
-%{_libdir}/collectd/snmp.so*
+%{_libdir}/collectd/snmp.so
 %config(noreplace) %{_sysconfdir}/collectd.d/snmp.conf
 %doc %{_mandir}/man5/collectd-snmp.5*
 
 
 %files virt
 %defattr(-, root, root, -)
-%{_libdir}/collectd/libvirt.so*
+%{_libdir}/collectd/libvirt.so
 %config(noreplace) %{_sysconfdir}/collectd.d/libvirt.conf
 
 
 %changelog
+* Mon Mar 02 2009 Alan Pevec <apevec@redhat.com> 4.5.3-1
+- New upstream version 4.5.3
+- fixes collectd is built without iptables plugin, bz# 479208
+- list all expected plugins explicitly to avoid such bugs
+
 * Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.5.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
