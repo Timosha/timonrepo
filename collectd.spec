@@ -162,6 +162,7 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 %configure \
     --disable-ascent \
     --disable-static \
+    --disable-ipvs \
     --enable-mysql \
     --enable-sensors \
     --enable-email \
@@ -284,7 +285,6 @@ fi
 %{_libdir}/collectd/hddtemp.so
 %{_libdir}/collectd/interface.so
 %{_libdir}/collectd/iptables.so
-%{_libdir}/collectd/ipvs.so
 %{_libdir}/collectd/irq.so
 %{_libdir}/collectd/load.so
 %{_libdir}/collectd/logfile.so
