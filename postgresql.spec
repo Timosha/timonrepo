@@ -73,6 +73,7 @@
 %{!?uuid:%define uuid 1}
 %{!?xml:%define xml 1}
 %{!?pam:%define pam 1}
+%{!?sdt:%define sdt 1}
 %{!?pgfts:%define pgfts 1}
 %{!?runselftest:%define runselftest 1}
 
@@ -83,7 +84,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.3.6
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -155,6 +156,10 @@ BuildRequires: libxml2-devel libxslt-devel
 
 %if %pam
 BuildRequires: pam-devel
+%endif
+
+%if %sdt
+BuildRequires: systemtap-sdt-devel
 %endif
 
 # main package requires -libs subpackage
@@ -439,6 +444,9 @@ LDFLAGS="-Wl,--as-needed"; export LDFLAGS
 %endif
 %if %nls
 	--enable-nls \
+%endif
+%if %sdt
+	--enable-dtrace \
 %endif
 %if %pgfts
 	--enable-thread-safety \
@@ -863,6 +871,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sun Mar  8 2009 Tom Lane <tgl@redhat.com> 8.3.6-3
+- Enable tracing via systemtap
+Resolves: #488941
+
 * Thu Feb 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.3.6-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
