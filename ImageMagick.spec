@@ -1,20 +1,15 @@
-%define VER 6.4.5
-%define Patchlevel 5
+%define VER 6.4.9
+%define Patchlevel 6
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        9%{?dist}
+Release:        1%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
 Url:            http://www.imagemagick.org/
-# This is: ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.bz2
-# With the 2 included copies of the non free ArtBrush font removed:
-# PerlMagick/t/ttf/input.ttf
-# PerlMagick/demo/Generic.ttf
-Source0:        %{name}-%{version}-clean.tar.bz2
+Source0:        ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.bz2
 Patch1:         ImageMagick-6.4.0-multilib.patch
-Patch2:         ImageMagick-6.3.8-invalid-gerror-use.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
@@ -131,9 +126,8 @@ however.
 
 
 %prep
-%setup -q -n %{name}-%{VER}
+%setup -q -n %{name}-%{VER}-%{Patchlevel}
 %patch1 -p1 -b .multilib
-%patch2 -p1
 sed -i 's/libltdl.la/libltdl.so/g' configure
 iconv -f ISO-8859-1 -t UTF-8 README.txt > README.txt.tmp
 touch -r README.txt README.txt.tmp
@@ -307,6 +301,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Mar  9 2009 Hans de Goede <hdegoede@redhat.com> 6.4.9.6-1
+- New upstream release 6.4.9-6
+
 * Mon Feb 23 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 6.4.5.5-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
