@@ -84,7 +84,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.3.6
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -109,6 +109,7 @@ Patch3: postgresql-logging.patch
 Patch4: postgresql-test.patch
 Patch5: pgtcl-no-rpath.patch
 Patch6: postgresql-perl-rpath.patch
+Patch7: postgresql-sdt-includes.patch
 
 BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf gawk
 BuildRequires: perl(ExtUtils::Embed), perl-devel
@@ -361,6 +362,7 @@ system, including regression tests and benchmarks.
 %patch4 -p1
 # patch5 is applied later
 %patch6 -p1
+%patch7 -p1
 
 #call autoconf 2.53 or greater
 %aconfver
@@ -398,8 +400,8 @@ CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS
 
 # Strip out -ffast-math from CFLAGS....
 CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
-# use -O1 on sparc64
-%ifarch sparc64
+# use -O1 on sparc64 and alpha
+%ifarch sparc64 alpha
 CFLAGS=`echo $CFLAGS| sed -e "s|-O2|-O1|g" `
 %endif
 
@@ -871,6 +873,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Mar 10 2009 Tom Lane <tgl@redhat.com> 8.3.6-4
+- Prevent dependent packages from needing to include sys/sdt.h
+  (unintended side effect of previous patch)
+- Use -O1 on alpha, per report from Oliver Falk; -O2 tickles gcc bugs
+
 * Sun Mar  8 2009 Tom Lane <tgl@redhat.com> 8.3.6-3
 - Enable tracing via systemtap
 Resolves: #488941
