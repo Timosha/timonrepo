@@ -3,13 +3,15 @@
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
 Url:            http://www.imagemagick.org/
 Source0:        ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.bz2
 Patch1:         ImageMagick-6.4.0-multilib.patch
+Patch2:         ImageMagick-6.4.9-6-undef-warning.patch
+Patch3:         ImageMagick-6.4.9-6-perl-build.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
@@ -128,6 +130,8 @@ however.
 %prep
 %setup -q -n %{name}-%{VER}-%{Patchlevel}
 %patch1 -p1 -b .multilib
+%patch2 -p1
+%patch3 -p1
 sed -i 's/libltdl.la/libltdl.so/g' configure
 iconv -f ISO-8859-1 -t UTF-8 README.txt > README.txt.tmp
 touch -r README.txt README.txt.tmp
@@ -301,6 +305,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Mar 13 2009 Hans de Goede <hdegoede@redhat.com> 6.4.9.6-2
+- Fix undefined warning in magick-type.h (#489453)
+- Do not link PerlMagick against system ImageMagick, but against the just
+  build one
+
 * Mon Mar  9 2009 Hans de Goede <hdegoede@redhat.com> 6.4.9.6-1
 - New upstream release 6.4.9-6
 

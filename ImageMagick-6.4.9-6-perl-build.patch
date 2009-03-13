@@ -1,0 +1,12 @@
+diff -up ImageMagick-6.4.9-6/PerlMagick/Makefile.PL.in~ ImageMagick-6.4.9-6/PerlMagick/Makefile.PL.in
+--- ImageMagick-6.4.9-6/PerlMagick/Makefile.PL.in~	2009-01-03 16:55:31.000000000 +0100
++++ ImageMagick-6.4.9-6/PerlMagick/Makefile.PL.in	2009-03-13 11:22:46.000000000 +0100
+@@ -77,7 +77,7 @@ WriteMakefile
+    'INSTALLBIN'	=> '@BIN_DIR@',
+ 
+    # Library specification
+-   'LIBS'	=> [ '-L@MAGICKCORE_PATH@ -L../magick/.libs -lMagickCore -L../wand/.libs -lMagickWand -lperl @MATH_LIBS@' ],
++   'LIBS'	=> [ '-L../magick/.libs -lMagickCore -L../wand/.libs -lMagickWand -lperl @MATH_LIBS@' ],
+ 
+    # Perl binary name (if a Perl binary is built)
+    'MAP_TARGET'	=> 'PerlMagick',
