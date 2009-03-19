@@ -1,12 +1,12 @@
 Name:		libev
-Version:	3.52
-Release:	2%{?dist}
+Version:	3.53
+Release:	1%{?dist}
 Summary:	High-performance event loop/event model with lots of features
 
 Group:		System Environment/Libraries
 License:	BSD or GPLv2+
 URL:		http://software.schmorp.de/pkg/libev.html
-Source0:	http://dist.schmorp.de/libev/%{name}-%{version}.tar.gz
+Source0:	http://dist.schmorp.de/libev/Attic/%{name}-%{version}.tar.gz
 Source1:	%{name}.pc.in
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -82,6 +82,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Mar 19 2009 Michal Nowak <mnowak@redhat.com> - 3.53-1
+- 3.53
+
 * Wed Feb 25 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.52-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
