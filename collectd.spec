@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.5.3
-Release: 2%{?dist}
+Release: 2%{?dist}.1
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -15,9 +15,11 @@ Patch2: collectd-4.5.3-gcc-4.4-strict-aliasing-issue.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
+%ifarch %{ix86} x86_64
 BuildRequires: libvirt-devel, libxml2-devel
-BuildRequires: rrdtool-devel
 BuildRequires: lm_sensors-devel
+%endif
+BuildRequires: rrdtool-devel
 BuildRequires: curl-devel
 %if 0%{?fedora} >= 8
 BuildRequires: perl-libs, perl-devel
@@ -124,6 +126,7 @@ Requires:      collectd = %{version}-%{release}, rrdtool
 This plugin for collectd provides rrdtool support.
 
 
+%ifarch %{ix86} x86_64
 %package sensors
 Summary:       Libsensors module for collectd
 Group:         System Environment/Daemons
@@ -131,6 +134,7 @@ Requires:      collectd = %{version}-%{release}, lm_sensors
 %description sensors
 This plugin for collectd provides querying of sensors supported by
 lm_sensors.
+%endif
 
 
 %package snmp
@@ -141,12 +145,14 @@ Requires:       collectd = %{version}-%{release}, net-snmp
 This plugin for collectd provides querying of net-snmp.
 
 
+%ifarch %{ix86} x86_64
 %package virt
 Summary:       Libvirt plugin for collectd
 Group:         System Environment/Daemons
 Requires:      collectd = %{version}-%{release}
 %description virt
 This plugin collects information from virtualized guests.
+%endif
 
 
 %prep
@@ -164,7 +170,9 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
     --disable-static \
     --disable-ipvs \
     --enable-mysql \
+%ifarch %{ix86} x86_64
     --enable-sensors \
+%endif
     --enable-email \
     --enable-apache \
     --enable-perl \
@@ -215,7 +223,7 @@ cp contrib/redhat/sensors.conf %{buildroot}/etc/collectd.d/sensors.conf
 cp contrib/redhat/snmp.conf %{buildroot}/etc/collectd.d/snmp.conf
 
 # configs for subpackaged plugins
-for p in dns ipmi libvirt nut perl postgresql rrdtool
+for p in dns ipmi nut libvirt perl postgresql rrdtool
 do
 %{__cat} > %{buildroot}/etc/collectd.d/$p.conf <<EOF
 LoadPlugin $p
@@ -390,10 +398,12 @@ fi
 %config(noreplace) %{_sysconfdir}/collectd.d/rrdtool.conf
 
 
+%ifarch %{ix86} x86_64
 %files sensors
 %defattr(-, root, root, -)
 %{_libdir}/collectd/sensors.so
 %config(noreplace) %{_sysconfdir}/collectd.d/sensors.conf
+%endif
 
 
 %files snmp
@@ -403,13 +413,18 @@ fi
 %doc %{_mandir}/man5/collectd-snmp.5*
 
 
+%ifarch %{ix86} x86_64
 %files virt
 %defattr(-, root, root, -)
 %{_libdir}/collectd/libvirt.so
 %config(noreplace) %{_sysconfdir}/collectd.d/libvirt.conf
+%endif
 
 
 %changelog
+* Wed Mar 25 2009 Lubomir Rintel <lkundrak@v3.sk> - 4.5.3-2.1
+- Disable sensors and libvirt for EL5 on ppc, VT is x86 only
+
 * Tue Mar 03 2009 Alan Pevec <apevec@redhat.com> 4.5.3-2
 - patch for strict-aliasing issue in liboping.c
 
