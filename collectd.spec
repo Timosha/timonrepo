@@ -1,24 +1,23 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.4.4
+Version: 4.5.3
 Release: 2%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
 
 Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
-Patch0: %{name}-%{version}-include-collectd.d.patch
+Patch0: %{name}-4.5.1-include-collectd.d.patch
 # bug 468067 "pkg-config --libs OpenIPMIpthread" fails
-Patch1: %{name}-%{version}-configure-OpenIPMI.patch
+Patch1: %{name}-4.5.1-configure-OpenIPMI.patch
+# posted upstream
+Patch2: collectd-4.5.3-gcc-4.4-strict-aliasing-issue.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
-%ifnarch ppc
-BuildRequires: libvirt-devel
-BuildRequires: lm_sensors-devel
-%endif
-BuildRequires: libxml2-devel
+BuildRequires: libvirt-devel, libxml2-devel
 BuildRequires: rrdtool-devel
+BuildRequires: lm_sensors-devel
 BuildRequires: curl-devel
 %if 0%{?fedora} >= 8
 BuildRequires: perl-libs, perl-devel
@@ -31,11 +30,8 @@ BuildRequires: net-snmp-devel
 BuildRequires: libpcap-devel
 BuildRequires: mysql-devel
 BuildRequires: OpenIPMI-devel
-
-%ifnarch ppc
-# Only required until libvirt-devel is fixed (rhbz#460138)
-BuildRequires: xen-devel
-%endif
+BuildRequires: postgresql-devel
+BuildRequires: nut-devel
 
 %description
 collectd is a small daemon written in C for performance.  It reads various
@@ -48,7 +44,7 @@ fine grained since the files are updated every 10 seconds.
 %package apache
 Summary:       Apache plugin for collectd
 Group:         System Environment/Daemons
-Requires:      collectd = %{version}-%{release}, curl
+Requires:      collectd = %{version}-%{release}
 %description apache
 This plugin collects data provided by Apache's 'mod_status'.
 
@@ -72,7 +68,7 @@ This plugin collects data provided by spamassassin.
 %package ipmi
 Summary:       IPMI module for collectd
 Group:         System Environment/Daemons
-Requires:      collectd = %{version}-%{release}, OpenIPMI
+Requires:      collectd = %{version}-%{release}
 %description ipmi
 This plugin for collectd provides IPMI support.
 
@@ -80,7 +76,7 @@ This plugin for collectd provides IPMI support.
 %package mysql
 Summary:       MySQL module for collectd
 Group:         System Environment/Daemons
-Requires:      collectd = %{version}-%{release}, mysql
+Requires:      collectd = %{version}-%{release}
 %description mysql
 MySQL querying plugin. This plugins provides data of issued commands,
 called handlers and database traffic.
@@ -89,9 +85,17 @@ called handlers and database traffic.
 %package nginx
 Summary:       Nginx plugin for collectd
 Group:         System Environment/Daemons
-Requires:      collectd = %{version}-%{release}, curl
+Requires:      collectd = %{version}-%{release}
 %description nginx
 This plugin gets data provided by nginx.
+
+
+%package nut
+Summary:       Network UPS Tools module for collectd
+Group:         System Environment/Daemons
+Requires:      collectd = %{version}-%{release}
+%description nut
+This plugin for collectd provides Network UPS Tools support.
 
 
 %package -n perl-Collectd
@@ -103,6 +107,15 @@ Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 This package contains Perl bindings and plugin for collectd.
 
 
+%package postgresql
+Summary:       PostgreSQL module for collectd
+Group:         System Environment/Daemons
+Requires:      collectd = %{version}-%{release}
+%description postgresql
+PostgreSQL querying plugin. This plugins provides data of issued commands,
+called handlers and database traffic.
+
+
 %package rrdtool
 Summary:       RRDTool module for collectd
 Group:         System Environment/Daemons
@@ -111,7 +124,6 @@ Requires:      collectd = %{version}-%{release}, rrdtool
 This plugin for collectd provides rrdtool support.
 
 
-%ifnarch ppc
 %package sensors
 Summary:       Libsensors module for collectd
 Group:         System Environment/Daemons
@@ -119,7 +131,6 @@ Requires:      collectd = %{version}-%{release}, lm_sensors
 %description sensors
 This plugin for collectd provides querying of sensors supported by
 lm_sensors.
-%endif
 
 
 %package snmp
@@ -130,38 +141,38 @@ Requires:       collectd = %{version}-%{release}, net-snmp
 This plugin for collectd provides querying of net-snmp.
 
 
-%ifnarch ppc
 %package virt
 Summary:       Libvirt plugin for collectd
 Group:         System Environment/Daemons
-Requires:      collectd = %{version}-%{release}, libvirt
+Requires:      collectd = %{version}-%{release}
 %description virt
 This plugin collects information from virtualized guests.
-%endif
 
 
 %prep
 %setup -q
 %patch0 -p1
 %patch1 -p0
- 
+%patch2 -p1
+
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
 
 %build
 %configure \
-    --without-libiptc \
     --disable-ascent \
     --disable-static \
+    --disable-ipvs \
     --enable-mysql \
-%ifnarch ppc
     --enable-sensors \
-%endif
     --enable-email \
     --enable-apache \
     --enable-perl \
     --enable-unixsock \
     --enable-ipmi \
+    --enable-nut \
+    --enable-postgresql \
+    --enable-iptables \
     --with-perl-bindings=INSTALLDIRS=vendor
 %{__make} %{?_smp_mflags}
 
@@ -169,7 +180,6 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 %install
 %{__rm} -rf %{buildroot}
 %{__rm} -rf contrib/SpamAssassin
-%{__rm} -rf contrib/collection3
 %{__make} install DESTDIR="%{buildroot}"
 
 %{__install} -Dp -m0644 src/collectd.conf %{buildroot}%{_sysconfdir}/collectd.conf
@@ -192,23 +202,20 @@ find %{buildroot} -name perllocal.pod -exec rm {} \;
 mkdir perl-examples
 find contrib -name '*.p[lm]' -exec mv {} perl-examples/ \;
 
+# postresql config example will be included by %doc
+rm %{buildroot}%{_datadir}/collectd/postgresql_default.conf
+
 # Move config contribs
 mkdir -p %{buildroot}/etc/collectd.d/
 cp contrib/redhat/apache.conf %{buildroot}/etc/collectd.d/apache.conf
 cp contrib/redhat/email.conf %{buildroot}/etc/collectd.d/email.conf
 cp contrib/redhat/mysql.conf %{buildroot}/etc/collectd.d/mysql.conf
 cp contrib/redhat/nginx.conf %{buildroot}/etc/collectd.d/nginx.conf
-%ifnarch ppc
 cp contrib/redhat/sensors.conf %{buildroot}/etc/collectd.d/sensors.conf
-%endif
 cp contrib/redhat/snmp.conf %{buildroot}/etc/collectd.d/snmp.conf
 
 # configs for subpackaged plugins
-subpkgs="dns ipmi perl rrdtool"
-%ifnarch ppc
-subpkgs="$subpkgs libvirt"
-%endif
-for p in $subpkgs
+for p in dns ipmi libvirt nut perl postgresql rrdtool
 do
 %{__cat} > %{buildroot}/etc/collectd.d/$p.conf <<EOF
 LoadPlugin $p
@@ -248,16 +255,14 @@ fi
 %exclude %{_sysconfdir}/collectd.d/dns.conf
 %exclude %{_sysconfdir}/collectd.d/email.conf
 %exclude %{_sysconfdir}/collectd.d/ipmi.conf
-%ifnarch ppc
 %exclude %{_sysconfdir}/collectd.d/libvirt.conf
-%endif
 %exclude %{_sysconfdir}/collectd.d/mysql.conf
 %exclude %{_sysconfdir}/collectd.d/nginx.conf
+%exclude %{_sysconfdir}/collectd.d/nut.conf
 %exclude %{_sysconfdir}/collectd.d/perl.conf
+%exclude %{_sysconfdir}/collectd.d/postgresql.conf
 %exclude %{_sysconfdir}/collectd.d/rrdtool.conf
-%ifnarch ppc
 %exclude %{_sysconfdir}/collectd.d/sensors.conf
-%endif
 %exclude %{_sysconfdir}/collectd.d/snmp.conf
 
 %{_initrddir}/collectd
@@ -266,23 +271,47 @@ fi
 %{_sbindir}/collectdmon
 %dir %{_localstatedir}/lib/collectd/
 
-%{_libdir}/collectd/*.so*
+%dir %{_libdir}/collectd
+%{_libdir}/collectd/apcups.so
+%{_libdir}/collectd/battery.so
+%{_libdir}/collectd/cpu.so
+%{_libdir}/collectd/cpufreq.so
+%{_libdir}/collectd/csv.so
+%{_libdir}/collectd/df.so
+%{_libdir}/collectd/disk.so
+%{_libdir}/collectd/entropy.so
+%{_libdir}/collectd/exec.so
+%{_libdir}/collectd/filecount.so
+%{_libdir}/collectd/hddtemp.so
+%{_libdir}/collectd/interface.so
+%{_libdir}/collectd/iptables.so
+%{_libdir}/collectd/irq.so
+%{_libdir}/collectd/load.so
+%{_libdir}/collectd/logfile.so
+%{_libdir}/collectd/mbmon.so
+%{_libdir}/collectd/memcached.so
+%{_libdir}/collectd/memory.so
+%{_libdir}/collectd/multimeter.so
+%{_libdir}/collectd/network.so
+%{_libdir}/collectd/nfs.so
+%{_libdir}/collectd/ntpd.so
+%{_libdir}/collectd/ping.so
+%{_libdir}/collectd/powerdns.so
+%{_libdir}/collectd/processes.so
+%{_libdir}/collectd/serial.so
+%{_libdir}/collectd/swap.so
+%{_libdir}/collectd/syslog.so
+%{_libdir}/collectd/tail.so
+%{_libdir}/collectd/tcpconns.so
+%{_libdir}/collectd/teamspeak2.so
+%{_libdir}/collectd/thermal.so
+%{_libdir}/collectd/unixsock.so
+%{_libdir}/collectd/users.so
+%{_libdir}/collectd/uuid.so
+%{_libdir}/collectd/vmem.so
+%{_libdir}/collectd/vserver.so
+%{_libdir}/collectd/wireless.so
 %{_libdir}/collectd/types.db
-%exclude %{_libdir}/collectd/apache.so*
-%exclude %{_libdir}/collectd/dns.so*
-%exclude %{_libdir}/collectd/email.so*
-%exclude %{_libdir}/collectd/ipmi.so*
-%ifnarch ppc
-%exclude %{_libdir}/collectd/libvirt.so*
-%endif
-%exclude %{_libdir}/collectd/mysql.so*
-%exclude %{_libdir}/collectd/nginx.so*
-%exclude %{_libdir}/collectd/perl.so*
-%exclude %{_libdir}/collectd/rrdtool.so*
-%ifnarch ppc
-%exclude %{_libdir}/collectd/sensors.so*
-%endif
-%exclude %{_libdir}/collectd/snmp.so*
 
 %doc AUTHORS ChangeLog COPYING INSTALL README
 %doc %{_mandir}/man1/collectd.1*
@@ -296,45 +325,51 @@ fi
 
 %files apache
 %defattr(-, root, root, -)
-%{_libdir}/collectd/apache.so*
+%{_libdir}/collectd/apache.so
 %config(noreplace) %{_sysconfdir}/collectd.d/apache.conf
 
 
 %files dns
 %defattr(-, root, root, -)
-%{_libdir}/collectd/dns.so*
+%{_libdir}/collectd/dns.so
 %config(noreplace) %{_sysconfdir}/collectd.d/dns.conf
 
 
 %files email
 %defattr(-, root, root, -)
-%{_libdir}/collectd/email.so*
+%{_libdir}/collectd/email.so
 %config(noreplace) %{_sysconfdir}/collectd.d/email.conf
 %doc %{_mandir}/man5/collectd-email.5*
 
 
 %files ipmi
 %defattr(-, root, root, -)
-%{_libdir}/collectd/ipmi.so*
+%{_libdir}/collectd/ipmi.so
 %config(noreplace) %{_sysconfdir}/collectd.d/ipmi.conf
 
 
 %files mysql
 %defattr(-, root, root, -)
-%{_libdir}/collectd/mysql.so*
+%{_libdir}/collectd/mysql.so
 %config(noreplace) %{_sysconfdir}/collectd.d/mysql.conf
 
 
 %files nginx
 %defattr(-, root, root, -)
-%{_libdir}/collectd/nginx.so*
+%{_libdir}/collectd/nginx.so
 %config(noreplace) %{_sysconfdir}/collectd.d/nginx.conf
+
+
+%files nut
+%defattr(-, root, root, -)
+%{_libdir}/collectd/nut.so
+%config(noreplace) %{_sysconfdir}/collectd.d/nut.conf
 
 
 %files -n perl-Collectd
 %defattr(-, root, root, -)
 %doc perl-examples/*
-%{_libdir}/collectd/perl.so*
+%{_libdir}/collectd/perl.so
 %{perl_vendorlib}/Collectd.pm
 %{perl_vendorlib}/Collectd/
 %config(noreplace) %{_sysconfdir}/collectd.d/perl.conf
@@ -342,59 +377,68 @@ fi
 %doc %{_mandir}/man3/Collectd::Unixsock.3pm*
 
 
+%files postgresql
+%defattr(-, root, root, -)
+%{_libdir}/collectd/postgresql.so
+%config(noreplace) %{_sysconfdir}/collectd.d/postgresql.conf
+%doc src/postgresql_default.conf
+
+
 %files rrdtool
 %defattr(-, root, root, -)
-%{_libdir}/collectd/rrdtool.so*
+%{_libdir}/collectd/rrdtool.so
 %config(noreplace) %{_sysconfdir}/collectd.d/rrdtool.conf
 
 
-%ifnarch ppc
 %files sensors
 %defattr(-, root, root, -)
-%{_libdir}/collectd/sensors.so*
+%{_libdir}/collectd/sensors.so
 %config(noreplace) %{_sysconfdir}/collectd.d/sensors.conf
-%endif
 
 
 %files snmp
 %defattr(-, root, root, -)
-%{_libdir}/collectd/snmp.so*
+%{_libdir}/collectd/snmp.so
 %config(noreplace) %{_sysconfdir}/collectd.d/snmp.conf
 %doc %{_mandir}/man5/collectd-snmp.5*
 
 
-%ifnarch ppc
 %files virt
 %defattr(-, root, root, -)
-%{_libdir}/collectd/libvirt.so*
+%{_libdir}/collectd/libvirt.so
 %config(noreplace) %{_sysconfdir}/collectd.d/libvirt.conf
-%endif
 
 
 %changelog
-* Mon Oct 27 2008 Alan Pevec <apevec@redhat.com> 4.4.4-2
-- remove contrib/collection3 because of missing Perl dependencies in EL-5
+* Tue Mar 03 2009 Alan Pevec <apevec@redhat.com> 4.5.3-2
+- patch for strict-aliasing issue in liboping.c
 
-* Wed Oct 22 2008 Alan Pevec <apevec@redhat.com> 4.4.4-1
-- new upstream bugfix release 4.4.4
+* Mon Mar 02 2009 Alan Pevec <apevec@redhat.com> 4.5.3-1
+- New upstream version 4.5.3
+- fixes collectd is built without iptables plugin, bz# 479208
+- list all expected plugins explicitly to avoid such bugs
+
+* Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.5.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
+* Fri Jan 23 2009 Richard W.M. Jones <rjones@redhat.com> - 4.5.1-3
+- Rebuild against new mysql client.
+
+* Sun Dec 07 2008 Alan Pevec <apevec@redhat.com> 4.5.1-2.1
+- fix subpackages, bz# 475093
+
+* Sun Nov 30 2008 Alan Pevec <apevec@redhat.com> 4.5.1-2
+- workaround for https://bugzilla.redhat.com/show_bug.cgi?id=468067
+
+* Sun Oct 22 2008 Alan Pevec <apevec@redhat.com> 4.5.1-1
+- New upstream version 4.5.1, bz# 470943
   http://collectd.org/news.shtml#news59
+- enable Network UPS Tools (nut) plugin, bz# 465729
+- enable postgresql plugin
+- spec cleanup, bz# 473641
 
-* Tue Sep 16 2008 Alan Pevec <apevec@redhat.com> 4.4.3-1
-- New upstream bugfix release 4.4.3.
-  http://collectd.org/news.shtml#news57
-
-* Mon Sep 01 2008 Alan Pevec <apevec@redhat.com> 4.4.2-1
-- New upstream release 4.4.2.
-
-* Thu Aug 28 2008 Richard W.M. Jones <rjones@redhat.com> 4.4.1-9
-- Exclude libvirt module, Xen deps, on PPC.
-- Exclude sensors module also on PPC.
-
-* Mon Aug 25 2008 Richard W.M. Jones <rjones@redhat.com> 4.4.1-7
-- +BR xen-devel (explicit dep required because of rhbz#460138).
-
-* Mon Aug 25 2008 Richard W.M. Jones <rjones@redhat.com> 4.4.1-5
-- Force rebuild.
+* Fri Aug 01 2008 Alan Pevec <apevec@redhat.com> 4.4.2-1
+- New upstream version 4.4.2.
 
 * Thu Jul 03 2008 Lubomir Rintel <lkundrak@v3.sk> 4.4.1-4
 - Fix a typo introduced by previous change that prevented building in el5
