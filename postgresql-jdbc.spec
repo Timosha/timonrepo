@@ -38,7 +38,7 @@
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
 Version:	8.3.603
-Release:	2.1%{?dist}
+Release:	3%{?dist}
 Epoch:		0
 License:	BSD
 Group:		Applications/Databases
@@ -54,7 +54,9 @@ BuildRequires:  jpackage-utils >= 0:1.5
 BuildRequires:  ant >= 0:1.6.2
 BuildRequires:  ant-junit >= 0:1.6.2
 BuildRequires:  junit >= 0:3.7
-BuildRequires:	findutils gettext
+BuildRequires:	findutils
+# gettext is only needed if we try to update translations
+#BuildRequires:	gettext
 %if %{gcj_support}
 BuildRequires:	gcc-java
 Requires(post): /usr/bin/rebuild-gcj-db
@@ -83,7 +85,13 @@ find -name "*.jar" -or -name "*.class" | xargs rm -f
 %build
 export OPT_JAR_LIST="ant/ant-junit junit"
 export CLASSPATH=
-sh update-translations.sh
+
+# Ideally we would run "sh update-translations.sh" here, but that results
+# in inserting the build timestamp into the generated messages_*.class
+# files, which makes rpmdiff complain about multilib conflicts if the
+# different platforms don't build in the same minute.  For now, rely on
+# upstream to have updated the translations files before packaging.
+
 ant
 
 %install
@@ -131,6 +139,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Apr 21 2009 Tom Lane <tgl@redhat.com> 8.3.603-3
+- Avoid multilib conflict caused by overeager attempt to rebuild translations
+
 * Thu Feb 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:8.3.603-2.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
