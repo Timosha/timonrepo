@@ -5,7 +5,7 @@
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.3.5
-Release:	2%{?dist}
+Release:	3%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
@@ -35,6 +35,7 @@ BuildRequires:  ant >= 0:1.6.2, junit >= 0:3.7, postgresql-jdbc
 
 %if %{gcj_support}
 BuildRequires:		gcc-java
+BuildRequires:		java-1.5.0-gcj-devel
 Requires(post):		%{_bindir}/rebuild-gcj-db
 Requires(postun):	%{_bindir}/rebuild-gcj-db
 %endif
@@ -149,6 +150,9 @@ rm -rf %{buildroot}
 %endif
 
 %changelog
+* Fri Apr 24 2009 Milos Jakubicek <xjakub@fi.muni.cz> - 1.3.5-3
+- Fix FTBFS: added BR: java-1.5.0-gcj-devel in case of gcj_support
+
 * Thu Feb 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.5-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
