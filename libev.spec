@@ -1,5 +1,5 @@
 Name:		libev
-Version:	3.53
+Version:	3.6
 Release:	1%{?dist}
 Summary:	High-performance event loop/event model with lots of features
 
@@ -10,7 +10,7 @@ Source0:	http://dist.schmorp.de/libev/Attic/%{name}-%{version}.tar.gz
 Source1:	%{name}.pc.in
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  automake17
+BuildRequires:	automake17
 
 %description
 Libev is modelled (very losely) after libevent and the Event perl
@@ -20,8 +20,8 @@ featureful. And also smaller.
 %package 	devel
 Summary:	High-performance event loop/event model with lots of features
 Group:		System Environment/Libraries
-Requires: 	%{name} = %{version}-%{release}
-Requires: 	pkgconfig
+Requires:	%{name} = %{version}-%{release}
+Requires:	pkgconfig
 
 %description 	devel
 Libev is modelled (very losely) after libevent and the Event perl
@@ -82,6 +82,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Apr 30 2009 Michal Nowak <mnowak@redhat.com> - 3.6-1
+- 3.60
+- fixed few mixed-use-of-spaces-and-tabs warnings in spec file
+
 * Thu Mar 19 2009 Michal Nowak <mnowak@redhat.com> - 3.53-1
 - 3.53
 
