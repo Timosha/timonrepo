@@ -1,17 +1,12 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   0.28
-Release:   2%{?dist}
+Version:   0.29
+Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://tangent.org/552/libmemcached.html
 Source0:   http://download.tangent.org/libmemcached-%{version}.tar.gz
 
-# Patch from upstream to disable hsieh hash (non free)
-# http://hg.tangent.org/libmemcached/rev/0fc201158518
-Patch0:    %{name}-hsieh.patch
-# Temporary for above patch
-BuildRequires: libtool
 
 # checked during configure (for test suite)
 BuildRequires: memcached
@@ -50,18 +45,10 @@ you will need to install %{name}-devel.
 %prep
 %setup -q
 
-%patch0 -p1 
 %{__rm} -f libmemcached/hsieh_hash.c 
 
 %{__mkdir} examples
 %{__cp} -p tests/*.{c,cpp,h} examples/
-
-# Temporary because of patched .m4 files
-libtoolize --force
-aclocal
-automake --add-missing -Wno-portability
-autoconf
-autoheader
 
 
 %build
@@ -98,7 +85,10 @@ autoheader
 %{_bindir}/mem*
 %exclude %{_libdir}/libmemcached.a
 %exclude %{_libdir}/libmemcached.la
+%exclude %{_libdir}/libmemcachedutil.a
+%exclude %{_libdir}/libmemcachedutil.la
 %{_libdir}/libmemcached.so.*
+%{_libdir}/libmemcachedutil.so.*
 %{_mandir}/man1/mem*
 
 
@@ -107,6 +97,7 @@ autoheader
 %doc examples
 %{_includedir}/libmemcached
 %{_libdir}/libmemcached.so
+%{_libdir}/libmemcachedutil.so
 %{_libdir}/pkgconfig/libmemcached.pc
 %{_libdir}/libmemcached.so
 %{_mandir}/man3/libmemcached*.3.gz
@@ -114,6 +105,9 @@ autoheader
 
 
 %changelog
+* Tue May 19 2009 Remi Collet <Fedora@famillecollet.com> - 0.29-1
+- update to 0.29
+
 * Fri May 01 2009 Remi Collet <Fedora@famillecollet.com> - 0.28-2
 - add upstream patch to disable nonfree hsieh hash method
 
