@@ -1,5 +1,5 @@
---- collectd-4.5.1/src/collectd.conf.in.ORIG	2008-10-16 22:29:56.000000000 +0200
-+++ collectd-4.5.1/src/collectd.conf.in	2008-11-30 10:39:23.000000000 +0100
+--- collectd-4.6.2/src/collectd.conf.in.orig	2009-03-18 11:55:39.000000000 +0100
++++ collectd-4.6.2/src/collectd.conf.in	2009-05-20 10:59:34.000000000 +0200
 @@ -26,7 +26,6 @@
  #	LogLevel info
  #</Plugin>
@@ -8,8 +8,8 @@
  @BUILD_PLUGIN_APCUPS_TRUE@LoadPlugin apcups
  @BUILD_PLUGIN_APPLE_SENSORS_TRUE@LoadPlugin apple_sensors
  @BUILD_PLUGIN_ASCENT_TRUE@LoadPlugin ascent
-@@ -36,42 +35,30 @@
- @BUILD_PLUGIN_CSV_TRUE@LoadPlugin csv
+@@ -39,45 +38,33 @@
+ @BUILD_PLUGIN_DBI_TRUE@LoadPlugin dbi
  @BUILD_PLUGIN_DF_TRUE@LoadPlugin df
  @BUILD_PLUGIN_DISK_TRUE@LoadPlugin disk
 -@BUILD_PLUGIN_DNS_TRUE@LoadPlugin dns
@@ -39,11 +39,14 @@
  @BUILD_PLUGIN_NTPD_TRUE@LoadPlugin ntpd
 -@BUILD_PLUGIN_NUT_TRUE@LoadPlugin nut
  @BUILD_PLUGIN_ONEWIRE_TRUE@LoadPlugin onewire
+ @BUILD_PLUGIN_OPENVPN_TRUE@LoadPlugin openvpn
+ @BUILD_PLUGIN_ORACLE_TRUE@LoadPlugin oracle
 -@BUILD_PLUGIN_PERL_TRUE@LoadPlugin perl
  @BUILD_PLUGIN_PING_TRUE@LoadPlugin ping
 -@BUILD_PLUGIN_POSTGRESQL_TRUE@LoadPlugin postgresql
  @BUILD_PLUGIN_POWERDNS_TRUE@LoadPlugin powerdns
  @BUILD_PLUGIN_PROCESSES_TRUE@LoadPlugin processes
+ @BUILD_PLUGIN_RRDCACHED_TRUE@LoadPlugin rrdcached
 -@BUILD_PLUGIN_RRDTOOL_TRUE@LoadPlugin rrdtool
 -@BUILD_PLUGIN_SENSORS_TRUE@LoadPlugin sensors
  @BUILD_PLUGIN_SERIAL_TRUE@LoadPlugin serial
@@ -51,8 +54,9 @@
  @BUILD_PLUGIN_SWAP_TRUE@LoadPlugin swap
  @BUILD_PLUGIN_TAIL_TRUE@LoadPlugin tail
  @BUILD_PLUGIN_TAPE_TRUE@LoadPlugin tape
-@@ -423,3 +410,4 @@
- #	Verbose false
- #</Plugin>
- 
+@@ -551,3 +538,5 @@
+ #<Chain "Main">
+ #  Target "write"
+ #</Chain>
++
 +Include "/etc/collectd.d"

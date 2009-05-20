@@ -1,17 +1,15 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.5.3
-Release: 2%{?dist}
+Version: 4.6.2
+Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
 
 Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
-Patch0: %{name}-4.5.1-include-collectd.d.patch
+Patch0: %{name}-%{version}-include-collectd.d.patch
 # bug 468067 "pkg-config --libs OpenIPMIpthread" fails
-Patch1: %{name}-4.5.1-configure-OpenIPMI.patch
-# posted upstream
-Patch2: collectd-4.5.3-gcc-4.4-strict-aliasing-issue.patch
+Patch1: %{name}-%{version}-configure-OpenIPMI.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -153,7 +151,6 @@ This plugin collects information from virtualized guests.
 %setup -q
 %patch0 -p1
 %patch1 -p0
-%patch2 -p1
 
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
@@ -410,6 +407,10 @@ fi
 
 
 %changelog
+* Wed May 20 2009 Alan Pevec <apevec@redhat.com> 4.6.2-1
+- New upstream version 4.6.2
+  http://collectd.org/news.shtml#news64
+
 * Tue Mar 03 2009 Alan Pevec <apevec@redhat.com> 4.5.3-2
 - patch for strict-aliasing issue in liboping.c
 
