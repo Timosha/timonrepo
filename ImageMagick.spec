@@ -1,5 +1,5 @@
-%define VER 6.5.1
-%define Patchlevel 2
+%define VER 6.5.3
+%define Patchlevel 7
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
@@ -301,6 +301,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Jun 15 2009 Hans de Goede <hdegoede@redhat.com> 6.5.3.7-1
+- New upstream release 6.5.3-7
+
 * Mon Apr 13 2009 Tom "spot" Callaway <tcallawa@redhat.com> - 6.5.1.2-1
 - update to 6.5.1-2
 
