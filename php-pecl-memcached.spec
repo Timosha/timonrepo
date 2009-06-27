@@ -4,7 +4,7 @@
 
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
-Version:      0.1.5
+Version:      0.2.0
 Release:      1%{?dist}
 License:      PHP
 Group:        Development/Languages
@@ -12,13 +12,19 @@ URL:          http://pecl.php.net/package/%{pecl_name}
 
 Source:       http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 
+# http://cvs.php.net/viewvc.cgi/pecl/memcached/php_memcached.c?r1=1.31&r2=1.32&view=patch
+Patch0:       memcached.patch
+
 BuildRoot:    %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires: php-devel >= 5.2.0, php-pear
+# 5.2.10 required to HAVE_JSON enabled
+BuildRequires: php-devel >= 5.2.10, php-pear
 BuildRequires: libmemcached-devel, zlib-devel
 
 Requires(post): %{__pecl}
 Requires(postun): %{__pecl}
+
+Requires:     php-common >= 5.2.10
 Requires:     php(zend-abi) = %{php_zend_api}
 Requires:     php(api) = %{php_core_api}
 
@@ -38,7 +44,9 @@ It also provides a session handler (memcached).
 
 %prep 
 %setup -c -q
+cd %{pecl_name}-%{version}
 
+%patch0 -p4
 
 %build
 cd %{pecl_name}-%{version}
@@ -95,6 +103,9 @@ fi
 
 
 %changelog
+* Sat Jun 27 2009 Remi Collet <fedora@famillecollet.com> - 0.2.0-1
+- Update to 0.2.0 + Patch for HAVE_JSON constant
+
 * Sun Apr 29 2009 Remi Collet <fedora@famillecollet.com> - 0.1.5-1
 - Initial RPM
 
