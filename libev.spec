@@ -1,12 +1,14 @@
+%define version_upstream 3.6
+
 Name:		libev
-Version:	3.6
+Version:	3.60
 Release:	1%{?dist}
 Summary:	High-performance event loop/event model with lots of features
 
 Group:		System Environment/Libraries
 License:	BSD or GPLv2+
 URL:		http://software.schmorp.de/pkg/libev.html
-Source0:	http://dist.schmorp.de/libev/Attic/%{name}-%{version}.tar.gz
+Source0:	http://dist.schmorp.de/libev/Attic/%{name}-%{version_upstream}.tar.gz
 Source1:	%{name}.pc.in
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -30,7 +32,7 @@ featureful. And also smaller. Development libraries.
 
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version_upstream}
 
 # Add pkgconfig support
 cp -p %{SOURCE1} .
@@ -82,6 +84,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Jun 29 2009 Michal Nowak <mnowak@redhat.com> - 3.60-1
+- previous version was called "3.6" but this is broken update
+  path wrt version "3.53" -- thus bumping to "3.60"
+
 * Thu Apr 30 2009 Michal Nowak <mnowak@redhat.com> - 3.6-1
 - 3.60
 - fixed few mixed-use-of-spaces-and-tabs warnings in spec file
