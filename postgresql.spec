@@ -135,7 +135,6 @@ BuildRequires: openssl-devel
 
 %if %kerberos
 BuildRequires: krb5-devel
-BuildRequires: e2fsprogs-devel
 %endif
 
 %if %ldap
