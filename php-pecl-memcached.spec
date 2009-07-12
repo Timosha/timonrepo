@@ -4,16 +4,13 @@
 
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
-Version:      0.2.0
+Version:      1.0.0
 Release:      1%{?dist}
 License:      PHP
 Group:        Development/Languages
 URL:          http://pecl.php.net/package/%{pecl_name}
 
 Source:       http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
-
-# http://cvs.php.net/viewvc.cgi/pecl/memcached/php_memcached.c?r1=1.31&r2=1.32&view=patch
-Patch0:       memcached.patch
 
 BuildRoot:    %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -46,7 +43,6 @@ It also provides a session handler (memcached).
 %setup -c -q
 cd %{pecl_name}-%{version}
 
-%patch0 -p4
 
 %build
 cd %{pecl_name}-%{version}
@@ -103,6 +99,9 @@ fi
 
 
 %changelog
+* Sun Jul 12 2009 Remi Collet <fedora@famillecollet.com> - 1.0.0-1
+- Update to 1.0.0 (First stable release)
+
 * Sat Jun 27 2009 Remi Collet <fedora@famillecollet.com> - 0.2.0-1
 - Update to 0.2.0 + Patch for HAVE_JSON constant
 
