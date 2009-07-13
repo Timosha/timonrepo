@@ -7,7 +7,7 @@
 Summary:		Provides a wrapper to the ImageMagick library
 Name:		php-pecl-%peclName
 Version:		2.2.2
-Release:		2%{?dist}
+Release:		3%{?dist}
 License:		PHP
 Group:		Development/Libraries
 Source0:		http://pecl.php.net/get/%peclName-%{version}.tgz
@@ -79,6 +79,9 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.d/%peclName.ini
 
 %changelog
+* Mon Jul 13 2009 Remi Collet <Fedora@FamilleCollet.com> - 2.2.2-3
+- rebuild for new PHP 5.3.0 ABI (20090626)
+
 * Tue Mar 10 2009 Pavel Alexeev <Pahan@Hubbitus.info> - 2.2.2-2
 - Rebuild due ImageMagick update
 
