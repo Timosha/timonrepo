@@ -1,8 +1,8 @@
-%define version_upstream 3.6
+%define version_upstream 3.7
 
 Name:		libev
 Version:	3.70
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	High-performance event loop/event model with lots of features
 
 Group:		System Environment/Libraries
@@ -85,6 +85,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Jul 17 2009 Michal Nowak <mnowak@redhat.com> - 3.70-2
+- spec file change, which prevented uploading most recent tarball
+  so the RPM was "3.70" but tarball was from 3.60
+
 * Fri Jul 17 2009 Michal Nowak <mnowak@redhat.com> - 3.70-1
 - v3.7
 - list libev soname explicitly
