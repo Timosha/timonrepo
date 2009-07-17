@@ -1,7 +1,7 @@
 %define version_upstream 3.6
 
 Name:		libev
-Version:	3.60
+Version:	3.70
 Release:	1%{?dist}
 Summary:	High-performance event loop/event model with lots of features
 
@@ -72,7 +72,8 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %doc Changes LICENSE README
-%{_libdir}/%{name}.so.*
+%{_libdir}/%{name}.so.3
+%{_libdir}/%{name}.so.3.0.0
 %{_mandir}/man?/*
 
 
@@ -84,6 +85,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Jul 17 2009 Michal Nowak <mnowak@redhat.com> - 3.70-1
+- v3.7
+- list libev soname explicitly
+
 * Mon Jun 29 2009 Michal Nowak <mnowak@redhat.com> - 3.60-1
 - previous version was called "3.6" but this is broken update
   path wrt version "3.53" -- thus bumping to "3.60"
