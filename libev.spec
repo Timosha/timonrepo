@@ -2,7 +2,7 @@
 
 Name:		libev
 Version:	3.70
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	High-performance event loop/event model with lots of features
 
 Group:		System Environment/Libraries
@@ -85,6 +85,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.70-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
 * Fri Jul 17 2009 Michal Nowak <mnowak@redhat.com> - 3.70-2
 - spec file change, which prevented uploading most recent tarball
   so the RPM was "3.70" but tarball was from 3.60
