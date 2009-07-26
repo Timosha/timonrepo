@@ -84,7 +84,7 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 Version: 8.3.7
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -870,6 +870,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sun Jul 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.3.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
 * Sat Mar 21 2009 Tom Lane <tgl@redhat.com> 8.3.7-1
 - Update to PostgreSQL 8.3.7, for various fixes described at
   http://www.postgresql.org/docs/8.3/static/release-8-3-7.html
