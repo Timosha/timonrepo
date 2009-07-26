@@ -38,7 +38,7 @@
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
 Version:	8.3.603
-Release:	3%{?dist}
+Release:	4%{?dist}
 Epoch:		0
 License:	BSD
 Group:		Applications/Databases
@@ -139,6 +139,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sun Jul 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:8.3.603-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
 * Tue Apr 21 2009 Tom Lane <tgl@redhat.com> 8.3.603-3
 - Avoid multilib conflict caused by overeager attempt to rebuild translations
 
