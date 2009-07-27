@@ -65,7 +65,6 @@ The postgis-utils package provides the utilities for PostGIS.
 
 %prep
 %setup -q
-%patch0 -p0
 # Copy .pdf file to top directory before installing.
 cp -p %{SOURCE2} .
 
