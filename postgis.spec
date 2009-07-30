@@ -70,7 +70,8 @@ cp -p %{SOURCE2} .
 
 %build
 %configure 
-make %{?_smp_mflags} LPATH=`pg_config --pkglibdir` shlib="%{name}.so"
+#make %{?_smp_mflags} LPATH=`pg_config --pkglibdir` shlib="%{name}.so"
+make LPATH=`pg_config --pkglibdir` shlib="%{name}.so"
 
 %if %javabuild
 export BUILDXML_DIR=%{_builddir}/%{name}-%{version}/java/jdbc
