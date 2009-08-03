@@ -1,14 +1,14 @@
-%define VER 6.5.3
+%define VER 6.5.4
 %define Patchlevel 7
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
 Url:            http://www.imagemagick.org/
-Source0:        ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.bz2
+Source0:        ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.lzma
 Patch1:         ImageMagick-6.4.0-multilib.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -301,6 +301,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Aug 3 2009 Pavel Alexeev <Pahan@Hubbitus.info> - 6.5.4.7-3
+- Update to version 6.5.4-7
+- Use lzma-compressed source tarball as sugested by Ville Skyttä (BZ#515319)
+
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 6.5.3.7-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
