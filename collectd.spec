@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.6.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -308,7 +308,7 @@ fi
 %{_libdir}/collectd/vmem.so
 %{_libdir}/collectd/vserver.so
 %{_libdir}/collectd/wireless.so
-%{_libdir}/collectd/types.db
+%{_datadir}/collectd/types.db
 
 %doc AUTHORS ChangeLog COPYING INSTALL README
 %doc %{_mandir}/man1/collectd.1*
@@ -407,8 +407,9 @@ fi
 
 
 %changelog
-* Thu Aug  6 2009 Richard W.M. Jones <rjones@redhat.com> - 4.6.2-3
+* Thu Aug  6 2009 Richard W.M. Jones <rjones@redhat.com> - 4.6.2-4
 - Force rebuild to test FTBFS issue.
+- lib/collectd/types.db seems to have moved to share/collectd/types.db
 
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.6.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
