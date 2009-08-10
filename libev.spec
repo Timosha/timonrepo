@@ -1,8 +1,8 @@
-%define version_upstream 3.7
+%define version_upstream 3.8
 
 Name:		libev
-Version:	3.70
-Release:	3%{?dist}
+Version:	3.80
+Release:	1%{?dist}
 Summary:	High-performance event loop/event model with lots of features
 
 Group:		System Environment/Libraries
@@ -12,7 +12,7 @@ Source0:	http://dist.schmorp.de/libev/Attic/%{name}-%{version_upstream}.tar.gz
 Source1:	%{name}.pc.in
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:	automake17
+BuildRequires:	automake libtool
 
 %description
 Libev is modelled (very losely) after libevent and the Event perl
@@ -38,8 +38,8 @@ featureful. And also smaller. Development libraries.
 cp -p %{SOURCE1} .
 sed -i.pkgconfig -e 's|Makefile|Makefile libev.pc|' configure.ac configure
 sed -i.pkgconfig -e 's|lib_LTLIBRARIES|pkgconfigdir = $(libdir)/pkgconfig\n\npkgconfig_DATA = libev.pc\n\nlib_LTLIBRARIES|' Makefile.am Makefile.in
-automake-1.7
-#touch -r
+aclocal
+automake
 
 
 %build
@@ -85,6 +85,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Aug 10 2009 Michal Nowak <mnowak@redhat.com> - 3.80-1
+- 3.8
+- always use the most recent automake
+- BuildRequires now libtool
+
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.70-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
