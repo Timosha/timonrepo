@@ -33,19 +33,18 @@
 %define gcj_support %{?_with_gcj_support:1}%{!?_with_gcj_support:%{?_without_gcj_support:0}%{!?_without_gcj_support:%{?_gcj_support:%{_gcj_support}}%{!?_gcj_support:0}}}
 
 %define section		devel
-%define upstreamver	8.3-603
+%define upstreamver	8.4-701
 
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
-Version:	8.3.603
-Release:	4%{?dist}
-Epoch:		0
+Version:	8.4.701
+Release:	1%{?dist}
 License:	BSD
 Group:		Applications/Databases
 URL:		http://jdbc.postgresql.org/
 
 Source0:	http://jdbc.postgresql.org/download/%{name}-%{upstreamver}.src.tar.gz
-Patch1:         postgresql-jdbc-version.patch
+Patch1:		postgresql-jdbc-bogus-import.patch
 
 %if ! %{gcj_support}
 BuildArch:	noarch
@@ -139,6 +138,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Aug 18 2009 Tom Lane <tgl@redhat.com> 8.4.701-1
+- Update to build 8.4-701
+
 * Sun Jul 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:8.3.603-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
