@@ -1,25 +1,6 @@
-# Conventions for PostgreSQL Global Development Group RPM releases:
-
-# Official PostgreSQL Development Group RPMS have a PGDG after the release number.
-# Integer releases are stable -- 0.1.x releases are Pre-releases, and x.y are
-# test releases.
-
-# Pre-releases are those that are built from CVS snapshots or pre-release
-# tarballs from postgresql.org.  Official beta releases are not 
-# considered pre-releases, nor are release candidates, as their beta or
-# release candidate status is reflected in the version of the tarball. Pre-
-# releases' versions do not change -- the pre-release tarball of 7.0.3, for
-# example, has the same tarball version as the final official release of 7.0.3:
-# but the tarball is different.
-
-# Test releases are where PostgreSQL itself is not in beta, but certain parts of
-# the RPM packaging (such as the spec file, the initscript, etc) are in beta.
-
-# Pre-release RPM's should not be put up on the public ftp.postgresql.org server
-# -- only test releases or full releases should be.
 # This is the PostgreSQL Global Development Group Official RPMset spec file,
 # or a derivative thereof.
-# Copyright 2003 Lamar Owen <lowen@pari.edu> <lamar.owen@wgcr.org>
+# Copyright 2003-2009 Lamar Owen <lowen@pari.edu> <lamar.owen@wgcr.org>
 # and others listed.
 
 # Major Contributors:
@@ -41,18 +22,12 @@
 # This spec file and ancilliary files are licensed in accordance with 
 # The PostgreSQL license.
 
-# In this file you can find the default build package list macros.  These can be overridden by defining
-# on the rpm command line:
+# In this file you can find the default build package list macros.
+# These can be overridden by defining on the rpm command line:
 # rpm --define 'packagename 1' .... to force the package to build.
 # rpm --define 'packagename 0' .... to force the package NOT to build.
-# The base package, the lib package, the devel package, and the server package always get built.
-
-#build7x, build8, and build9 similar
-%{?build7x:%define tcldevel 0}
-%{?build7x:%define aconfver autoconf-2.53}
-%{?build8:%define build89 1}
-%{?build8:%define tcldevel 0}
-%{?build9:%define build89 1}
+# The base package, the lib package, the devel package, and the server package
+# always get built.
 
 %define beta 0
 %{?beta:%define __os_install_post /usr/lib/rpm/brp-compress}
@@ -83,8 +58,9 @@
 
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
-Version: 8.3.7
-Release: 2%{?dist}
+%define majorversion 8.4
+Version: 8.4.0
+Release: 1%{?dist}
 License: BSD
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -98,7 +74,7 @@ Source7: ecpg_config.h
 Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
-Source17: http://www.postgresql.org/docs/manuals/postgresql-8.3.7-US.pdf
+Source17: http://www.postgresql.org/docs/manuals/postgresql-8.4.0-US.pdf
 Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.8.1.tgz
 Source19: http://pgfoundry.org/projects/pgtclng/pgtcl1.6.2.tar.gz
 Source20: http://pgfoundry.org/projects/pgtclng/pgtcldocs-20070115.zip
@@ -106,7 +82,6 @@ Source20: http://pgfoundry.org/projects/pgtclng/pgtcldocs-20070115.zip
 Patch1: rpm-pgsql.patch
 Patch2: postgresql-ac-version.patch
 Patch3: postgresql-logging.patch
-Patch4: postgresql-test.patch
 Patch5: pgtcl-no-rpath.patch
 Patch6: postgresql-perl-rpath.patch
 
@@ -185,7 +160,7 @@ server over a network connection. This package contains the docs
 in HTML for the whole package, as well as command-line utilities for
 managing PostgreSQL databases on a PostgreSQL server. 
 
-If you want to manipulate a PostgreSQL database on a remote PostgreSQL
+If you want to manipulate a PostgreSQL database on a local or remote PostgreSQL
 server, you need this package. You also need to install this package
 if you're installing the postgresql-server package.
 
@@ -228,8 +203,8 @@ Obsoletes: rh-postgresql-docs
 
 %description docs
 The postgresql-docs package includes some additional documentation for
-PostgreSQL.  Currently, this includes the main documentation in PDF format,
-the FAQ, and source files for the PostgreSQL tutorial.
+PostgreSQL.  Currently, this includes the main documentation in PDF format
+and source files for the PostgreSQL tutorial.
 
 
 %package contrib
@@ -256,7 +231,6 @@ with a PostgreSQL database management server and the ecpg Embedded C
 Postgres preprocessor. You need to install this package if you want to
 develop applications which will interact with a PostgreSQL server.
 
-#------------
 %if %plperl
 %package plperl
 Summary: The Perl procedural language for PostgreSQL
@@ -272,7 +246,6 @@ system.  The postgresql-plperl package contains the PL/Perl
 procedural language for the backend.
 %endif
 
-#------------
 %if %plpython
 %package plpython
 Summary: The Python procedural language for PostgreSQL
@@ -287,7 +260,6 @@ system.  The postgresql-plpython package contains the PL/Python
 procedural language for the backend.
 %endif
 
-#------------
 %if %pltcl
 %package pltcl
 Summary: The Tcl procedural language for PostgreSQL
@@ -302,7 +274,6 @@ system.  The postgresql-pltcl package contains the PL/Tcl
 procedural language for the backend.
 %endif
 
-#------------
 %if %tcl
 %package tcl
 Summary: A Tcl client library for PostgreSQL
@@ -318,7 +289,6 @@ system.  The postgresql-tcl package contains the Pgtcl client library
 and its documentation.
 %endif
 
-#------------
 %if %python
 %package python
 Summary: Development module for Python code to access a PostgreSQL DB
@@ -335,7 +305,6 @@ developers to use when writing Python code for accessing a PostgreSQL
 database.
 %endif
 
-#----------
 %if %test
 %package test
 Summary: The test suite distributed with PostgreSQL
@@ -357,7 +326,6 @@ system, including regression tests and benchmarks.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
 # patch5 is applied later
 %patch6 -p1
 
@@ -401,10 +369,6 @@ CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
 %ifarch sparc64 alpha
 CFLAGS=`echo $CFLAGS| sed -e "s|-O2|-O1|g" `
 %endif
-
-# Use --as-needed to eliminate unnecessary link dependencies.
-# NB: Postgres 8.4 will do this for itself.
-LDFLAGS="-Wl,--as-needed"; export LDFLAGS
 
 %configure --disable-rpath \
 %if %beta
@@ -466,11 +430,8 @@ rm -f src/tutorial/GNUmakefile
 %if %runselftest
 	pushd src/test/regress
 	make all
-	cp ../../../contrib/spi/refint.so .
-	cp ../../../contrib/spi/autoinc.so .
 	make MAX_CONNECTIONS=5 check
 	make clean
-	rm refint.so autoinc.so
 	popd
 %endif
 
@@ -572,8 +533,6 @@ install -d -m 700 $RPM_BUILD_ROOT/etc/sysconfig/pgsql
 	# Makefiles, however.
 	mkdir -p $RPM_BUILD_ROOT%{_libdir}/pgsql/test
 	cp -a src/test/regress $RPM_BUILD_ROOT%{_libdir}/pgsql/test
-	install -m 0755 contrib/spi/refint.so $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress
-	install -m 0755 contrib/spi/autoinc.so $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress
 	pushd  $RPM_BUILD_ROOT%{_libdir}/pgsql/test/regress
 	strip *.so
 	rm -f GNUmakefile Makefile *.o
@@ -597,21 +556,44 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/pgsql
    popd
 %endif
 
-%find_lang libpq
-%find_lang initdb
-%find_lang pg_config
-%find_lang pg_ctl
-%find_lang pg_dump
-%find_lang postgres
-%find_lang psql
-%find_lang pg_resetxlog
-%find_lang pg_controldata
-%find_lang pgscripts
-
-cat libpq.lang > libpq.lst
-cat pg_config.lang > pg_config.lst
-cat initdb.lang pg_ctl.lang psql.lang pg_dump.lang pgscripts.lang > main.lst
-cat postgres.lang pg_resetxlog.lang pg_controldata.lang > server.lst
+%find_lang ecpg-%{majorversion}
+cat ecpg-%{majorversion}.lang >devel.lst
+%find_lang ecpglib6-%{majorversion}
+cat ecpglib6-%{majorversion}.lang >libs.lst
+%find_lang initdb-%{majorversion}
+cat initdb-%{majorversion}.lang >server.lst
+%find_lang libpq5-%{majorversion}
+cat libpq5-%{majorversion}.lang >>libs.lst
+%find_lang pg_config-%{majorversion}
+cat pg_config-%{majorversion}.lang >>devel.lst
+%find_lang pg_controldata-%{majorversion}
+cat pg_controldata-%{majorversion}.lang >>server.lst
+%find_lang pg_ctl-%{majorversion}
+cat pg_ctl-%{majorversion}.lang >>server.lst
+%find_lang pg_dump-%{majorversion}
+cat pg_dump-%{majorversion}.lang >main.lst
+%find_lang pg_resetxlog-%{majorversion}
+cat pg_resetxlog-%{majorversion}.lang >>server.lst
+%find_lang pgscripts-%{majorversion}
+cat pgscripts-%{majorversion}.lang >>main.lst
+%if %plperl
+%find_lang plperl-%{majorversion}
+cat plperl-%{majorversion}.lang >plperl.lst
+%endif
+%find_lang plpgsql-%{majorversion}
+cat plpgsql-%{majorversion}.lang >>server.lst
+%if %plpython
+%find_lang plpython-%{majorversion}
+cat plpython-%{majorversion}.lang >plpython.lst
+%endif
+%if %pltcl
+%find_lang pltcl-%{majorversion}
+cat pltcl-%{majorversion}.lang >pltcl.lst
+%endif
+%find_lang postgres-%{majorversion}
+cat postgres-%{majorversion}.lang >>server.lst
+%find_lang psql-%{majorversion}
+cat psql-%{majorversion}.lang >>main.lst
 
 %post libs -p /sbin/ldconfig 
 %postun libs -p /sbin/ldconfig 
@@ -672,7 +654,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -f main.lst
 %defattr(-,root,root)
-%doc doc/FAQ doc/KNOWN_BUGS doc/MISSING_FEATURES doc/README* 
+%doc doc/KNOWN_BUGS doc/MISSING_FEATURES doc/README* 
 %doc COPYRIGHT README HISTORY doc/bug.template
 %doc README.rpm-dist
 %doc doc/html
@@ -707,7 +689,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files docs
 %defattr(-,root,root)
-%doc doc/src/FAQ
 %doc *-US.pdf
 %{_libdir}/pgsql/tutorial/
 
@@ -716,8 +697,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pgsql/_int.so
 %{_libdir}/pgsql/adminpack.so
 %{_libdir}/pgsql/autoinc.so
+%{_libdir}/pgsql/auto_explain.so
+%{_libdir}/pgsql/btree_gin.so
 %{_libdir}/pgsql/btree_gist.so
 %{_libdir}/pgsql/chkpass.so
+%{_libdir}/pgsql/citext.so
 %{_libdir}/pgsql/cube.so
 %{_libdir}/pgsql/dblink.so
 %{_libdir}/pgsql/dict_int.so
@@ -726,7 +710,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pgsql/fuzzystrmatch.so
 %{_libdir}/pgsql/hstore.so
 %{_libdir}/pgsql/insert_username.so
-%{_libdir}/pgsql/int_aggregate.so
 %{_libdir}/pgsql/isn.so
 %{_libdir}/pgsql/lo.so
 %{_libdir}/pgsql/ltree.so
@@ -738,6 +721,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pgsql/pgcrypto.so
 %{_libdir}/pgsql/pgrowlocks.so
 %{_libdir}/pgsql/pgstattuple.so
+%{_libdir}/pgsql/pg_stat_statements.so
 %{_libdir}/pgsql/refint.so
 %{_libdir}/pgsql/seg.so
 %{_libdir}/pgsql/sslinfo.so
@@ -756,9 +740,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/pg_standby
 %{_bindir}/pgbench
 %{_bindir}/vacuumlo
-%doc contrib/*/README.* contrib/spi/*.example
+%doc contrib/spi/*.example
 
-%files libs -f libpq.lang
+%files libs -f libs.lst
 %defattr(-,root,root)
 %{_libdir}/libpq.so.*
 %{_libdir}/libecpg.so.*
@@ -773,14 +757,12 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 %attr (755,root,root) %dir /etc/sysconfig/pgsql
 %{_bindir}/initdb
-%{_bindir}/ipcclean
 %{_bindir}/pg_controldata
 %{_bindir}/pg_ctl
 %{_bindir}/pg_resetxlog
 %{_bindir}/postgres
 %{_bindir}/postmaster
 %{_mandir}/man1/initdb.*
-%{_mandir}/man1/ipcclean.*
 %{_mandir}/man1/pg_controldata.*
 %{_mandir}/man1/pg_ctl.*
 %{_mandir}/man1/pg_resetxlog.*
@@ -806,7 +788,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/pgsql/snowball_create.sql
 %{_datadir}/pgsql/sql_features.txt
 
-%files devel -f pg_config.lst
+%files devel -f devel.lst
 %defattr(-,root,root)
 /usr/include/*
 %{_bindir}/ecpg
@@ -832,13 +814,13 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %if %plperl
-%files plperl
+%files plperl -f plperl.lst
 %defattr(-,root,root)
 %{_libdir}/pgsql/plperl.so
 %endif
 
 %if %pltcl
-%files pltcl
+%files pltcl -f pltcl.lst
 %defattr(-,root,root)
 %{_libdir}/pgsql/pltcl.so
 %{_bindir}/pltcl_delmod
@@ -848,7 +830,7 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %if %plpython
-%files plpython
+%files plpython -f plpython.lst
 %defattr(-,root,root)
 %{_libdir}/pgsql/plpython.so
 %endif
@@ -870,6 +852,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Aug 17 2009 Tom Lane <tgl@redhat.com> 8.4.0-1
+- Update to PostgreSQL 8.4.0.  See release notes at
+  http://www.postgresql.org/docs/8.4/static/release-8-4.html
+
 * Sun Jul 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.3.7-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 

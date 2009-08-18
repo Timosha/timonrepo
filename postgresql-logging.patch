@@ -1,7 +1,10 @@
-diff -Naur postgresql-8.3RC2.orig/src/backend/utils/misc/postgresql.conf.sample postgresql-8.3RC2/src/backend/utils/misc/postgresql.conf.sample
---- postgresql-8.3RC2.orig/src/backend/utils/misc/postgresql.conf.sample	2008-01-09 21:50:01.000000000 -0500
-+++ postgresql-8.3RC2/src/backend/utils/misc/postgresql.conf.sample	2008-01-18 11:44:08.000000000 -0500
-@@ -237,17 +237,17 @@
+Select stderr-based logging with a week's worth of daily logfiles.
+
+
+diff -Naur postgresql-8.4.0.orig/src/backend/utils/misc/postgresql.conf.sample postgresql-8.4.0/src/backend/utils/misc/postgresql.conf.sample
+--- postgresql-8.4.0.orig/src/backend/utils/misc/postgresql.conf.sample	2009-04-22 20:23:45.000000000 -0400
++++ postgresql-8.4.0/src/backend/utils/misc/postgresql.conf.sample	2009-08-12 23:20:46.000000000 -0400
+@@ -236,17 +236,17 @@
  					# requires logging_collector to be on.
  
  # This is used when logging to stderr:
@@ -23,15 +26,15 @@ diff -Naur postgresql-8.3RC2.orig/src/backend/utils/misc/postgresql.conf.sample 
  					# same name as the new log file will be
  					# truncated rather than appended to.
  					# But such truncation only occurs on
-@@ -255,9 +255,9 @@
+@@ -254,9 +254,9 @@
  					# or size-driven rotation.  Default is
  					# off, meaning append to existing files
  					# in all cases.
 -#log_rotation_age = 1d			# Automatic rotation of logfiles will
 +log_rotation_age = 1d			# Automatic rotation of logfiles will
- 					# happen after that time.  0 to disable.
+ 					# happen after that time.  0 disables.
 -#log_rotation_size = 10MB		# Automatic rotation of logfiles will 
 +log_rotation_size = 0			# Automatic rotation of logfiles will 
  					# happen after that much log output.
- 					# 0 to disable.
+ 					# 0 disables.
  

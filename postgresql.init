@@ -67,10 +67,15 @@
 # Version 8.2 Devrim Gunduz <devrim@CommandPrompt.com>
 # Set initdb as a seperate option.
 
-# PGVERSION is the full package version, e.g., 8.2.0
+# Version 8.3 Devrim Gunduz <devrim@CommandPrompt.com>
+
+# Version 8.4 Devrim Gunduz <devrim@CommandPrompt.com>
+# Remove "sameuser" from initdb, to match the new hba conf file.
+
+# PGVERSION is the full package version, e.g., 8.4.0
 # Note: the specfile ordinarily updates this during install
 PGVERSION=xxxx
-# PGMAJORVERSION is major version, e.g., 8.2 (this should match PG_VERSION)
+# PGMAJORVERSION is major version, e.g., 8.4 (this should match PG_VERSION)
 PGMAJORVERSION=`echo "$PGVERSION" | sed 's/^\([0-9]*\.[0-9]*\).*$/\1/'`
 
 # Source function library.
@@ -101,13 +106,7 @@ fi
 # Set defaults for configuration variables
 PGENGINE=/usr/bin
 PGPORT=5432
-PGDATA=/var/lib/pgsql
-if [ -f "$PGDATA/PG_VERSION" ] && [ -d "$PGDATA/base/template1" ]
-then
-	echo "Using old-style directory structure"
-else
-	PGDATA=/var/lib/pgsql/data
-fi
+PGDATA=/var/lib/pgsql/data
 PGLOG=/var/lib/pgsql/pgstartup.log
 
 # Override defaults from /etc/sysconfig/pgsql if file is present
@@ -245,7 +244,7 @@ initdb(){
 	# Clean up SELinux tagging for PGDATA
 	[ -x /sbin/restorecon ] && /sbin/restorecon "$PGDATA"
 	# Initialize the database
-	$SU -l postgres -c "$PGENGINE/initdb --pgdata='$PGDATA' --auth='ident sameuser'" >> "$PGLOG" 2>&1 < /dev/null
+	$SU -l postgres -c "$PGENGINE/initdb --pgdata='$PGDATA' --auth='ident'" >> "$PGLOG" 2>&1 < /dev/null
 	# Create directory for postmaster log
 	mkdir "$PGDATA/pg_log"
 	chown postgres:postgres "$PGDATA/pg_log"
