@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.6.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -407,6 +407,9 @@ fi
 
 
 %changelog
+* Fri Aug 21 2009 Tomas Mraz <tmraz@redhat.com> - 4.6.2-5
+- rebuilt with new openssl
+
 * Thu Aug  6 2009 Richard W.M. Jones <rjones@redhat.com> - 4.6.2-4
 - Force rebuild to test FTBFS issue.
 - lib/collectd/types.db seems to have moved to share/collectd/types.db
