@@ -60,7 +60,7 @@ Summary: PostgreSQL client programs and libraries
 Name: postgresql
 %define majorversion 8.4
 Version: 8.4.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: MIT
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -852,6 +852,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Fri Aug 21 2009 Tomas Mraz <tmraz@redhat.com> - 8.4.0-3
+- rebuilt with new openssl
+
 * Thu Aug 20 2009 Tom "spot" Callaway <tcallawa@redhat.com> 8.4.0-2
 - update License tag to MIT (PostgreSQL calls it "BSD", but it is MIT)
 - Note: This changes nothing from a license compatibility perspective.
