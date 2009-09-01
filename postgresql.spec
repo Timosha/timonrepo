@@ -60,7 +60,7 @@ Summary: PostgreSQL client programs and libraries
 Name: postgresql
 %define majorversion 8.4
 Version: 8.4.0
-Release: 3.1%{?dist}
+Release: 3.2%{?dist}
 License: MIT
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -856,6 +856,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Sep 01 2009 Karsten Hopp <karsten@redhat.com> 8.4.0-3.2
+- bump release and build again with the correct libssl
+
 * Tue Sep 01 2009 Karsten Hopp <karsten@redhat.com> 8.4.0-3.1
 - disable dtrace on s390x as a workaround until #520469 has been fixed
 
