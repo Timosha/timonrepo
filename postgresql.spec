@@ -60,7 +60,7 @@ Summary: PostgreSQL client programs and libraries
 Name: postgresql
 %define majorversion 8.4
 Version: 8.4.0
-Release: 3%{?dist}
+Release: 3.1%{?dist}
 License: MIT
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -89,6 +89,10 @@ BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf gawk
 BuildRequires: perl(ExtUtils::Embed), perl-devel
 # for /sbin/ldconfig
 Prereq: glibc initscripts
+
+%ifarch s390 s390x
+%define sdt 0
+%endif
 
 %if %python || %plpython
 BuildRequires: python-devel
@@ -365,8 +369,8 @@ CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS
 
 # Strip out -ffast-math from CFLAGS....
 CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
-# use -O1 on sparc64 and alpha
-%ifarch sparc64 alpha
+# use -O1 on sparc64, s390x  and alpha
+%ifarch sparc64 alpha s390x s390
 CFLAGS=`echo $CFLAGS| sed -e "s|-O2|-O1|g" `
 %endif
 
@@ -852,6 +856,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Sep 01 2009 Karsten Hopp <karsten@redhat.com> 8.4.0-3.1
+- disable dtrace on s390x as a workaround until #520469 has been fixed
+
 * Fri Aug 21 2009 Tomas Mraz <tmraz@redhat.com> - 8.4.0-3
 - rebuilt with new openssl
 
