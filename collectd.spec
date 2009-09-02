@@ -1,15 +1,19 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.6.2
-Release: 5%{?dist}
+Version: 4.6.4
+Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
 
 Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
-Patch0: %{name}-%{version}-include-collectd.d.patch
+Patch0: %{name}-4.6.2-include-collectd.d.patch
 # bug 468067 "pkg-config --libs OpenIPMIpthread" fails
-Patch1: %{name}-%{version}-configure-OpenIPMI.patch
+Patch1: %{name}-4.6.2-configure-OpenIPMI.patch
+# bug 516273 on upgrade collectd is not restarted
+Patch2: %{name}-4.5.4-fix-condrestart.patch
+# bug 480997 collectd does not re-connect to libvirtd
+Patch3: %{name}-4.5.4-libvirt-reconnect.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -151,6 +155,8 @@ This plugin collects information from virtualized guests.
 %setup -q
 %patch0 -p1
 %patch1 -p0
+%patch2 -p0
+%patch3 -p1
 
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
@@ -221,7 +227,7 @@ done
 
 
 # *.la files shouldn't be distributed.
-rm -f %{buildroot}/%{_libdir}/collectd/*.la
+rm -f %{buildroot}/%{_libdir}/{collectd/,}*.la
 
 
 %post
@@ -309,6 +315,24 @@ fi
 %{_libdir}/collectd/vserver.so
 %{_libdir}/collectd/wireless.so
 %{_datadir}/collectd/types.db
+
+%{_libdir}/collectd/bind.so
+%{_libdir}/collectd/curl.so
+%{_libdir}/collectd/match_regex.so
+%{_libdir}/collectd/match_timediff.so
+%{_libdir}/collectd/match_value.so
+%{_libdir}/collectd/openvpn.so
+%{_libdir}/collectd/target_notification.so
+%{_libdir}/collectd/target_replace.so
+%{_libdir}/collectd/target_set.so
+
+# collectdclient - TBD reintroduce -devel subpackage?
+%{_libdir}/libcollectdclient.so
+%{_libdir}/libcollectdclient.so.0
+%{_libdir}/libcollectdclient.so.0.0.0
+%{_libdir}/pkgconfig/libcollectdclient.pc
+%{_includedir}/collectd/client.h
+%{_includedir}/collectd/lcc_features.h
 
 %doc AUTHORS ChangeLog COPYING INSTALL README
 %doc %{_mandir}/man1/collectd.1*
@@ -407,6 +431,13 @@ fi
 
 
 %changelog
+* Wed Sep 02 2009 Alan Pevec <apevec@redhat.com> 4.6.4-1
+- fix condrestart: on upgrade collectd is not restarted, bz# 516273
+- collectd does not re-connect to libvirtd, bz# 480997
+- fix unpackaged files https://bugzilla.redhat.com/show_bug.cgi?id=516276#c4
+- New upstream version 4.6.4
+  http://collectd.org/news.shtml#news69
+
 * Fri Aug 21 2009 Tomas Mraz <tmraz@redhat.com> - 4.6.2-5
 - rebuilt with new openssl
 
