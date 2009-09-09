@@ -59,8 +59,9 @@
 Summary: PostgreSQL client programs and libraries
 Name: postgresql
 %define majorversion 8.4
-Version: 8.4.0
-Release: 3.2%{?dist}
+Version: 8.4.1
+Release: 1%{?dist}
+# PG considers their license to be simplified BSD, but it's more nearly MIT
 License: MIT
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -74,7 +75,7 @@ Source7: ecpg_config.h
 Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
-Source17: http://www.postgresql.org/docs/manuals/postgresql-8.4.0-US.pdf
+Source17: http://www.postgresql.org/docs/manuals/postgresql-8.4.1-US.pdf
 Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.8.1.tgz
 Source19: http://pgfoundry.org/projects/pgtclng/pgtcl1.6.2.tar.gz
 Source20: http://pgfoundry.org/projects/pgtclng/pgtcldocs-20070115.zip
@@ -89,10 +90,6 @@ BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf gawk
 BuildRequires: perl(ExtUtils::Embed), perl-devel
 # for /sbin/ldconfig
 Prereq: glibc initscripts
-
-%ifarch s390 s390x
-%define sdt 0
-%endif
 
 %if %python || %plpython
 BuildRequires: python-devel
@@ -369,10 +366,11 @@ CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS
 
 # Strip out -ffast-math from CFLAGS....
 CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
-# use -O1 on sparc64, s390x  and alpha
-%ifarch sparc64 alpha s390x s390
-CFLAGS=`echo $CFLAGS| sed -e "s|-O2|-O1|g" `
-%endif
+# let's try removing this kluge, it may just be a workaround for bz#520916
+# # use -O1 on sparc64 and alpha
+# %ifarch sparc64 alpha
+# CFLAGS=`echo $CFLAGS| sed -e "s|-O2|-O1|g" `
+# %endif
 
 %configure --disable-rpath \
 %if %beta
@@ -856,6 +854,13 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Sep  9 2009 Tom Lane <tgl@redhat.com> 8.4.1-1
+- Update to PostgreSQL 8.4.1, for various fixes described at
+  http://www.postgresql.org/docs/8.4/static/release-8-4-1.html
+  including two security issues
+Related: #522085
+Related: #522092
+
 * Tue Sep 01 2009 Karsten Hopp <karsten@redhat.com> 8.4.0-3.2
 - bump release and build again with the correct libssl
 
