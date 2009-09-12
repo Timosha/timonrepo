@@ -1,6 +1,7 @@
---- collectd-4.6.2/src/collectd.conf.in.orig	2009-03-18 11:55:39.000000000 +0100
-+++ collectd-4.6.2/src/collectd.conf.in	2009-05-20 10:59:34.000000000 +0200
-@@ -26,7 +26,6 @@
+diff -up collectd-4.6.5/src/collectd.conf.in.orig collectd-4.6.5/src/collectd.conf.in
+--- collectd-4.6.5/src/collectd.conf.in.orig	2009-09-10 14:16:52.000000000 -0400
++++ collectd-4.6.5/src/collectd.conf.in	2009-09-11 19:34:18.865782426 -0400
+@@ -26,7 +26,6 @@ FQDNLookup   true
  #	LogLevel info
  #</Plugin>
  
@@ -8,7 +9,7 @@
  @BUILD_PLUGIN_APCUPS_TRUE@LoadPlugin apcups
  @BUILD_PLUGIN_APPLE_SENSORS_TRUE@LoadPlugin apple_sensors
  @BUILD_PLUGIN_ASCENT_TRUE@LoadPlugin ascent
-@@ -39,45 +38,33 @@
+@@ -39,45 +38,33 @@ FQDNLookup   true
  @BUILD_PLUGIN_DBI_TRUE@LoadPlugin dbi
  @BUILD_PLUGIN_DF_TRUE@LoadPlugin df
  @BUILD_PLUGIN_DISK_TRUE@LoadPlugin disk
@@ -54,8 +55,8 @@
  @BUILD_PLUGIN_SWAP_TRUE@LoadPlugin swap
  @BUILD_PLUGIN_TAIL_TRUE@LoadPlugin tail
  @BUILD_PLUGIN_TAPE_TRUE@LoadPlugin tape
-@@ -551,3 +538,5 @@
- #<Chain "Main">
+@@ -560,3 +547,5 @@ FQDNLookup   true
+ #<Chain "PostCache">
  #  Target "write"
  #</Chain>
 +

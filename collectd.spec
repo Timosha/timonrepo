@@ -1,6 +1,6 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.6.4
+Version: 4.6.5
 Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
@@ -10,10 +10,6 @@ Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
 Patch0: %{name}-4.6.2-include-collectd.d.patch
 # bug 468067 "pkg-config --libs OpenIPMIpthread" fails
 Patch1: %{name}-4.6.2-configure-OpenIPMI.patch
-# bug 516273 on upgrade collectd is not restarted
-Patch2: %{name}-4.5.4-fix-condrestart.patch
-# bug 480997 collectd does not re-connect to libvirtd
-Patch3: %{name}-4.5.4-libvirt-reconnect.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -34,6 +30,16 @@ BuildRequires: mysql-devel
 BuildRequires: OpenIPMI-devel
 BuildRequires: postgresql-devel
 BuildRequires: nut-devel
+
+# In function 'strncpy',
+#    inlined from 'ping_send_one_ipv6' at liboping.c:626:
+# /usr/include/bits/string3.h:122: error: call to __builtin___strncpy_chk will always overflow destination buffer
+# In function 'strncpy',
+#    inlined from 'ping_send_one_ipv4' at liboping.c:579:
+# /usr/include/bits/string3.h:122: error: call to __builtin___strncpy_chk will always overflow destination buffer
+
+# PPC/PPC64 disabled due to above error.
+ExcludeArch: ppc ppc64
 
 %description
 collectd is a small daemon written in C for performance.  It reads various
@@ -155,8 +161,6 @@ This plugin collects information from virtualized guests.
 %setup -q
 %patch0 -p1
 %patch1 -p0
-%patch2 -p0
-%patch3 -p1
 
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
@@ -431,6 +435,10 @@ fi
 
 
 %changelog
+* Fri Sep 11 2009 Tom "spot" Callaway <tcallawa@redhat.com> 4.6.5-1
+- update to 4.6.5
+- disable ppc/ppc64 due to compile error
+
 * Wed Sep 02 2009 Alan Pevec <apevec@redhat.com> 4.6.4-1
 - fix condrestart: on upgrade collectd is not restarted, bz# 516273
 - collectd does not re-connect to libvirtd, bz# 480997
