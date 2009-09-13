@@ -1,7 +1,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   0.30
-Release:   2%{?dist}
+Version:   0.31
+Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://tangent.org/552/libmemcached.html
@@ -105,6 +105,9 @@ you will need to install %{name}-devel.
 
 
 %changelog
+* Sun Sep 13 2009 Remi Collet <Fedora@famillecollet.com> - 0.31-1
+- update to 0.31
+
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.30-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
