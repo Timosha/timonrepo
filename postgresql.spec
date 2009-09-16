@@ -60,7 +60,7 @@ Summary: PostgreSQL client programs and libraries
 Name: postgresql
 %define majorversion 8.4
 Version: 8.4.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 # PG considers their license to be simplified BSD, but it's more nearly MIT
 License: MIT
 Group: Applications/Databases
@@ -854,6 +854,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Sep 16 2009 Tomas Mraz <tmraz@redhat.com> - 8.4.1-2
+- Use password-auth common PAM configuration instead of system-auth
+
 * Wed Sep  9 2009 Tom Lane <tgl@redhat.com> 8.4.1-1
 - Update to PostgreSQL 8.4.1, for various fixes described at
   http://www.postgresql.org/docs/8.4/static/release-8-4-1.html
