@@ -60,7 +60,7 @@ Summary: PostgreSQL client programs and libraries
 Name: postgresql
 %define majorversion 8.4
 Version: 8.4.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 # PG considers their license to be simplified BSD, but it's more nearly MIT
 License: MIT
 Group: Applications/Databases
@@ -854,6 +854,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Sep 21 2009 Tom Lane <tgl@redhat.com> 8.4.1-3
+- Ensure pgstartup.log gets the right ownership/permissions during initdb
+Resolves: #498959
+
 * Wed Sep 16 2009 Tomas Mraz <tmraz@redhat.com> - 8.4.1-2
 - Use password-auth common PAM configuration instead of system-auth
 
