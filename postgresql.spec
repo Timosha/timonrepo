@@ -60,8 +60,9 @@ Summary: PostgreSQL client programs and libraries
 Name: postgresql
 %define majorversion 8.4
 Version: 8.4.1
-Release: 3%{?dist}
-# PG considers their license to be simplified BSD, but it's more nearly MIT
+Release: 4%{?dist}
+# PostgreSQL calls their license simplified BSD, but the requirements are
+# more similar to other MIT licenses.
 License: MIT
 Group: Applications/Databases
 Url: http://www.postgresql.org/ 
@@ -478,7 +479,7 @@ make -C contrib DESTDIR=$RPM_BUILD_ROOT install
 # multilib header hack; note pg_config.h is installed in two places!
 # we only apply this to known Red Hat multilib arches, per bug #177564
 case `uname -i` in
-  i386 | x86_64 | ppc | ppc64 | s390 | s390x)
+  i386 | x86_64 | ppc | ppc64 | s390 | s390x | sparc | sparc64 )
     mv $RPM_BUILD_ROOT/usr/include/pg_config.h $RPM_BUILD_ROOT/usr/include/pg_config_`uname -i`.h
     install -m 644 %{SOURCE5} $RPM_BUILD_ROOT/usr/include/
     mv $RPM_BUILD_ROOT/usr/include/pgsql/server/pg_config.h $RPM_BUILD_ROOT/usr/include/pgsql/server/pg_config_`uname -i`.h
@@ -854,6 +855,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Oct 15 2009 Tom Lane <tgl@redhat.com> 8.4.1-4
+- add sparc/sparc64 to multilib header support
+
 * Mon Sep 21 2009 Tom Lane <tgl@redhat.com> 8.4.1-3
 - Ensure pgstartup.log gets the right ownership/permissions during initdb
 Resolves: #498959
