@@ -5,7 +5,7 @@
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.4.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
@@ -96,8 +96,8 @@ install -m 644 *.sql %{buildroot}%{_datadir}/pgsql/contrib/
 rm -f  %{buildroot}%{_datadir}/*.sql
 
 if [ "%{_libdir}" = "/usr/lib64" ] ; then
-	mv %{buildroot}%{_datadir}/pgsql/contrib/lwpostgis.sql %{buildroot}%{_datadir}/pgsql/contrib/lwpostgis-64.sql
-	mv %{buildroot}%{_datadir}/pgsql/contrib/lwpostgis_upgrade.sql %{buildroot}%{_datadir}/pgsql/contrib/lwpostgis_upgrade-64.sql
+	mv %{buildroot}%{_datadir}/pgsql/contrib/postgis.sql %{buildroot}%{_datadir}/pgsql/contrib/postgis-64.sql
+	mv %{buildroot}%{_datadir}/pgsql/contrib/postgis_upgrade.sql %{buildroot}%{_datadir}/pgsql/contrib/postgis_upgrade-64.sql
 fi
 
 %if %javabuild
@@ -162,6 +162,9 @@ rm -rf %{buildroot}
 %doc postgis*.pdf
 
 %changelog
+* Sun Nov 22 2009 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.4.0-2
+- Fix spec, per bz #536860
+
 * Mon Jul 27 2009 Devrim GUNDUZ <devrim@gunduz.org> - 1.4.0-1
 - Update to 1.4.0
 
