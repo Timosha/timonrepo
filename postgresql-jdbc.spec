@@ -38,12 +38,15 @@
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
 Version:	8.4.701
-Release:	1%{?dist}
-License:	BSD
+Release:	2%{?dist}
+# ASL 2.0 applies only to postgresql-jdbc.pom file
+License:	BSD and ASL 2.0
 Group:		Applications/Databases
 URL:		http://jdbc.postgresql.org/
 
 Source0:	http://jdbc.postgresql.org/download/%{name}-%{upstreamver}.src.tar.gz
+# originally http://repo2.maven.org/maven2/postgresql/postgresql/8.4-701.jdbc4/postgresql-8.4-701.jdbc4.pom:
+Source1:	postgresql-jdbc.pom
 Patch1:		postgresql-jdbc-bogus-import.patch
 
 %if ! %{gcj_support}
@@ -61,6 +64,8 @@ BuildRequires:	gcc-java
 Requires(post): /usr/bin/rebuild-gcj-db
 Requires(postun): /usr/bin/rebuild-gcj-db
 %endif
+Requires(post): jpackage-utils >= 0:1.7.2
+Requires(postun): jpackage-utils >= 0:1.7.2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 Obsoletes: rh-postgresql-jdbc
@@ -114,6 +119,11 @@ popd
 aot-compile-rpm
 %endif
 
+# Install the pom
+install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/maven2/poms/
+install -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/maven2/poms/JPP-postgresql-jdbc.pom
+%add_to_maven_depmap postgresql postgresql %{version} JPP postgresql-jdbc
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -121,9 +131,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 /usr/bin/rebuild-gcj-db
+%update_maven_depmap
 
 %postun
 /usr/bin/rebuild-gcj-db
+%update_maven_depmap
 
 %endif
 
@@ -136,8 +148,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/gcj/%{name}/*.jar.so
 %{_libdir}/gcj/%{name}/*.jar.db
 %endif
+%{_sysconfdir}/maven/fragments/%{name}
+%{_datadir}/maven2/poms/JPP-%{name}.pom
 
 %changelog
+* Mon Nov 23 2009 Tom Lane <tgl@redhat.com> 8.4.701-2
+- Add a .pom file to ease use by maven-based packages (courtesy Deepak Bhole)
+Resolves: #538487
+
 * Tue Aug 18 2009 Tom Lane <tgl@redhat.com> 8.4.701-1
 - Update to build 8.4-701
 
