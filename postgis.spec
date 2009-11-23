@@ -4,12 +4,12 @@
 
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
-Version:	1.4.0
-Release:	2%{?dist}
+Version:	1.4.1
+Release:	rc1_1%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
-Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
-Source2:	http://www.postgis.org/download/%{name}-%{version}.pdf
+Source0:	http://postgis.refractions.net/download/%{name}-%{version}rc1.tar.gz
+Source2:	http://www.postgis.org/download/%{name}-%{version}rc1.pdf
 Source4:	filter-requires-perl-Pg.sh
 URL:		http://postgis.refractions.net/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -37,7 +37,7 @@ The postgis-docs package includes PDF documentation of PostGIS.
 Summary:	The JDBC driver for PostGIS
 Group:		Applications/Databases
 License:	LGPLv2+
-Requires:	%{name} = %{version}-%{release}, postgresql-jdbc
+Requires:	%{name} = %{version}rc1-%{release}, postgresql-jdbc
 BuildRequires:  ant >= 0:1.6.2, junit >= 0:3.7, postgresql-jdbc
 
 %if %{gcj_support}
@@ -55,7 +55,7 @@ The postgis-jdbc package provides the essential jdbc driver for PostGIS.
 %package utils
 Summary:	The utils for PostGIS
 Group:		Applications/Databases
-Requires:	%{name} = %{version}-%{release}, perl-DBD-Pg
+Requires:	%{name} = %{version}rc1-%{release}, perl-DBD-Pg
 
 %description utils
 The postgis-utils package provides the utilities for PostGIS.
@@ -64,7 +64,7 @@ The postgis-utils package provides the utilities for PostGIS.
 %define __perl_requires %{SOURCE4}
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}rc1
 # Copy .pdf file to top directory before installing.
 cp -p %{SOURCE2} .
 
@@ -74,7 +74,7 @@ cp -p %{SOURCE2} .
 make LPATH=`pg_config --pkglibdir` shlib="%{name}.so"
 
 %if %javabuild
-export BUILDXML_DIR=%{_builddir}/%{name}-%{version}/java/jdbc
+export BUILDXML_DIR=%{_builddir}/%{name}-%{version}rc1/java/jdbc
 JDBC_VERSION_RPM=`rpm -ql postgresql-jdbc| grep 'jdbc2.jar$'|awk -F '/' '{print $5}'`
 sed 's/postgresql.jar/'${JDBC_VERSION_RPM}'/g' $BUILDXML_DIR/build.xml > $BUILDXML_DIR/build.xml.new
 mv -f $BUILDXML_DIR/build.xml.new $BUILDXML_DIR/build.xml
@@ -102,7 +102,7 @@ fi
 
 %if %javabuild
 install -d %{buildroot}%{_javadir}
-install -m 755 java/jdbc/%{name}-%{version}.jar %{buildroot}%{_javadir}
+install -m 755 java/jdbc/%{name}-%{version}rc1.jar %{buildroot}%{_javadir}
 %if %{gcj_support}
 aot-compile-rpm
 %endif
@@ -135,7 +135,7 @@ rm -rf %{buildroot}
 %files jdbc
 %defattr(-,root,root)
 %doc java/jdbc/COPYING_LGPL java/jdbc/README
-%attr(755,root,root) %{_javadir}/%{name}-%{version}.jar
+%attr(755,root,root) %{_javadir}/%{name}-%{version}rc1.jar
 %if %{gcj_support}
 %dir %{_libdir}/gcj/%{name}
 %{_libdir}/gcj/%{name}/*.jar.so
@@ -162,6 +162,9 @@ rm -rf %{buildroot}
 %doc postgis*.pdf
 
 %changelog
+* Mon Nov 23 2009 Devrim GUNDUZ <devrim@gunduz.org> - 1.4.1rc1-1
+- Update to 1.4.1rc1
+
 * Sun Nov 22 2009 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.4.0-2
 - Fix spec, per bz #536860
 
