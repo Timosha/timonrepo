@@ -38,8 +38,8 @@
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
 Version:	8.4.701
-Release:	2%{?dist}
-# ASL 2.0 applies only to postgresql-jdbc.pom file
+Release:	3%{?dist}
+# ASL 2.0 applies only to postgresql-jdbc.pom file, the rest is BSD
 License:	BSD and ASL 2.0
 Group:		Applications/Databases
 URL:		http://jdbc.postgresql.org/
@@ -119,9 +119,10 @@ popd
 aot-compile-rpm
 %endif
 
-# Install the pom
+# Install the pom after inserting the correct version number
+sed 's/UPSTREAM_VERSION/%{upstreamver}/g' %{SOURCE1} >JPP-postgresql-jdbc.pom
 install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/maven2/poms/
-install -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/maven2/poms/JPP-postgresql-jdbc.pom
+install -m 644 JPP-postgresql-jdbc.pom $RPM_BUILD_ROOT%{_datadir}/maven2/poms/JPP-postgresql-jdbc.pom
 %add_to_maven_depmap postgresql postgresql %{version} JPP postgresql-jdbc
 
 %clean
@@ -152,6 +153,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/maven2/poms/JPP-%{name}.pom
 
 %changelog
+* Tue Nov 24 2009 Tom Lane <tgl@redhat.com> 8.4.701-3
+- Seems the .pom file *must* have a package version number in it, sigh
+Resolves: #538487
+
 * Mon Nov 23 2009 Tom Lane <tgl@redhat.com> 8.4.701-2
 - Add a .pom file to ease use by maven-based packages (courtesy Deepak Bhole)
 Resolves: #538487

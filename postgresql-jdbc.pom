@@ -6,6 +6,7 @@
   <packaging>jar</packaging>
   <name>PostgreSQL JDBC Driver</name>
 
+  <version>UPSTREAM_VERSION</version>
   <url>http://jdbc.postgresql.org</url>
   <description>The PostgreSQL Driver JDBC4</description>
   <licenses>
