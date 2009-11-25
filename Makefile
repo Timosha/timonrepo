@@ -1,10 +1,10 @@
 # Makefile for source rpm: postgresql-jdbc
-# $Id: Makefile,v 1.1 2006/02/16 21:08:44 tgl Exp $
+# $Id: Makefile,v 1.2 2007/10/15 19:17:57 notting Exp $
 NAME := postgresql-jdbc
 SPECFILE = $(firstword $(wildcard *.spec))
 
 define find-makefile-common
-for d in common ../common ../../common ; do if [ -f $$d/Makefile.common ] ; then if [ -f $$d/CVS/Root -a -w $$/Makefile.common ] ; then cd $$d ; cvs -Q update ; fi ; echo "$$d/Makefile.common" ; break ; fi ; done
+for d in common ../common ../../common ; do if [ -f $$d/Makefile.common ] ; then if [ -f $$d/CVS/Root -a -w $$d/Makefile.common ] ; then cd $$d ; cvs -Q update ; fi ; echo "$$d/Makefile.common" ; break ; fi ; done
 endef
 
 MAKEFILE_COMMON := $(shell $(find-makefile-common))
