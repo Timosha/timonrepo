@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.8.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -30,6 +30,7 @@ BuildRequires: mysql-devel
 BuildRequires: OpenIPMI-devel
 BuildRequires: postgresql-devel
 BuildRequires: nut-devel
+BuildRequires: iptables-devel
 
 %description
 collectd is a small daemon written in C for performance.  It reads various
@@ -171,6 +172,7 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
     --enable-postgresql \
     --enable-iptables \
     --disable-ping \
+    --with-libiptc \
     --with-perl-bindings=INSTALLDIRS=vendor
 %{__make} %{?_smp_mflags}
 
@@ -437,6 +439,9 @@ fi
 
 
 %changelog
+* Fri Nov 27 2009 Alan Pevec <apevec@redhat.com> 4.8.1-2
+- use Fedora libiptc, owniptc in collectd sources fails to compile
+
 * Wed Nov 25 2009 Alan Pevec <apevec@redhat.com> 4.8.1-1
 - update to 4.8.1 (Florian La Roche) bz# 516276
 - disable ping plugin until liboping is packaged bz# 541744
