@@ -1,6 +1,6 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.6.5
+Version: 4.8.1
 Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
@@ -30,16 +30,6 @@ BuildRequires: mysql-devel
 BuildRequires: OpenIPMI-devel
 BuildRequires: postgresql-devel
 BuildRequires: nut-devel
-
-# In function 'strncpy',
-#    inlined from 'ping_send_one_ipv6' at liboping.c:626:
-# /usr/include/bits/string3.h:122: error: call to __builtin___strncpy_chk will always overflow destination buffer
-# In function 'strncpy',
-#    inlined from 'ping_send_one_ipv4' at liboping.c:579:
-# /usr/include/bits/string3.h:122: error: call to __builtin___strncpy_chk will always overflow destination buffer
-
-# PPC/PPC64 disabled due to above error.
-ExcludeArch: ppc ppc64
 
 %description
 collectd is a small daemon written in C for performance.  It reads various
@@ -180,6 +170,7 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
     --enable-nut \
     --enable-postgresql \
     --enable-iptables \
+    --disable-ping \
     --with-perl-bindings=INSTALLDIRS=vendor
 %{__make} %{?_smp_mflags}
 
@@ -295,6 +286,8 @@ fi
 %{_libdir}/collectd/irq.so
 %{_libdir}/collectd/load.so
 %{_libdir}/collectd/logfile.so
+%{_libdir}/collectd/madwifi.so
+%{_libdir}/collectd/match_empty_counter.so
 %{_libdir}/collectd/mbmon.so
 %{_libdir}/collectd/memcached.so
 %{_libdir}/collectd/memory.so
@@ -302,7 +295,7 @@ fi
 %{_libdir}/collectd/network.so
 %{_libdir}/collectd/nfs.so
 %{_libdir}/collectd/ntpd.so
-%{_libdir}/collectd/ping.so
+%{_libdir}/collectd/olsrd.so
 %{_libdir}/collectd/powerdns.so
 %{_libdir}/collectd/processes.so
 %{_libdir}/collectd/serial.so
@@ -318,17 +311,25 @@ fi
 %{_libdir}/collectd/vmem.so
 %{_libdir}/collectd/vserver.so
 %{_libdir}/collectd/wireless.so
-%{_datadir}/collectd/types.db
+%{_libdir}/collectd/write_http.so
 
 %{_libdir}/collectd/bind.so
+%{_libdir}/collectd/conntrack.so
 %{_libdir}/collectd/curl.so
+%{_libdir}/collectd/fscache.so
 %{_libdir}/collectd/match_regex.so
 %{_libdir}/collectd/match_timediff.so
 %{_libdir}/collectd/match_value.so
 %{_libdir}/collectd/openvpn.so
+%{_libdir}/collectd/protocols.so
+%{_libdir}/collectd/table.so
 %{_libdir}/collectd/target_notification.so
 %{_libdir}/collectd/target_replace.so
 %{_libdir}/collectd/target_set.so
+%{_libdir}/collectd/ted.so
+%{_libdir}/collectd/uptime.so
+
+%{_datadir}/collectd/types.db
 
 # collectdclient - TBD reintroduce -devel subpackage?
 %{_libdir}/libcollectdclient.so
@@ -344,6 +345,7 @@ fi
 %doc %{_mandir}/man1/collectdmon.1*
 %doc %{_mandir}/man5/collectd.conf.5*
 %doc %{_mandir}/man5/collectd-exec.5*
+%doc %{_mandir}/man5/collectd-java.5*
 %doc %{_mandir}/man5/collectd-unixsock.5*
 %doc %{_mandir}/man5/types.db.5*
 
@@ -435,6 +437,10 @@ fi
 
 
 %changelog
+* Wed Nov 25 2009 Alan Pevec <apevec@redhat.com> 4.8.1-1
+- update to 4.8.1 (Florian La Roche) bz# 516276
+- disable ping plugin until liboping is packaged bz# 541744
+
 * Fri Sep 11 2009 Tom "spot" Callaway <tcallawa@redhat.com> 4.6.5-1
 - update to 4.6.5
 - disable ppc/ppc64 due to compile error

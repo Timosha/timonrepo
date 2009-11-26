@@ -1,63 +1,70 @@
-diff -up collectd-4.6.5/src/collectd.conf.in.orig collectd-4.6.5/src/collectd.conf.in
---- collectd-4.6.5/src/collectd.conf.in.orig	2009-09-10 14:16:52.000000000 -0400
-+++ collectd-4.6.5/src/collectd.conf.in	2009-09-11 19:34:18.865782426 -0400
-@@ -26,7 +26,6 @@ FQDNLookup   true
- #	LogLevel info
- #</Plugin>
+diff -up collectd-4.8.1/src/collectd.conf.in.lr collectd-4.8.1/src/collectd.conf.in
+--- collectd-4.8.1/src/collectd.conf.in.lr	2009-10-04 09:46:19.000000000 +0200
++++ collectd-4.8.1/src/collectd.conf.in	2009-10-10 11:40:27.000000000 +0200
+@@ -50,7 +50,6 @@ FQDNLookup   true
+ # to missing dependencies or because they have been deactivated explicitly.  #
+ ##############################################################################
  
--@BUILD_PLUGIN_APACHE_TRUE@LoadPlugin apache
- @BUILD_PLUGIN_APCUPS_TRUE@LoadPlugin apcups
- @BUILD_PLUGIN_APPLE_SENSORS_TRUE@LoadPlugin apple_sensors
- @BUILD_PLUGIN_ASCENT_TRUE@LoadPlugin ascent
-@@ -39,45 +38,33 @@ FQDNLookup   true
- @BUILD_PLUGIN_DBI_TRUE@LoadPlugin dbi
- @BUILD_PLUGIN_DF_TRUE@LoadPlugin df
- @BUILD_PLUGIN_DISK_TRUE@LoadPlugin disk
--@BUILD_PLUGIN_DNS_TRUE@LoadPlugin dns
--@BUILD_PLUGIN_EMAIL_TRUE@LoadPlugin email
- @BUILD_PLUGIN_ENTROPY_TRUE@LoadPlugin entropy
- @BUILD_PLUGIN_EXEC_TRUE@LoadPlugin exec
- @BUILD_PLUGIN_FILECOUNT_TRUE@LoadPlugin filecount
- @BUILD_PLUGIN_HDDTEMP_TRUE@LoadPlugin hddtemp
- @BUILD_PLUGIN_INTERFACE_TRUE@LoadPlugin interface
- @BUILD_PLUGIN_IPTABLES_TRUE@LoadPlugin iptables
--@BUILD_PLUGIN_IPMI_TRUE@LoadPlugin ipmi
- @BUILD_PLUGIN_IPVS_TRUE@LoadPlugin ipvs
- @BUILD_PLUGIN_IRQ_TRUE@LoadPlugin irq
--@BUILD_PLUGIN_LIBVIRT_TRUE@LoadPlugin libvirt
- @BUILD_PLUGIN_LOAD_TRUE@LoadPlugin load
- @BUILD_PLUGIN_MBMON_TRUE@LoadPlugin mbmon
- @BUILD_PLUGIN_MEMCACHED_TRUE@LoadPlugin memcached
- @BUILD_PLUGIN_MEMORY_TRUE@LoadPlugin memory
- @BUILD_PLUGIN_MULTIMETER_TRUE@LoadPlugin multimeter
--@BUILD_PLUGIN_MYSQL_TRUE@LoadPlugin mysql
- @BUILD_PLUGIN_NETLINK_TRUE@LoadPlugin netlink
- @BUILD_PLUGIN_NETWORK_TRUE@LoadPlugin network
- @BUILD_PLUGIN_NFS_TRUE@LoadPlugin nfs
--@BUILD_PLUGIN_NGINX_TRUE@LoadPlugin nginx
- @BUILD_PLUGIN_NOTIFY_DESKTOP_TRUE@LoadPlugin notify_desktop
- @BUILD_PLUGIN_NOTIFY_EMAIL_TRUE@LoadPlugin notify_email
- @BUILD_PLUGIN_NTPD_TRUE@LoadPlugin ntpd
--@BUILD_PLUGIN_NUT_TRUE@LoadPlugin nut
- @BUILD_PLUGIN_ONEWIRE_TRUE@LoadPlugin onewire
- @BUILD_PLUGIN_OPENVPN_TRUE@LoadPlugin openvpn
- @BUILD_PLUGIN_ORACLE_TRUE@LoadPlugin oracle
--@BUILD_PLUGIN_PERL_TRUE@LoadPlugin perl
- @BUILD_PLUGIN_PING_TRUE@LoadPlugin ping
--@BUILD_PLUGIN_POSTGRESQL_TRUE@LoadPlugin postgresql
- @BUILD_PLUGIN_POWERDNS_TRUE@LoadPlugin powerdns
- @BUILD_PLUGIN_PROCESSES_TRUE@LoadPlugin processes
- @BUILD_PLUGIN_RRDCACHED_TRUE@LoadPlugin rrdcached
--@BUILD_PLUGIN_RRDTOOL_TRUE@LoadPlugin rrdtool
--@BUILD_PLUGIN_SENSORS_TRUE@LoadPlugin sensors
- @BUILD_PLUGIN_SERIAL_TRUE@LoadPlugin serial
--@BUILD_PLUGIN_SNMP_TRUE@LoadPlugin snmp
- @BUILD_PLUGIN_SWAP_TRUE@LoadPlugin swap
- @BUILD_PLUGIN_TAIL_TRUE@LoadPlugin tail
- @BUILD_PLUGIN_TAPE_TRUE@LoadPlugin tape
-@@ -560,3 +547,5 @@ FQDNLookup   true
- #<Chain "PostCache">
- #  Target "write"
- #</Chain>
-+
+-#@BUILD_PLUGIN_APACHE_TRUE@LoadPlugin apache
+ #@BUILD_PLUGIN_APCUPS_TRUE@LoadPlugin apcups
+ #@BUILD_PLUGIN_APPLE_SENSORS_TRUE@LoadPlugin apple_sensors
+ #@BUILD_PLUGIN_ASCENT_TRUE@LoadPlugin ascent
+@@ -65,8 +64,6 @@ FQDNLookup   true
+ #@BUILD_PLUGIN_DBI_TRUE@LoadPlugin dbi
+ #@BUILD_PLUGIN_DF_TRUE@LoadPlugin df
+ #@BUILD_PLUGIN_DISK_TRUE@LoadPlugin disk
+-#@BUILD_PLUGIN_DNS_TRUE@LoadPlugin dns
+-#@BUILD_PLUGIN_EMAIL_TRUE@LoadPlugin email
+ #@BUILD_PLUGIN_ENTROPY_TRUE@LoadPlugin entropy
+ #@BUILD_PLUGIN_EXEC_TRUE@LoadPlugin exec
+ #@BUILD_PLUGIN_FILECOUNT_TRUE@LoadPlugin filecount
+@@ -75,41 +72,31 @@ FQDNLookup   true
+ #@BUILD_PLUGIN_HDDTEMP_TRUE@LoadPlugin hddtemp
+ @BUILD_PLUGIN_INTERFACE_TRUE@@BUILD_PLUGIN_INTERFACE_TRUE@LoadPlugin interface
+ #@BUILD_PLUGIN_IPTABLES_TRUE@LoadPlugin iptables
+-#@BUILD_PLUGIN_IPMI_TRUE@LoadPlugin ipmi
+ #@BUILD_PLUGIN_IPVS_TRUE@LoadPlugin ipvs
+ #@BUILD_PLUGIN_IRQ_TRUE@LoadPlugin irq
+ #@BUILD_PLUGIN_JAVA_TRUE@LoadPlugin java
+-#@BUILD_PLUGIN_LIBVIRT_TRUE@LoadPlugin libvirt
+ @BUILD_PLUGIN_LOAD_TRUE@@BUILD_PLUGIN_LOAD_TRUE@LoadPlugin load
+ #@BUILD_PLUGIN_MBMON_TRUE@LoadPlugin mbmon
+ #@BUILD_PLUGIN_MEMCACHEC_TRUE@LoadPlugin memcachec
+ #@BUILD_PLUGIN_MEMCACHED_TRUE@LoadPlugin memcached
+ @BUILD_PLUGIN_MEMORY_TRUE@@BUILD_PLUGIN_MEMORY_TRUE@LoadPlugin memory
+ #@BUILD_PLUGIN_MULTIMETER_TRUE@LoadPlugin multimeter
+-#@BUILD_PLUGIN_MYSQL_TRUE@LoadPlugin mysql
+ #@BUILD_PLUGIN_NETLINK_TRUE@LoadPlugin netlink
+ @LOAD_PLUGIN_NETWORK@LoadPlugin network
+ #@BUILD_PLUGIN_NFS_TRUE@LoadPlugin nfs
+-#@BUILD_PLUGIN_NGINX_TRUE@LoadPlugin nginx
+ #@BUILD_PLUGIN_NOTIFY_DESKTOP_TRUE@LoadPlugin notify_desktop
+ #@BUILD_PLUGIN_NOTIFY_EMAIL_TRUE@LoadPlugin notify_email
+ #@BUILD_PLUGIN_NTPD_TRUE@LoadPlugin ntpd
+-#@BUILD_PLUGIN_NUT_TRUE@LoadPlugin nut
+ #@BUILD_PLUGIN_OLSRD_TRUE@LoadPlugin olsrd
+ #@BUILD_PLUGIN_ONEWIRE_TRUE@LoadPlugin onewire
+ #@BUILD_PLUGIN_OPENVPN_TRUE@LoadPlugin openvpn
+ #@BUILD_PLUGIN_ORACLE_TRUE@LoadPlugin oracle
+-#@BUILD_PLUGIN_PERL_TRUE@LoadPlugin perl
+ #@BUILD_PLUGIN_PING_TRUE@LoadPlugin ping
+-#@BUILD_PLUGIN_POSTGRESQL_TRUE@LoadPlugin postgresql
+ #@BUILD_PLUGIN_POWERDNS_TRUE@LoadPlugin powerdns
+ #@BUILD_PLUGIN_PROCESSES_TRUE@LoadPlugin processes
+ #@BUILD_PLUGIN_PROTOCOLS_TRUE@LoadPlugin protocols
+ #@BUILD_PLUGIN_RRDCACHED_TRUE@LoadPlugin rrdcached
+-@LOAD_PLUGIN_RRDTOOL@LoadPlugin rrdtool
+-#@BUILD_PLUGIN_SENSORS_TRUE@LoadPlugin sensors
+ #@BUILD_PLUGIN_SERIAL_TRUE@LoadPlugin serial
+-#@BUILD_PLUGIN_SNMP_TRUE@LoadPlugin snmp
+ #@BUILD_PLUGIN_SWAP_TRUE@LoadPlugin swap
+ #@BUILD_PLUGIN_TABLE_TRUE@LoadPlugin table
+ #@BUILD_PLUGIN_TAIL_TRUE@LoadPlugin tail
+@@ -574,6 +561,7 @@ FQDNLookup   true
+ #	CreateFiles true
+ #	CollectStatistics true
+ #</Plugin>
 +Include "/etc/collectd.d"
+ 
+ #<Plugin rrdtool>
+ #	DataDir "@prefix@/var/lib/@PACKAGE_NAME@/rrd"
