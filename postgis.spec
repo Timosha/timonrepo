@@ -5,7 +5,7 @@
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.4.1
-Release:	rc2_1%{?dist}
+Release:	rc2_1%{?dist}.1
 License:	GPLv2+
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}rc2.tar.gz
@@ -164,6 +164,9 @@ rm -rf %{buildroot}
 %doc postgis*.pdf
 
 %changelog
+* Tue Dec 01 2009 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.4.1-rc2_1.1
+- Update spec for rc2 changes.
+
 * Mon Nov 30 2009 Devrim GUNDUZ <devrim@gunduz.org> - 1.4.1rc2-1
 - Update to 1.4.1rc2
 
