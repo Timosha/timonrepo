@@ -3,7 +3,7 @@
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -222,6 +222,8 @@ cat >$RPM_BUILD_ROOT%{_includedir}/%{name}/magick/magick-config.h <<EOF
 #endif
 EOF
 
+# Fonts must be packaged separately. It does nothave matter and demos work without it.
+rm PerlMagick/demo/Generic.ttf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -301,6 +303,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Nov 30 2009 Pavel Alexeev <Pahan@Hubbitus.info> - 6.5.4.7-4
+- Explude file Generic.ttf from -perl subpackage demos. Demos perfectly work without it, but with bundled font
+	package does not pass QA (Unfortunately no bugreport there, only mail from Nicolas Mailhot)
+
 * Mon Aug 3 2009 Pavel Alexeev <Pahan@Hubbitus.info> - 6.5.4.7-3
 - Update to version 6.5.4-7
 - Use lzma-compressed source tarball as sugested by Ville Skyttä (BZ#515319)
