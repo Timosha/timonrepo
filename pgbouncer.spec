@@ -1,13 +1,13 @@
 %define debug 0
 
 Name:		pgbouncer
-Version:	1.2.3
-Release:	5%{?dist}
+Version:	1.3.1
+Release:	1%{?dist}
 Summary:	Lightweight connection pooler for PostgreSQL
 Group:		Applications/Databases
 License:	MIT and BSD
 URL:		http://pgfoundry.org/projects/pgbouncer/
-Source0:	http://pgfoundry.org/frs/download.php/1873/%{name}-%{version}.tgz
+Source0:	http://pgfoundry.org/frs/download.php/2284/%{name}-%{version}.tgz
 Source1:	%{name}.init
 Source2:	%{name}.sysconfig
 Patch0:		%{name}-ini.patch
@@ -82,6 +82,9 @@ rm -rf %{buildroot}
 %{_mandir}/man5/%{name}.*
 
 %changelog
+* Tue Dec 1 2009 - Devrim GUNDUZ <devrim@gunduz.org> 1.3.1-1
+- Update to 1.3.1
+
 * Sun Jul 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2.3-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
