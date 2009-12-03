@@ -5,7 +5,7 @@
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.4.1
-Release:	rc2_1%{?dist}.1
+Release:	rc2_1%{?dist}.2
 License:	GPLv2+
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}rc2.tar.gz
@@ -37,7 +37,7 @@ The postgis-docs package includes PDF documentation of PostGIS.
 Summary:	The JDBC driver for PostGIS
 Group:		Applications/Databases
 License:	LGPLv2+
-Requires:	%{name} = %{version}rc2-%{release}, postgresql-jdbc
+Requires:	%{name} = %{version}-%{release}, postgresql-jdbc
 BuildRequires:  ant >= 0:1.6.2, junit >= 0:3.7, postgresql-jdbc
 
 %if %{gcj_support}
@@ -55,7 +55,7 @@ The postgis-jdbc package provides the essential jdbc driver for PostGIS.
 %package utils
 Summary:	The utils for PostGIS
 Group:		Applications/Databases
-Requires:	%{name} = %{version}rc2-%{release}, perl-DBD-Pg
+Requires:	%{name} = %{version}-%{release}, perl-DBD-Pg
 
 %description utils
 The postgis-utils package provides the utilities for PostGIS.
@@ -164,6 +164,9 @@ rm -rf %{buildroot}
 %doc postgis*.pdf
 
 %changelog
+* Thu Dec 03 2009 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.4.1-rc2_1.2
+- Fix spec per rawhide report.
+
 * Tue Dec 01 2009 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.4.1-rc2_1.1
 - Update spec for rc2 changes.
 
