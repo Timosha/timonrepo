@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.8.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -439,6 +439,9 @@ fi
 
 
 %changelog
+* Fri Dec  4 2009 Stepan Kasal <skasal@redhat.com> - 4.8.1-3
+- rebuild against perl 5.10.1
+
 * Fri Nov 27 2009 Alan Pevec <apevec@redhat.com> 4.8.1-2
 - use Fedora libiptc, owniptc in collectd sources fails to compile
 
