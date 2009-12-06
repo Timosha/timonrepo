@@ -3,7 +3,7 @@
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -303,6 +303,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Dec  4 2009 Stepan Kasal <skasal@redhat.com> - 6.5.4.7-5
+- rebuild against perl 5.10.1
+
 * Mon Nov 30 2009 Pavel Alexeev <Pahan@Hubbitus.info> - 6.5.4.7-4
 - Explude file Generic.ttf from -perl subpackage demos. Demos perfectly work without it, but with bundled font
 	package does not pass QA (Unfortunately no bugreport there, only mail from Nicolas Mailhot)
