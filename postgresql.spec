@@ -60,7 +60,7 @@ Summary: PostgreSQL client programs and libraries
 Name: postgresql
 %define majorversion 8.4
 Version: 8.4.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 # PostgreSQL calls their license simplified BSD, but the requirements are
 # more similar to other MIT licenses.
 License: MIT
@@ -855,6 +855,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Dec  7 2009 Stepan Kasal <skasal@redhat.com> - 8.4.1-5
+- rebuild against perl 5.10.1
+
 * Thu Oct 15 2009 Tom Lane <tgl@redhat.com> 8.4.1-4
 - add sparc/sparc64 to multilib header support
 
