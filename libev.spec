@@ -1,7 +1,7 @@
-%define version_upstream 3.8
+%define version_upstream 3.9
 
 Name:		libev
-Version:	3.80
+Version:	3.90
 Release:	1%{?dist}
 Summary:	High-performance event loop/event model with lots of features
 
@@ -85,6 +85,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sat Jan  2 2010 Michal Nowak <mnowak@redhat.com> - 3.90-1
+- 3.9
+
 * Fri Aug 10 2009 Michal Nowak <mnowak@redhat.com> - 3.80-1
 - 3.8
 - always use the most recent automake
