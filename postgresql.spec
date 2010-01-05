@@ -29,38 +29,38 @@
 # The base package, the lib package, the devel package, and the server package
 # always get built.
 
-%define beta 0
-%{?beta:%define __os_install_post /usr/lib/rpm/brp-compress}
+%global beta 0
+%{?beta:%global __os_install_post /usr/lib/rpm/brp-compress}
 
-%{!?aconfver:%define aconfver autoconf}
+%{!?aconfver:%global aconfver autoconf}
 
-%{!?tcldevel:%define tcldevel 1}
-%{!?test:%define test 1}
-%{!?plpython:%define plpython 1}
-%{!?pltcl:%define pltcl 1}
-%{!?plperl:%define plperl 1}
-%{!?python:%define python 1}
-%{!?tcl:%define tcl 1}
-%{!?ssl:%define ssl 1}
-%{!?kerberos:%define kerberos 1}
-%{!?ldap:%define ldap 1}
-%{!?nls:%define nls 1}
-%{!?uuid:%define uuid 1}
-%{!?xml:%define xml 1}
-%{!?pam:%define pam 1}
-%{!?sdt:%define sdt 1}
-%{!?pgfts:%define pgfts 1}
-%{!?runselftest:%define runselftest 1}
+%{!?tcldevel:%global tcldevel 1}
+%{!?test:%global test 1}
+%{!?plpython:%global plpython 1}
+%{!?pltcl:%global pltcl 1}
+%{!?plperl:%global plperl 1}
+%{!?python:%global python 1}
+%{!?tcl:%global tcl 1}
+%{!?ssl:%global ssl 1}
+%{!?kerberos:%global kerberos 1}
+%{!?ldap:%global ldap 1}
+%{!?nls:%global nls 1}
+%{!?uuid:%global uuid 1}
+%{!?xml:%global xml 1}
+%{!?pam:%global pam 1}
+%{!?sdt:%global sdt 1}
+%{!?pgfts:%global pgfts 1}
+%{!?runselftest:%global runselftest 1}
 
 # Python major version.
-%{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
+%{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
 
 Summary: PostgreSQL client programs
 Name: postgresql
-%define majorversion 8.4
+%global majorversion 8.4
 Version: 8.4.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 # PostgreSQL calls their license simplified BSD, but the requirements are
 # more similar to other MIT licenses.
 License: MIT
@@ -305,7 +305,7 @@ binaries of various tests for the PostgreSQL database management
 system, including regression tests and benchmarks.
 %endif
 
-%define __perl_requires %{SOURCE16}
+%global __perl_requires %{SOURCE16}
 
 %prep
 %setup -q 
@@ -543,6 +543,9 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/pgsql
    popd
 %endif
 
+# remove files not to be packaged
+rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
+
 %find_lang ecpg-%{majorversion}
 cat ecpg-%{majorversion}.lang >devel.lst
 %find_lang ecpglib6-%{majorversion}
@@ -769,13 +772,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/pg_config
 %{_libdir}/libpq.so
 %{_libdir}/libecpg.so
-%{_libdir}/libpq.a
-%{_libdir}/libecpg.a
 %{_libdir}/libecpg_compat.so
-%{_libdir}/libecpg_compat.a
-%{_libdir}/libpgport.a
 %{_libdir}/libpgtypes.so
-%{_libdir}/libpgtypes.a
 %{_libdir}/pgsql/pgxs/
 %{_mandir}/man1/ecpg.*
 %{_mandir}/man1/pg_config.*
@@ -826,6 +824,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Jan  5 2010 Tom Lane <tgl@redhat.com> 8.4.2-2
+- Remove static libraries (.a files) from package, per packaging guidelines
+- Change %%define to %%global, per packaging guidelines
+
 * Wed Dec 16 2009 Tom Lane <tgl@redhat.com> 8.4.2-1
 - Update to PostgreSQL 8.4.2, for various fixes described at
   http://www.postgresql.org/docs/8.4/static/release-8-4-2.html
