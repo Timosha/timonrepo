@@ -1,19 +1,19 @@
-%define VER 6.5.4
-%define Patchlevel 7
+%define VER 6.5.8
+%define Patchlevel 10
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
 Url:            http://www.imagemagick.org/
-Source0:        ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.lzma
+Source0:        ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.xz
 Patch1:         ImageMagick-6.4.0-multilib.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
-BuildRequires:  libtiff-devel, giflib-devel, zlib-devel, perl-devel
+BuildRequires:  libtiff-devel, giflib-devel, zlib-devel, perl-devel >= 5.8.1
 BuildRequires:  ghostscript-devel, djvulibre-devel
 BuildRequires:  libwmf-devel, jasper-devel, libtool-ltdl-devel
 BuildRequires:  libX11-devel, libXext-devel, libXt-devel
@@ -303,6 +303,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Jan 5 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 6.5.8.10-6
+- Update to 6.5.8-10 (BZ#547806)
+- Change source tarball from .tar.lzma to .tar.xz folow to upstream.
+
 * Fri Dec  4 2009 Stepan Kasal <skasal@redhat.com> - 6.5.4.7-5
 - rebuild against perl 5.10.1
 
