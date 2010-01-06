@@ -5,7 +5,7 @@
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.4.1
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
@@ -15,7 +15,7 @@ URL:		http://postgis.refractions.net/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:	postgresql-devel >= 8.2, proj-devel, geos-devel >= 3.1.1, byacc, proj-devel, flex, sinjdoc, java, java-devel, ant
-
+BuildRequires:	gtk2-devel
 Requires:	postgresql >= 8.2, geos >= 3.1.1, proj
 
 %description
@@ -69,7 +69,7 @@ The postgis-utils package provides the utilities for PostGIS.
 cp -p %{SOURCE2} .
 
 %build
-%configure 
+%configure --with-gui
 #make %{?_smp_mflags} LPATH=`pg_config --pkglibdir` shlib="%{name}.so"
 make LPATH=`pg_config --pkglibdir` shlib="%{name}.so"
 
@@ -93,6 +93,7 @@ make install DESTDIR=%{buildroot}
 install -d %{buildroot}%{_libdir}/pgsql/
 install -d  %{buildroot}%{_datadir}/pgsql/contrib/
 install -m 644 *.sql %{buildroot}%{_datadir}/pgsql/contrib/
+install -m 755 loader/shp2pgsql-cli loader/shp2pgsql-gui %{buildroot}%{_bindir}/
 rm -f  %{buildroot}%{_datadir}/*.sql
 
 if [ "%{_libdir}" = "/usr/lib64" ] ; then
@@ -164,6 +165,9 @@ rm -rf %{buildroot}
 %doc postgis*.pdf
 
 %changelog
+* Wed Jan 6 2010 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.4.1-2
+- Add shp2pgsql-{cli-gui} among installed files.
+
 * Sun Dec 20 2009 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.4.1-1
 - Update to 1.4.1
 
