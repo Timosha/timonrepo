@@ -32,15 +32,11 @@
 %global beta 0
 %{?beta:%global __os_install_post /usr/lib/rpm/brp-compress}
 
-%{!?aconfver:%global aconfver autoconf}
-
 %{!?tcldevel:%global tcldevel 1}
 %{!?test:%global test 1}
 %{!?plpython:%global plpython 1}
 %{!?pltcl:%global pltcl 1}
 %{!?plperl:%global plperl 1}
-%{!?python:%global python 1}
-%{!?tcl:%global tcl 1}
 %{!?ssl:%global ssl 1}
 %{!?kerberos:%global kerberos 1}
 %{!?ldap:%global ldap 1}
@@ -52,15 +48,12 @@
 %{!?pgfts:%global pgfts 1}
 %{!?runselftest:%global runselftest 1}
 
-# Python major version.
-%{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
-
 
 Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 8.4
 Version: 8.4.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 # PostgreSQL calls their license simplified BSD, but the requirements are
 # more similar to other MIT licenses.
 License: MIT
@@ -77,14 +70,10 @@ Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
 Source17: http://www.postgresql.org/docs/manuals/postgresql-8.4.2-US.pdf
-Source18: ftp://ftp.pygresql.org/pub/distrib/PyGreSQL-3.8.1.tgz
-Source19: http://pgfoundry.org/projects/pgtclng/pgtcl1.6.2.tar.gz
-Source20: http://pgfoundry.org/projects/pgtclng/pgtcldocs-20070115.zip
 
 Patch1: rpm-pgsql.patch
 Patch2: postgresql-ac-version.patch
 Patch3: postgresql-logging.patch
-Patch5: pgtcl-no-rpath.patch
 Patch6: postgresql-perl-rpath.patch
 
 BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf gawk
@@ -93,11 +82,11 @@ BuildRequires: perl(ExtUtils::Embed), perl-devel
 Requires(post): glibc initscripts
 Requires(postun): glibc initscripts
 
-%if %python || %plpython
+%if %plpython
 BuildRequires: python-devel
 %endif
 
-%if %tcl || %pltcl
+%if %pltcl
 BuildRequires: tcl
 %if %tcldevel
 BuildRequires: tcl-devel
@@ -263,35 +252,6 @@ system.  The postgresql-pltcl package contains the PL/Tcl
 procedural language for the backend.
 %endif
 
-%if %tcl
-%package tcl
-Summary: A Tcl client library for PostgreSQL
-Group: Applications/Databases
-# this is intentionally not a version-specific Requires:
-Requires: libpq.so
-Requires: tcl >= 8.5
-
-%description tcl
-PostgreSQL is an advanced Object-Relational database management
-system.  The postgresql-tcl package contains the Pgtcl client library
-and its documentation.
-%endif
-
-%if %python
-%package python
-Summary: Development module for Python code to access a PostgreSQL DB
-Group: Applications/Databases
-# this is intentionally not a version-specific Requires:
-Requires: libpq.so
-Requires: python mx
-
-%description python
-PostgreSQL is an advanced Object-Relational database management
-system.  The postgresql-python package includes a module for
-developers to use when writing Python code for accessing a PostgreSQL
-database.
-%endif
-
 %if %test
 %package test
 Summary: The test suite distributed with PostgreSQL
@@ -312,37 +272,11 @@ system, including regression tests and benchmarks.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-# patch5 is applied later
 %patch6 -p1
 
-#call autoconf 2.53 or greater
-%aconfver
+autoconf
 
 cp -p %{SOURCE17} .
-
-%if %python
-   tar xzf %{SOURCE18}
-   PYGRESQLDIR=`basename %{SOURCE18} .tgz`
-   mv $PYGRESQLDIR PyGreSQL
-   # Some versions of PyGreSQL.tgz contain wrong file permissions
-   chmod 755 PyGreSQL/tutorial
-   chmod 644 PyGreSQL/tutorial/*.py
-   chmod 755 PyGreSQL/tutorial/advanced.py PyGreSQL/tutorial/basics.py
-%endif
-
-%if %tcl
-   tar xzf %{SOURCE19}
-   PGTCLDIR=`basename %{SOURCE19} .tar.gz`
-   mv $PGTCLDIR Pgtcl
-   unzip %{SOURCE20}
-   PGTCLDOCDIR=`basename %{SOURCE20} .zip`
-   mv $PGTCLDOCDIR Pgtcl-docs
-
-   pushd Pgtcl
-%patch5 -p1
-%aconfver
-   popd
-%endif
 
 %build
 
@@ -428,32 +362,6 @@ rm -f src/tutorial/GNUmakefile
 	popd
 %endif
 
-%if %python
-   PYTHON=/usr/bin/python
-   python_version=`${PYTHON} -c "import sys; print sys.version[:3]"`
-   python_prefix=`${PYTHON} -c "import sys; print sys.prefix"`
-   python_includespec="-I${python_prefix}/include/python${python_version}"
-
-   pushd PyGreSQL
-
-   gcc $CFLAGS -fpic -shared -o _pgmodule.so ${python_includespec} -I../src/interfaces/libpq -I../src/include -L../src/interfaces/libpq -lpq pgmodule.c
-
-   popd
-%endif
-
-%if %tcl
-   pushd Pgtcl
-   # pgtcl's configure only handles one include directory :-(
-   ./configure --prefix=/usr \
-     --libdir=%{_libdir} \
-     --with-tcl=%{_libdir} \
-     --with-postgres-include="../src/interfaces/libpq -I../src/include" \
-     --with-postgres-lib=../src/interfaces/libpq
-   # note: as of pgtcl 1.5.2, its makefile is not parallel-safe
-   make all
-   popd
-%endif
-
 %install
 rm -rf $RPM_BUILD_ROOT
 
@@ -477,20 +385,6 @@ esac
 
 install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
 cp src/tutorial/* $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
-
-%if %tcl
-	TCL_VERSION=`echo 'puts $tcl_version' | tclsh`
-	TCLLIBDIR="%{_libdir}/tcl$TCL_VERSION"
-	# check the target directory is a dir, not a symlink
-	if [ -h "$TCLLIBDIR" ] ; then
-		echo "$TCLLIBDIR must not be a symlink"
-		exit 1
-	fi
-	PGTCL_DIR="${RPM_BUILD_ROOT}${TCLLIBDIR}/Pgtcl"
-	install -d -m 755 "$PGTCL_DIR"
-	cp Pgtcl/pkgIndex.tcl "$PGTCL_DIR"
-	cp Pgtcl/libpgtcl*.so "$PGTCL_DIR"
-%endif
 
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 sed 's/^PGVERSION=.*$/PGVERSION=%{version}/' <%{SOURCE3} >postgresql.init
@@ -533,15 +427,6 @@ install -d -m 700 $RPM_BUILD_ROOT/etc/sysconfig/pgsql
 cp %{SOURCE6} README.rpm-dist
 mv $RPM_BUILD_ROOT%{_docdir}/pgsql/html doc
 rm -rf $RPM_BUILD_ROOT%{_docdir}/pgsql
-
-%if %python
-   pushd PyGreSQL
-   install -m 0755 -d $RPM_BUILD_ROOT%{python_sitearch}
-   install -m 0755 _pgmodule.so $RPM_BUILD_ROOT%{python_sitearch}
-   install -m 0644 pg.py $RPM_BUILD_ROOT%{python_sitearch}
-   install -m 0644 pgdb.py $RPM_BUILD_ROOT%{python_sitearch}
-   popd
-%endif
 
 # remove files not to be packaged
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
@@ -778,13 +663,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/ecpg.*
 %{_mandir}/man1/pg_config.*
 
-%if %tcl
-%files tcl
-%defattr(-,root,root)
-%{_libdir}/tcl*/Pgtcl/
-%doc Pgtcl-docs/*
-%endif
-
 %if %plperl
 %files plperl -f plperl.lst
 %defattr(-,root,root)
@@ -807,15 +685,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pgsql/plpython.so
 %endif
 
-%if %python
-%files python
-%defattr(-,root,root)
-%doc PyGreSQL/docs/*.txt
-%doc PyGreSQL/tutorial
-%{python_sitearch}/_pgmodule.so
-%{python_sitearch}/*.py
-%endif
-
 %if %test
 %files test
 %defattr(-,postgres,postgres)
@@ -824,6 +693,12 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Jan  9 2010 Tom Lane <tgl@redhat.com> 8.4.2-3
+- Remove the postgresql-python and postgresql-tcl subpackages.  These files
+  are now broken out as their own packages (PyGreSQL and tcl-pgtcl,
+  respectively), to reflect the now longstanding split of upstream projects.
+Related: #452306, #452321
+
 * Tue Jan  5 2010 Tom Lane <tgl@redhat.com> 8.4.2-2
 - Remove static libraries (.a files) from package, per packaging guidelines
 - Change %%define to %%global, per packaging guidelines
