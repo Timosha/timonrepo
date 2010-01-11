@@ -53,7 +53,7 @@ Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 8.4
 Version: 8.4.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 # PostgreSQL calls their license simplified BSD, but the requirements are
 # more similar to other MIT licenses.
 License: MIT
@@ -74,6 +74,7 @@ Source17: http://www.postgresql.org/docs/manuals/postgresql-8.4.2-US.pdf
 Patch1: rpm-pgsql.patch
 Patch2: postgresql-ac-version.patch
 Patch3: postgresql-logging.patch
+Patch4: postgresql-oom-adj.patch
 Patch6: postgresql-perl-rpath.patch
 
 BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf gawk
@@ -272,6 +273,7 @@ system, including regression tests and benchmarks.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 %patch6 -p1
 
 autoconf
@@ -281,10 +283,11 @@ cp -p %{SOURCE17} .
 %build
 
 CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS
-CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS
 
 # Strip out -ffast-math from CFLAGS....
 CFLAGS=`echo $CFLAGS|xargs -n 1|grep -v ffast-math|xargs -n 100`
+# Add LINUX_OOM_ADJ=0 to ensure child processes reset postmaster's oom_adj
+CFLAGS="$CFLAGS -DLINUX_OOM_ADJ=0"
 # let's try removing this kluge, it may just be a workaround for bz#520916
 # # use -O1 on sparc64 and alpha
 # %ifarch sparc64 alpha
@@ -693,6 +696,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Jan 11 2010 Tom Lane <tgl@redhat.com> 8.4.2-4
+- Arrange for the postmaster, but not any of its child processes, to be run
+  with oom_adj -17.  This compensates for the OOM killer not being smart about
+  accounting for shared memory usage.
+
 * Sat Jan  9 2010 Tom Lane <tgl@redhat.com> 8.4.2-3
 - Remove the postgresql-python and postgresql-tcl subpackages.  These files
   are now broken out as their own packages (PyGreSQL and tcl-pgtcl,

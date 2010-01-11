@@ -108,6 +108,8 @@ PGENGINE=/usr/bin
 PGPORT=5432
 PGDATA=/var/lib/pgsql/data
 PGLOG=/var/lib/pgsql/pgstartup.log
+# Value to set as postmaster process's oom_adj
+PG_OOM_ADJ=-17
 
 # Override defaults from /etc/sysconfig/pgsql if file is present
 [ -f /etc/sysconfig/pgsql/${NAME} ] && . /etc/sysconfig/pgsql/${NAME}
@@ -177,6 +179,7 @@ start(){
  	fi
 
 	echo -n "$PSQL_START"
+	test x"$PG_OOM_ADJ" != x && echo "$PG_OOM_ADJ" > /proc/self/oom_adj
 	$SU -l postgres -c "$PGENGINE/postmaster -p '$PGPORT' -D '$PGDATA' ${PGOPTS} &" >> "$PGLOG" 2>&1 < /dev/null
 	sleep 2
 	pid=`pidof -s "$PGENGINE/postmaster"`
