@@ -4,12 +4,12 @@
 
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
-Version:	1.4.1
-Release:	2%{?dist}
+Version:	1.5.0
+Release:	b2_1%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
-Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
-Source2:	http://www.postgis.org/download/%{name}-%{version}.pdf
+Source0:	http://postgis.refractions.net/download/%{name}-%{version}b2.tar.gz
+Source2:	http://www.postgis.org/download/%{name}-%{version}b2.pdf
 Source4:	filter-requires-perl-Pg.sh
 URL:		http://postgis.refractions.net/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -38,7 +38,7 @@ Summary:	The JDBC driver for PostGIS
 Group:		Applications/Databases
 License:	LGPLv2+
 Requires:	%{name} = %{version}-%{release}, postgresql-jdbc
-BuildRequires:  ant >= 0:1.6.2, junit >= 0:3.7, postgresql-jdbc
+BuildRequires:	ant >= 0:1.6.2, junit >= 0:3.7, postgresql-jdbc
 
 %if %{gcj_support}
 BuildRequires:		gcc-java
@@ -64,7 +64,7 @@ The postgis-utils package provides the utilities for PostGIS.
 %define __perl_requires %{SOURCE4}
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}b2
 # Copy .pdf file to top directory before installing.
 cp -p %{SOURCE2} .
 
@@ -74,7 +74,7 @@ cp -p %{SOURCE2} .
 make LPATH=`pg_config --pkglibdir` shlib="%{name}.so"
 
 %if %javabuild
-export BUILDXML_DIR=%{_builddir}/%{name}-%{version}/java/jdbc
+export BUILDXML_DIR=%{_builddir}/%{name}-%{version}b2/java/jdbc
 JDBC_VERSION_RPM=`rpm -ql postgresql-jdbc| grep 'jdbc2.jar$'|awk -F '/' '{print $5}'`
 sed 's/postgresql.jar/'${JDBC_VERSION_RPM}'/g' $BUILDXML_DIR/build.xml > $BUILDXML_DIR/build.xml.new
 mv -f $BUILDXML_DIR/build.xml.new $BUILDXML_DIR/build.xml
@@ -93,7 +93,7 @@ make install DESTDIR=%{buildroot}
 install -d %{buildroot}%{_libdir}/pgsql/
 install -d  %{buildroot}%{_datadir}/pgsql/contrib/
 install -m 644 *.sql %{buildroot}%{_datadir}/pgsql/contrib/
-install -m 755 loader/shp2pgsql-cli loader/shp2pgsql-gui %{buildroot}%{_bindir}/
+install -m 755 loader/shp2pgsql loader/shp2pgsql-gui %{buildroot}%{_bindir}/
 rm -f  %{buildroot}%{_datadir}/*.sql
 
 if [ "%{_libdir}" = "/usr/lib64" ] ; then
@@ -105,7 +105,7 @@ fi
 
 %if %javabuild
 install -d %{buildroot}%{_javadir}
-install -m 755 java/jdbc/%{name}-%{version}.jar %{buildroot}%{_javadir}
+install -m 755 java/jdbc/%{name}-%{version}b2.jar %{buildroot}%{_javadir}
 %if %{gcj_support}
 aot-compile-rpm
 %endif
@@ -114,7 +114,7 @@ strip %{buildroot}/%{_libdir}/gcj/%{name}/*.jar.so
 
 %if %utils
 install -d %{buildroot}%{_datadir}/%{name}
-install -m 644 utils/*.pl %{buildroot}%{_datadir}/%{name}
+install -m 755 utils/*.pl %{buildroot}%{_datadir}/%{name}
 %endif
 
 %clean
@@ -133,12 +133,13 @@ rm -rf %{buildroot}
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_libdir}/pgsql/postgis-*.so
 %{_datadir}/pgsql/contrib/*.sql
+%{_datadir}/pgsql/contrib/%{name}-1.5/*.sql
 
 %if %javabuild
 %files jdbc
 %defattr(-,root,root)
 %doc java/jdbc/COPYING_LGPL java/jdbc/README
-%attr(755,root,root) %{_javadir}/%{name}-%{version}.jar
+%attr(755,root,root) %{_javadir}/%{name}-%{version}b2.jar
 %if %{gcj_support}
 %dir %{_libdir}/gcj/%{name}
 %{_libdir}/gcj/%{name}/*.jar.so
@@ -148,16 +149,19 @@ rm -rf %{buildroot}
 
 %if %utils
 %files utils
-%defattr(-,root,root)
+%defattr(755,root,root)
 %doc utils/README
 %dir %{_datadir}/%{name}/
-%attr(755,root,root) %{_datadir}/%{name}/test_estimation.pl
-%attr(755,root,root) %{_datadir}/%{name}/profile_intersects.pl
-%attr(755,root,root) %{_datadir}/%{name}/test_joinestimation.pl
-%attr(644,root,root) %{_datadir}/%{name}/create_undef.pl
-%attr(644,root,root) %{_datadir}/%{name}/%{name}_proc_upgrade.pl
-%attr(644,root,root) %{_datadir}/%{name}/%{name}_restore.pl
-%attr(644,root,root) %{_datadir}/%{name}/new_postgis_restore.pl
+%{_datadir}/%{name}/test_estimation.pl
+%{_datadir}/%{name}/profile_intersects.pl
+%{_datadir}/%{name}/test_joinestimation.pl
+%{_datadir}/%{name}/create_undef.pl
+%{_datadir}/%{name}/%{name}_proc_upgrade.pl
+%{_datadir}/%{name}/%{name}_restore.pl
+%{_datadir}/%{name}/new_postgis_restore.pl
+%{_datadir}/%{name}/read_scripts_version.pl
+%{_datadir}/%{name}/test_geography_estimation.pl
+%{_datadir}/%{name}/test_geography_joinestimation.pl
 %endif
 
 %files docs
@@ -165,6 +169,12 @@ rm -rf %{buildroot}
 %doc postgis*.pdf
 
 %changelog
+* Tue Jan 19 2010 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5.0b2-1
+- Update to 1.5.0 beta2
+
+* Tue Jan 12 2010 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5.0-b1-1
+- Update to 1.5.0 beta1
+
 * Wed Jan 6 2010 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.4.1-2
 - Add shp2pgsql-{cli-gui} among installed files.
 
@@ -291,7 +301,7 @@ rm -rf %{buildroot}
 - Fixed all build errors except jdbc (so, defaulted to 0)
 - Added new files under %%utils
 - Removed postgis-jdbc2-makefile.patch (applied to -head)
-                                                                                                    
+
 * Tue Sep 27 2005 - Devrim GUNDUZ <devrim@gunduz.org>
 - Update to 1.0.4
 
