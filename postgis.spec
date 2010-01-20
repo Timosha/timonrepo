@@ -15,7 +15,7 @@ URL:		http://postgis.refractions.net/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:	postgresql-devel >= 8.2, proj-devel, geos-devel >= 3.1.1, byacc, proj-devel, flex, sinjdoc, java, java-devel, ant
-BuildRequires:	gtk2-devel
+BuildRequires:	gtk2-devel, libxml2-devel
 Requires:	postgresql >= 8.2, geos >= 3.1.1, proj
 
 %description
