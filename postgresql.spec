@@ -79,6 +79,7 @@ Patch2: postgresql-ac-version.patch
 Patch3: postgresql-logging.patch
 Patch4: postgresql-oom-adj.patch
 Patch6: postgresql-perl-rpath.patch
+Patch7: postgresql-dtrace.patch
 
 BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf gawk
 BuildRequires: perl(ExtUtils::Embed), perl-devel
@@ -278,6 +279,7 @@ system, including regression tests and benchmarks.
 %patch3 -p1
 %patch4 -p1
 %patch6 -p1
+%patch7 -p1
 
 autoconf
 
@@ -700,6 +702,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Wed Jan 20 2010 Tom Lane <tgl@redhat.com> 8.4.2-5
+- Latest version of systemtap needs the probes.o file to be built again
+Resolves: #557266
 - Provide script and instructions for building the documentation PDF
 
 * Mon Jan 11 2010 Tom Lane <tgl@redhat.com> 8.4.2-4
