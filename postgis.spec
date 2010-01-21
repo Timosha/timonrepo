@@ -2,6 +2,8 @@
 %{!?utils:%define	utils 1}
 %{!?gcj_support:%define	gcj_support 1}
 
+%global majorversion 1.5
+
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.5.0
@@ -97,10 +99,9 @@ install -m 755 loader/shp2pgsql loader/shp2pgsql-gui %{buildroot}%{_bindir}/
 rm -f  %{buildroot}%{_datadir}/*.sql
 
 if [ "%{_libdir}" = "/usr/lib64" ] ; then
-	mv %{buildroot}%{_datadir}/pgsql/contrib/postgis.sql %{buildroot}%{_datadir}/pgsql/contrib/postgis-64.sql
-	mv %{buildroot}%{_datadir}/pgsql/contrib/postgis_upgrade_12_to_14.sql %{buildroot}%{_datadir}/pgsql/contrib/postgis_upgrade_12_to_14-64.sql
-	mv %{buildroot}%{_datadir}/pgsql/contrib/postgis_upgrade_13_to_14.sql %{buildroot}%{_datadir}/pgsql/contrib/postgis_upgrade_13_to_14-64.sql
-	mv %{buildroot}%{_datadir}/pgsql/contrib/postgis_upgrade_14_minor.sql %{buildroot}%{_datadir}/pgsql/contrib/postgis_upgrade_14_minor-64.sql	
+	mv %{buildroot}%{_datadir}/pgsql/contrib/%{name}-%{majorversion}/postgis.sql %{buildroot}%{_datadir}/pgsql/contrib/postgis-64.sql
+	mv %{buildroot}%{_datadir}/pgsql/contrib/%{name}-%{majorversion}/postgis_upgrade_13_to_15.sql %{buildroot}%{_datadir}/pgsql/contrib/%{name}-%{majorversion}/postgis_upgrade_13_to_15-64.sql
+	mv %{buildroot}%{_datadir}/pgsql/contrib/%{name}-%{majorversion}/postgis_upgrade_14_to_15.sql %{buildroot}%{_datadir}/pgsql/contrib/%{name}-%{majorversion}/postgis_upgrade_14_to_15-64.sql
 fi
 
 %if %javabuild
@@ -133,7 +134,7 @@ rm -rf %{buildroot}
 %attr(755,root,root) %{_bindir}/*
 %attr(755,root,root) %{_libdir}/pgsql/postgis-*.so
 %{_datadir}/pgsql/contrib/*.sql
-%{_datadir}/pgsql/contrib/%{name}-1.5/*.sql
+%{_datadir}/pgsql/contrib/%{name}-%{majorversion}/*.sql
 
 %if %javabuild
 %files jdbc
