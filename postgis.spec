@@ -5,11 +5,11 @@
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.5.0
-Release:	b2_1%{?dist}
+Release:	rc1_1%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
-Source0:	http://postgis.refractions.net/download/%{name}-%{version}b2.tar.gz
-Source2:	http://www.postgis.org/download/%{name}-%{version}b2.pdf
+Source0:	http://postgis.refractions.net/download/%{name}-%{version}rc1.tar.gz
+Source2:	http://www.postgis.org/download/%{name}-%{version}rc1.pdf
 Source4:	filter-requires-perl-Pg.sh
 URL:		http://postgis.refractions.net/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -64,7 +64,7 @@ The postgis-utils package provides the utilities for PostGIS.
 %define __perl_requires %{SOURCE4}
 
 %prep
-%setup -q -n %{name}-%{version}b2
+%setup -q -n %{name}-%{version}rc1
 # Copy .pdf file to top directory before installing.
 cp -p %{SOURCE2} .
 
@@ -74,7 +74,7 @@ cp -p %{SOURCE2} .
 make LPATH=`pg_config --pkglibdir` shlib="%{name}.so"
 
 %if %javabuild
-export BUILDXML_DIR=%{_builddir}/%{name}-%{version}b2/java/jdbc
+export BUILDXML_DIR=%{_builddir}/%{name}-%{version}rc1/java/jdbc
 JDBC_VERSION_RPM=`rpm -ql postgresql-jdbc| grep 'jdbc2.jar$'|awk -F '/' '{print $5}'`
 sed 's/postgresql.jar/'${JDBC_VERSION_RPM}'/g' $BUILDXML_DIR/build.xml > $BUILDXML_DIR/build.xml.new
 mv -f $BUILDXML_DIR/build.xml.new $BUILDXML_DIR/build.xml
@@ -105,7 +105,7 @@ fi
 
 %if %javabuild
 install -d %{buildroot}%{_javadir}
-install -m 755 java/jdbc/%{name}-%{version}b2.jar %{buildroot}%{_javadir}
+install -m 755 java/jdbc/%{name}-%{version}rc1.jar %{buildroot}%{_javadir}
 %if %{gcj_support}
 aot-compile-rpm
 %endif
@@ -139,7 +139,7 @@ rm -rf %{buildroot}
 %files jdbc
 %defattr(-,root,root)
 %doc java/jdbc/COPYING_LGPL java/jdbc/README
-%attr(755,root,root) %{_javadir}/%{name}-%{version}b2.jar
+%attr(755,root,root) %{_javadir}/%{name}-%{version}rc1.jar
 %if %{gcj_support}
 %dir %{_libdir}/gcj/%{name}
 %{_libdir}/gcj/%{name}/*.jar.so
@@ -169,6 +169,9 @@ rm -rf %{buildroot}
 %doc postgis*.pdf
 
 %changelog
+* Thu Jan 21 2010 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5.0rc1-1
+- Update to 1.5.0 rc1
+
 * Tue Jan 19 2010 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5.0b2-1
 - Update to 1.5.0 beta2
 
