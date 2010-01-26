@@ -53,7 +53,7 @@ Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 8.4
 Version: 8.4.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 # PostgreSQL calls their license simplified BSD, but the requirements are
 # more similar to other MIT licenses.
 License: MIT
@@ -286,6 +286,16 @@ autoconf
 cp -p %{SOURCE1} .
 
 %build
+
+# fail quickly and obviously if user tries to build as root
+%if %runselftest
+	if [ x"`id -u`" = x0 ]; then
+		echo "postgresql's regression tests fail if run as root."
+		echo "If you really need to build the RPM as root, use"
+		echo "--define='runselftest 0' to skip the regression tests."
+		exit 1
+	fi
+%endif
 
 CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS
 
@@ -701,6 +711,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Jan 26 2010 Tom Lane <tgl@redhat.com> 8.4.2-6
+- Emit explicit error message if user tries to build RPM as root
+Related: #558921
+
 * Wed Jan 20 2010 Tom Lane <tgl@redhat.com> 8.4.2-5
 - Latest version of systemtap needs the probes.o file to be built again
 Resolves: #557266
