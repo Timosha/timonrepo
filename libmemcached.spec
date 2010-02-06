@@ -1,6 +1,6 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   0.31
+Version:   0.37
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -83,11 +83,13 @@ you will need to install %{name}-devel.
 %defattr (-,root,root,-) 
 %doc AUTHORS COPYING README THANKS TODO ChangeLog
 %{_bindir}/mem*
-%exclude %{_libdir}/libmemcached.a
 %exclude %{_libdir}/libmemcached.la
-%exclude %{_libdir}/libmemcachedutil.a
+%exclude %{_libdir}/libmemcachedprotocol.la
 %exclude %{_libdir}/libmemcachedutil.la
+%exclude %{_libdir}/libhashkit.la
+%{_libdir}/libhashkit.so.*
 %{_libdir}/libmemcached.so.*
+%{_libdir}/libmemcachedprotocol.so.*
 %{_libdir}/libmemcachedutil.so.*
 %{_mandir}/man1/mem*
 
@@ -96,15 +98,22 @@ you will need to install %{name}-devel.
 %defattr (-,root,root,-) 
 %doc examples
 %{_includedir}/libmemcached
+%{_includedir}/libhashkit
+%{_libdir}/libhashkit.so
 %{_libdir}/libmemcached.so
+%{_libdir}/libmemcachedprotocol.so
 %{_libdir}/libmemcachedutil.so
 %{_libdir}/pkgconfig/libmemcached.pc
-%{_libdir}/libmemcached.so
 %{_mandir}/man3/libmemcached*.3.gz
 %{_mandir}/man3/memcached_*.3.gz
+%{_mandir}/man3/hashkit*
 
 
 %changelog
+* Sat Feb 06 2010 Remi Collet <Fedora@famillecollet.com> - 0.37-1
+- update to 0.37 (soname bump)
+- new libhashkit (should be a separated project in the futur)
+
 * Sun Sep 13 2009 Remi Collet <Fedora@famillecollet.com> - 0.31-1
 - update to 0.31
 
