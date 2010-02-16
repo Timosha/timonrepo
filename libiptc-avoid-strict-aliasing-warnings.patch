@@ -1,0 +1,113 @@
+From 43db56e316b1dae1515d4ddf0085435731d3b9be Mon Sep 17 00:00:00 2001
+From: Jan Engelhardt <jengelh@medozas.de>
+Date: Fri, 23 Oct 2009 21:35:49 +0200
+Subject: [PATCH] libiptc: avoid strict-aliasing warnings
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+libiptc: avoid strict-aliasing warnings
+
+In file included from libiptc/libip4tc.c:117:0:
+libiptc/libiptc.c: In function ‘__iptcc_p_del_policy’:
+libiptc/libiptc.c:826:4: warning: dereferencing type-punned pointer will break
+strict-aliasing rules
+libiptc/libiptc.c: In function ‘iptc_get_target’:
+libiptc/libiptc.c:1650:4: warning: dereferencing type-punned pointer will break
+strict-aliasing rules
+libiptc/libip4tc.c: In function ‘dump_entry’:
+libiptc/libip4tc.c:157:3: warning: dereferencing type-punned pointer will break
+strict-aliasing rules
+  CC     libiptc/libip6tc.lo
+In file included from libiptc/libip6tc.c:112:0:
+libiptc/libiptc.c: In function ‘__iptcc_p_del_policy’:
+libiptc/libiptc.c:826:4: warning: dereferencing type-punned pointer will break
+strict-aliasing rules
+libiptc/libiptc.c: In function ‘ip6tc_get_target’:
+libiptc/libiptc.c:1650:4: warning: dereferencing type-punned pointer will break
+strict-aliasing rules
+libiptc/libip6tc.c: In function ‘dump_entry’:
+libiptc/libip6tc.c:188:3: warning: dereferencing type-punned pointer will break
+strict-aliasing rules
+
+Signed-off-by: Jan Engelhardt <jengelh@medozas.de>
+
+Rebased for collectd/src/owniptc: Alan Pevec <apevec@gmail.com>
+---
+ src/owniptc/libip4tc.c |    3 ++-
+ src/owniptc/libip6tc.c |    3 ++-
+ src/owniptc/libiptc.c  |   10 +++++++---
+ 3 files changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/src/owniptc/libip4tc.c b/src/owniptc/libip4tc.c
+index 66abb44..bf7327c 100644
+--- a/src/owniptc/libip4tc.c
++++ b/src/owniptc/libip4tc.c
+@@ -173,7 +173,8 @@ dump_entry(STRUCT_ENTRY *e, const TC_HANDLE_T handle)
+ 	t = GET_TARGET(e);
+ 	printf("Target name: `%s' [%u]\n", t->u.user.name, t->u.target_size);
+ 	if (strcmp(t->u.user.name, STANDARD_TARGET) == 0) {
+-		int pos = *(int *)t->data;
++		const unsigned char *data = t->data;
++		int pos = *(const int *)data;
+ 		if (pos < 0)
+ 			printf("verdict=%s\n",
+ 			       pos == -NF_ACCEPT-1 ? "NF_ACCEPT"
+diff --git a/src/owniptc/libip6tc.c b/src/owniptc/libip6tc.c
+index 276b7af..672dae1 100644
+--- a/src/owniptc/libip6tc.c
++++ b/src/owniptc/libip6tc.c
+@@ -204,7 +204,8 @@ dump_entry(struct ip6t_entry *e, const ip6tc_handle_t handle)
+ 	t = ip6t_get_target(e);
+ 	printf("Target name: `%s' [%u]\n", t->u.user.name, t->u.target_size);
+ 	if (strcmp(t->u.user.name, IP6T_STANDARD_TARGET) == 0) {
+-		int pos = *(int *)t->data;
++		const unsigned char *data = t->data;
++		int pos = *(const int *)data;
+ 		if (pos < 0)
+ 			printf("verdict=%s\n",
+ 			       pos == -NF_ACCEPT-1 ? "NF_ACCEPT"
+diff --git a/src/owniptc/libiptc.c b/src/owniptc/libiptc.c
+index 5e5fde0..8f0b0f0 100644
+--- a/src/owniptc/libiptc.c
++++ b/src/owniptc/libiptc.c
+@@ -744,14 +744,16 @@ static void iptcc_delete_rule(struct rule_head *r)
+  * to be called from specific places within the parser */
+ static int __iptcc_p_del_policy(TC_HANDLE_T h, unsigned int num)
+ {
++	const unsigned char *data;
++
+ 	if (h->chain_iterator_cur) {
+ 		/* policy rule is last rule */
+ 		struct rule_head *pr = (struct rule_head *)
+ 			h->chain_iterator_cur->rules.prev;
+ 
+ 		/* save verdict */
+-		h->chain_iterator_cur->verdict = 
+-			*(int *)GET_TARGET(pr->entry)->data;
++		data = GET_TARGET(pr->entry)->data;
++		h->chain_iterator_cur->verdict = *(const int *)data;
+ 
+ 		/* save counter and counter_map information */
+ 		h->chain_iterator_cur->counter_map.maptype = 
+@@ -1563,6 +1565,7 @@ const char *TC_GET_TARGET(const STRUCT_ENTRY *ce,
+ {
+ 	STRUCT_ENTRY *e = (STRUCT_ENTRY *)ce;
+ 	struct rule_head *r = container_of(e, struct rule_head, entry[0]);
++	const unsigned char *data;
+ 
+ 	iptc_fn = TC_GET_TARGET;
+ 
+@@ -1576,7 +1579,8 @@ const char *TC_GET_TARGET(const STRUCT_ENTRY *ce,
+ 			return r->jump->name;
+ 			break;
+ 		case IPTCC_R_STANDARD:
+-			spos = *(int *)GET_TARGET(e)->data;
++			data = GET_TARGET(e)->data;
++			spos = *(const int *)data;
+ 			DEBUGP("r=%p, spos=%d'\n", r, spos);
+ 			return standard_target_map(spos);
+ 			break;
+-- 
+1.6.0.6
+

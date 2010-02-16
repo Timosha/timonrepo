@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.8.1
-Release: 3%{?dist}
+Version: 4.8.3
+Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -10,6 +10,8 @@ Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
 Patch0: %{name}-4.6.2-include-collectd.d.patch
 # bug 468067 "pkg-config --libs OpenIPMIpthread" fails
 Patch1: %{name}-4.6.2-configure-OpenIPMI.patch
+# bug 564943 FTBFS system libiptc is not usable anymore, fix owniptc
+Patch2: libiptc-avoid-strict-aliasing-warnings.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -152,6 +154,7 @@ This plugin collects information from virtualized guests.
 %setup -q
 %patch0 -p1
 %patch1 -p0
+%patch2 -p1
 
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
@@ -439,6 +442,12 @@ fi
 
 
 %changelog
+* Tue Feb 16 2010 Alan Pevec <apevec@redhat.com> 4.8.3-1
+- New upstream version 4.8.3
+  http://collectd.org/news.shtml
+- FTBS bz#564943 - system libiptc is not usable and owniptc fails to compile:
+  add a patch from upstream iptables.git to fix owniptc compilation
+
 * Fri Dec  4 2009 Stepan Kasal <skasal@redhat.com> - 4.8.1-3
 - rebuild against perl 5.10.1
 
