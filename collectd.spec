@@ -444,8 +444,8 @@ fi
 %changelog
 * Tue Feb 16 2010 Alan Pevec <apevec@redhat.com> 4.8.3-1
 - New upstream version 4.8.3
-  http://collectd.org/news.shtml
-- FTBS bz#564943 - system libiptc is not usable and owniptc fails to compile:
+  http://collectd.org/news.shtml#news81
+- FTBFS bz#564943 - system libiptc is not usable and owniptc fails to compile:
   add a patch from upstream iptables.git to fix owniptc compilation
 
 * Fri Dec  4 2009 Stepan Kasal <skasal@redhat.com> - 4.8.1-3
