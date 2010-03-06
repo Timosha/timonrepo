@@ -1,9 +1,9 @@
-%define VER 6.5.8
-%define Patchlevel 10
+%define VER 6.6.0
+%define Patchlevel 2
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -303,6 +303,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sat Mar 6 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 6.6.0.2-7
+- Update to 6.6.0-2 (BZ#570766)
+
 * Tue Jan 5 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 6.5.8.10-6
 - Update to 6.5.8-10 (BZ#547806)
 - Change source tarball from .tar.lzma to .tar.xz folow to upstream.
