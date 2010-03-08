@@ -1,13 +1,13 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.8.3
+Version: 4.9.1
 Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
 
 Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
-Patch0: %{name}-4.6.2-include-collectd.d.patch
+Patch0: %{name}-4.9.1-include-collectd.d.patch
 # bug 468067 "pkg-config --libs OpenIPMIpthread" fails
 Patch1: %{name}-4.6.2-configure-OpenIPMI.patch
 # bug 564943 FTBFS system libiptc is not usable anymore, fix owniptc
@@ -277,8 +277,9 @@ fi
 %dir %{_libdir}/collectd
 %{_libdir}/collectd/apcups.so
 %{_libdir}/collectd/battery.so
-%{_libdir}/collectd/cpu.so
+%{_libdir}/collectd/contextswitch.so
 %{_libdir}/collectd/cpufreq.so
+%{_libdir}/collectd/cpu.so
 %{_libdir}/collectd/csv.so
 %{_libdir}/collectd/df.so
 %{_libdir}/collectd/disk.so
@@ -293,6 +294,7 @@ fi
 %{_libdir}/collectd/logfile.so
 %{_libdir}/collectd/madwifi.so
 %{_libdir}/collectd/match_empty_counter.so
+%{_libdir}/collectd/match_hashed.so
 %{_libdir}/collectd/mbmon.so
 %{_libdir}/collectd/memcached.so
 %{_libdir}/collectd/memory.so
@@ -307,6 +309,7 @@ fi
 %{_libdir}/collectd/swap.so
 %{_libdir}/collectd/syslog.so
 %{_libdir}/collectd/tail.so
+%{_libdir}/collectd/target_scale.so
 %{_libdir}/collectd/tcpconns.so
 %{_libdir}/collectd/teamspeak2.so
 %{_libdir}/collectd/thermal.so
@@ -352,8 +355,8 @@ fi
 %doc %{_mandir}/man5/collectd-exec.5*
 %doc %{_mandir}/man5/collectd-java.5*
 %doc %{_mandir}/man5/collectd-unixsock.5*
+%doc %{_mandir}/man5/collectd-python.5*
 %doc %{_mandir}/man5/types.db.5*
-
 
 %files apache
 %defattr(-, root, root, -)
@@ -442,6 +445,10 @@ fi
 
 
 %changelog
+* Mon Mar 08 2010 Lubomir Rintel <lkundrak@v3.sl> 4.9.1-1
+- New upstream version 4.9.1
+  http://collectd.org/news.shtml#news81
+
 * Tue Feb 16 2010 Alan Pevec <apevec@redhat.com> 4.8.3-1
 - New upstream version 4.8.3
   http://collectd.org/news.shtml#news81

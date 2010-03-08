@@ -1,6 +1,7 @@
-diff -rup collectd-4.8.3-orig/src/collectd.conf.in collectd-4.8.3/src/collectd.conf.in
---- collectd-4.8.3-orig/src/collectd.conf.in	2010-01-14 15:04:27.000000000 +0100
-+++ collectd-4.8.3/src/collectd.conf.in	2010-02-16 17:57:11.000000000 +0100
+diff --git a/src/collectd.conf.in b/src/collectd.conf.in
+index 049b07d..a795169 100644
+--- a/src/collectd.conf.in
++++ b/src/collectd.conf.in
 @@ -50,7 +50,6 @@ FQDNLookup   true
  # to missing dependencies or because they have been deactivated explicitly.  #
  ##############################################################################
@@ -9,7 +10,7 @@ diff -rup collectd-4.8.3-orig/src/collectd.conf.in collectd-4.8.3/src/collectd.c
  #@BUILD_PLUGIN_APCUPS_TRUE@LoadPlugin apcups
  #@BUILD_PLUGIN_APPLE_SENSORS_TRUE@LoadPlugin apple_sensors
  #@BUILD_PLUGIN_ASCENT_TRUE@LoadPlugin ascent
-@@ -65,8 +64,6 @@ FQDNLookup   true
+@@ -66,8 +65,6 @@ FQDNLookup   true
  #@BUILD_PLUGIN_DBI_TRUE@LoadPlugin dbi
  #@BUILD_PLUGIN_DF_TRUE@LoadPlugin df
  #@BUILD_PLUGIN_DISK_TRUE@LoadPlugin disk
@@ -18,7 +19,7 @@ diff -rup collectd-4.8.3-orig/src/collectd.conf.in collectd-4.8.3/src/collectd.c
  #@BUILD_PLUGIN_ENTROPY_TRUE@LoadPlugin entropy
  #@BUILD_PLUGIN_EXEC_TRUE@LoadPlugin exec
  #@BUILD_PLUGIN_FILECOUNT_TRUE@LoadPlugin filecount
-@@ -75,11 +72,9 @@ FQDNLookup   true
+@@ -76,11 +73,9 @@ FQDNLookup   true
  #@BUILD_PLUGIN_HDDTEMP_TRUE@LoadPlugin hddtemp
  @BUILD_PLUGIN_INTERFACE_TRUE@@BUILD_PLUGIN_INTERFACE_TRUE@LoadPlugin interface
  #@BUILD_PLUGIN_IPTABLES_TRUE@LoadPlugin iptables
@@ -30,11 +31,12 @@ diff -rup collectd-4.8.3-orig/src/collectd.conf.in collectd-4.8.3/src/collectd.c
  @BUILD_PLUGIN_LOAD_TRUE@@BUILD_PLUGIN_LOAD_TRUE@LoadPlugin load
  #@BUILD_PLUGIN_MADWIFI_TRUE@LoadPlugin madwifi
  #@BUILD_PLUGIN_MBMON_TRUE@LoadPlugin mbmon
-@@ -87,30 +82,22 @@ FQDNLookup   true
+@@ -88,33 +83,25 @@ FQDNLookup   true
  #@BUILD_PLUGIN_MEMCACHED_TRUE@LoadPlugin memcached
  @BUILD_PLUGIN_MEMORY_TRUE@@BUILD_PLUGIN_MEMORY_TRUE@LoadPlugin memory
  #@BUILD_PLUGIN_MULTIMETER_TRUE@LoadPlugin multimeter
 -#@BUILD_PLUGIN_MYSQL_TRUE@LoadPlugin mysql
+ #@BUILD_PLUGIN_NETAPP_TRUE@LoadPlugin netapp
  #@BUILD_PLUGIN_NETLINK_TRUE@LoadPlugin netlink
  @LOAD_PLUGIN_NETWORK@LoadPlugin network
  #@BUILD_PLUGIN_NFS_TRUE@LoadPlugin nfs
@@ -53,6 +55,8 @@ diff -rup collectd-4.8.3-orig/src/collectd.conf.in collectd-4.8.3/src/collectd.c
  #@BUILD_PLUGIN_POWERDNS_TRUE@LoadPlugin powerdns
  #@BUILD_PLUGIN_PROCESSES_TRUE@LoadPlugin processes
  #@BUILD_PLUGIN_PROTOCOLS_TRUE@LoadPlugin protocols
+ #@BUILD_PLUGIN_PYTHON_TRUE@LoadPlugin python
+ #@BUILD_PLUGIN_ROUTEROS_TRUE@LoadPlugin routeros
  #@BUILD_PLUGIN_RRDCACHED_TRUE@LoadPlugin rrdcached
 -@LOAD_PLUGIN_RRDTOOL@LoadPlugin rrdtool
 -#@BUILD_PLUGIN_SENSORS_TRUE@LoadPlugin sensors
@@ -61,7 +65,7 @@ diff -rup collectd-4.8.3-orig/src/collectd.conf.in collectd-4.8.3/src/collectd.c
  #@BUILD_PLUGIN_SWAP_TRUE@LoadPlugin swap
  #@BUILD_PLUGIN_TABLE_TRUE@LoadPlugin table
  #@BUILD_PLUGIN_TAIL_TRUE@LoadPlugin tail
-@@ -586,6 +573,7 @@ FQDNLookup   true
+@@ -674,6 +661,7 @@ FQDNLookup   true
  #	CreateFiles true
  #	CollectStatistics true
  #</Plugin>
