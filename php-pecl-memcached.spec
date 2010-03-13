@@ -1,11 +1,11 @@
 %{!?__pecl:     %{expand: %%global __pecl     %{_bindir}/pecl}}
 
-%define pecl_name memcached
+%global pecl_name memcached
 
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
-Version:      1.0.0
-Release:      3%{?dist}.1
+Version:      1.0.1
+Release:      1%{?dist}
 License:      PHP
 Group:        Development/Languages
 URL:          http://pecl.php.net/package/%{pecl_name}
@@ -103,13 +103,16 @@ cd %{pecl_name}-%{version}
 
 %files
 %defattr(-, root, root, -)
-%doc %{pecl_name}-%{version}/{CREDITS,LICENSE,EXPERIMENTAL,README.markdown,ChangeLog}
+%doc %{pecl_name}-%{version}/{CREDITS,LICENSE,README.markdown,ChangeLog}
 %config(noreplace) %{_sysconfdir}/php.d/%{pecl_name}.ini
 %{php_extdir}/%{pecl_name}.so
 %{pecl_xmldir}/%{name}.xml
 
 
 %changelog
+* Sat Mar 13 2010 Remi Collet <fedora@famillecollet.com> - 1.0.1-1
+- update to 1.0.1 for libmemcached 0.38
+
 * Sun Feb 07 2010 Remi Collet <fedora@famillecollet.com> - 1.0.0-3.1
 - bump release
 
