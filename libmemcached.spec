@@ -1,6 +1,6 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   0.37
+Version:   0.38
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -110,6 +110,9 @@ you will need to install %{name}-devel.
 
 
 %changelog
+* Sat Mar 13 2010 Remi Collet <Fedora@famillecollet.com> - 0.38-1
+- update to 0.38
+
 * Sat Feb 06 2010 Remi Collet <Fedora@famillecollet.com> - 0.37-1
 - update to 0.37 (soname bump)
 - new libhashkit (should be a separated project in the futur)
