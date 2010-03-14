@@ -52,8 +52,8 @@
 Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 8.4
-Version: 8.4.2
-Release: 8%{?dist}
+Version: 8.4.3
+Release: 1%{?dist}
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
 License: PostgreSQL
@@ -74,12 +74,12 @@ Source14: postgresql.pam
 Source15: postgresql-bashprofile
 Source16: filter-requires-perl-Pg.sh
 
+# Comments for these patches are in the patch files.
 Patch1: rpm-pgsql.patch
 Patch2: postgresql-ac-version.patch
 Patch3: postgresql-logging.patch
 Patch4: postgresql-oom-adj.patch
 Patch6: postgresql-perl-rpath.patch
-Patch7: postgresql-dtrace.patch
 
 BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex autoconf gawk
 BuildRequires: perl(ExtUtils::Embed), perl-devel
@@ -282,7 +282,6 @@ system, including regression tests and benchmarks.
 %patch3 -p1
 %patch4 -p1
 %patch6 -p1
-%patch7 -p1
 
 autoconf
 
@@ -714,6 +713,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sun Mar 14 2010 Tom Lane <tgl@redhat.com> 8.4.3-1
+- Update to PostgreSQL 8.4.3, for various fixes described at
+  http://www.postgresql.org/docs/8.4/static/release-8-4-3.html
+
 * Mon Feb 22 2010 Tom Lane <tgl@redhat.com> 8.4.2-8
 - Bring init script into some modicum of compliance with Fedora/LSB standards
 Resolves: #201043
