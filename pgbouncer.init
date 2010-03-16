@@ -6,6 +6,9 @@
 #
 # processname: pgbouncer
 # pidfile: /var/run/pgbouncer/pgbouncer.pid
+#
+# v2.0 Devrim GUNDUZ <devrim@gunduz.org>
+# - Adjust order of startup and kill
 
 # Source function library.
 INITD=/etc/rc.d/init.d
