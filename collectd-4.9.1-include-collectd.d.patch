@@ -31,7 +31,7 @@ index 049b07d..a795169 100644
  @BUILD_PLUGIN_LOAD_TRUE@@BUILD_PLUGIN_LOAD_TRUE@LoadPlugin load
  #@BUILD_PLUGIN_MADWIFI_TRUE@LoadPlugin madwifi
  #@BUILD_PLUGIN_MBMON_TRUE@LoadPlugin mbmon
-@@ -88,33 +83,25 @@ FQDNLookup   true
+@@ -88,33 +83,24 @@ FQDNLookup   true
  #@BUILD_PLUGIN_MEMCACHED_TRUE@LoadPlugin memcached
  @BUILD_PLUGIN_MEMORY_TRUE@@BUILD_PLUGIN_MEMORY_TRUE@LoadPlugin memory
  #@BUILD_PLUGIN_MULTIMETER_TRUE@LoadPlugin multimeter
@@ -50,7 +50,7 @@ index 049b07d..a795169 100644
  #@BUILD_PLUGIN_OPENVPN_TRUE@LoadPlugin openvpn
  #@BUILD_PLUGIN_ORACLE_TRUE@LoadPlugin oracle
 -#@BUILD_PLUGIN_PERL_TRUE@LoadPlugin perl
- #@BUILD_PLUGIN_PING_TRUE@LoadPlugin ping
+-#@BUILD_PLUGIN_PING_TRUE@LoadPlugin ping
 -#@BUILD_PLUGIN_POSTGRESQL_TRUE@LoadPlugin postgresql
  #@BUILD_PLUGIN_POWERDNS_TRUE@LoadPlugin powerdns
  #@BUILD_PLUGIN_PROCESSES_TRUE@LoadPlugin processes
