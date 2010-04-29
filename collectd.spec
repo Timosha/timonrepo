@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.9.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -461,6 +461,9 @@ fi
 
 
 %changelog
+* Thu Apr 29 2010 Marcela Maslanova <mmaslano@redhat.com> - 4.9.1-3
+- Mass rebuild with perl-5.12.0
+
 * Fri Mar 26 2010 Alan Pevec <apevec@redhat.com> 4.9.1-2
 - enable ping plugin bz#541744
 
