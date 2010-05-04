@@ -1,11 +1,11 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   0.38
+Version:   0.40
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
-URL:       http://tangent.org/552/libmemcached.html
-Source0:   http://download.tangent.org/libmemcached-%{version}.tar.gz
+URL:       http://libmemcached.org/
+Source0:   http://launchpad.net/libmemcached/1.0/%{version}/+download/libmemcached-%{version}.tar.gz
 
 
 # checked during configure (for test suite)
@@ -110,6 +110,10 @@ you will need to install %{name}-devel.
 
 
 %changelog
+* Tue May 04 2010 Remi Collet <Fedora@famillecollet.com> - 0.40-1
+- update to 0.40 (new soname for libmemcached.so.5)
+- new URI (site + source)
+
 * Sat Mar 13 2010 Remi Collet <Fedora@famillecollet.com> - 0.38-1
 - update to 0.38
 
