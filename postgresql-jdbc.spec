@@ -38,7 +38,7 @@
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
 Version:	8.4.701
-Release:	3%{?dist}
+Release:	4%{?dist}
 # ASL 2.0 applies only to postgresql-jdbc.pom file, the rest is BSD
 License:	BSD and ASL 2.0
 Group:		Applications/Databases
@@ -60,9 +60,9 @@ BuildRequires:	findutils
 # gettext is only needed if we try to update translations
 #BuildRequires:	gettext
 %if %{gcj_support}
-BuildRequires:	gcc-java
-Requires(post): /usr/bin/rebuild-gcj-db
-Requires(postun): /usr/bin/rebuild-gcj-db
+BuildRequires:    java-gcj-compat-devel >= 1.0.31
+Requires(post):   java-gcj-compat >= 1.0.31
+Requires(postun): java-gcj-compat >= 1.0.31
 %endif
 Requires(post): jpackage-utils >= 0:1.7.2
 Requires(postun): jpackage-utils >= 0:1.7.2
@@ -116,7 +116,7 @@ ln -s postgresql-jdbc.jar postgresql-jdbc3.jar
 popd
 
 %if %{gcj_support}
-aot-compile-rpm
+%{_bindir}/aot-compile-rpm
 %endif
 
 # Install the pom after inserting the correct version number
@@ -128,16 +128,22 @@ install -m 644 JPP-postgresql-jdbc.pom $RPM_BUILD_ROOT%{_datadir}/maven2/poms/JP
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%if %{gcj_support}
-
 %post
-/usr/bin/rebuild-gcj-db
 %update_maven_depmap
+%if %{gcj_support}
+  if [ -x %{_bindir}/rebuild-gcj-db ] 
+  then
+    %{_bindir}/rebuild-gcj-db
+  fi
+%endif
 
 %postun
-/usr/bin/rebuild-gcj-db
 %update_maven_depmap
-
+%if %{gcj_support}
+  if [ -x %{_bindir}/rebuild-gcj-db ] 
+  then
+    %{_bindir}/rebuild-gcj-db
+  fi
 %endif
 
 %files
@@ -145,14 +151,16 @@ rm -rf $RPM_BUILD_ROOT
 %doc LICENSE README doc/*
 %{_javadir}/*
 %if %{gcj_support}
-%dir %{_libdir}/gcj/%{name}
-%{_libdir}/gcj/%{name}/*.jar.so
-%{_libdir}/gcj/%{name}/*.jar.db
+%attr(-,root,root) %{_libdir}/gcj/%{name}
 %endif
 %{_sysconfdir}/maven/fragments/%{name}
 %{_datadir}/maven2/poms/JPP-%{name}.pom
 
 %changelog
+* Mon May 31 2010 Tom Lane <tgl@redhat.com> 8.4.701-4
+- Update gcj_support sections to meet Packaging/GCJGuidelines;
+  fixes FTBFS in F-14 rawhide
+
 * Tue Nov 24 2009 Tom Lane <tgl@redhat.com> 8.4.701-3
 - Seems the .pom file *must* have a package version number in it, sigh
 Resolves: #538487
