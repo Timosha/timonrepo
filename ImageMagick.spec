@@ -1,9 +1,9 @@
-%define VER 6.6.0
-%define Patchlevel 2
+%global VER 6.6.2
+%global Patchlevel 1
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -166,6 +166,7 @@ rm -rf $RPM_BUILD_ROOT
 
 make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
 cp -a www/source $RPM_BUILD_ROOT%{_datadir}/doc/%{name}-%{VER}
+# Delete *ONLY* _libdir/*.la files! .la files used internally to handle plugins - BUG#185237!!!
 rm $RPM_BUILD_ROOT%{_libdir}/*.la
 
 # fix weird perl Magick.so permissions
@@ -303,6 +304,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Jun 1 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 6.6.2.1-10
+- New version 6.6.2-1 (BZ#579458, BZ#565940 - http://www.imagemagick.org/discourse-server/viewtopic.php?f=3&t=16320)
+- Replace %%define by %%global
+
 * Tue Jun 01 2010 Marcela Maslanova <mmaslano@redhat.com> - 6.6.0.2-9
 - Mass rebuild with perl-5.12.0
 
@@ -318,7 +323,7 @@ rm -rf $RPM_BUILD_ROOT
 
 * Mon Nov 30 2009 Pavel Alexeev <Pahan@Hubbitus.info> - 6.5.4.7-4
 - Explude file Generic.ttf from -perl subpackage demos. Demos perfectly work without it, but with bundled font
-	package does not pass QA (Unfortunately no bugreport there, only mail from Nicolas Mailhot)
+  package does not pass QA (Unfortunately no bugreport there, only mail from Nicolas Mailhot)
 
 * Mon Aug 3 2009 Pavel Alexeev <Pahan@Hubbitus.info> - 6.5.4.7-3
 - Update to version 6.5.4-7
