@@ -1,24 +1,24 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.5.3
-Release: 2%{?dist}.1
+Version: 4.10.0
+Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
 
 Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
-Patch0: %{name}-4.5.1-include-collectd.d.patch
+Source1: collectd-httpd.conf
+Source2: collection.conf
 # bug 468067 "pkg-config --libs OpenIPMIpthread" fails
-Patch1: %{name}-4.5.1-configure-OpenIPMI.patch
-# posted upstream
-Patch2: collectd-4.5.3-gcc-4.4-strict-aliasing-issue.patch
+Patch0: %{name}-4.6.2-configure-OpenIPMI.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
-%ifarch %{ix86} x86_64
-BuildRequires: libvirt-devel, libxml2-devel
+%ifnarch ppc ppc64 sparc sparc64
+BuildRequires: libvirt-devel
 BuildRequires: lm_sensors-devel
 %endif
+BuildRequires: libxml2-devel
 BuildRequires: rrdtool-devel
 BuildRequires: curl-devel
 %if 0%{?fedora} >= 8
@@ -34,6 +34,9 @@ BuildRequires: mysql-devel
 BuildRequires: OpenIPMI-devel
 BuildRequires: postgresql-devel
 BuildRequires: nut-devel
+#BuildRequires: iptables-devel
+BuildRequires: liboping-devel
+BuildRequires: python-devel
 
 %description
 collectd is a small daemon written in C for performance.  It reads various
@@ -109,6 +112,14 @@ Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 This package contains Perl bindings and plugin for collectd.
 
 
+%package ping
+Summary:       ping module for collectd
+Group:         System Environment/Daemons
+Requires:      collectd = %{version}-%{release}
+%description ping
+This plugin for collectd provides network latency statistics.
+
+
 %package postgresql
 Summary:       PostgreSQL module for collectd
 Group:         System Environment/Daemons
@@ -126,7 +137,7 @@ Requires:      collectd = %{version}-%{release}, rrdtool
 This plugin for collectd provides rrdtool support.
 
 
-%ifarch %{ix86} x86_64
+%ifnarch ppc ppc64 sparc sparc64
 %package sensors
 Summary:       Libsensors module for collectd
 Group:         System Environment/Daemons
@@ -136,7 +147,6 @@ This plugin for collectd provides querying of sensors supported by
 lm_sensors.
 %endif
 
-
 %package snmp
 Summary:        SNMP module for collectd
 Group:          System Environment/Daemons
@@ -145,7 +155,17 @@ Requires:       collectd = %{version}-%{release}, net-snmp
 This plugin for collectd provides querying of net-snmp.
 
 
-%ifarch %{ix86} x86_64
+%package web
+Summary:        Contrib web interface to viewing rrd files
+Group:          System Environment/Daemons
+Requires:       collectd = %{version}-%{release}
+Requires:       collectd-rrdtool = %{version}-%{release}
+Requires:       perl-HTML-Parser, perl-Regexp-Common, rrdtool-perl, httpd
+%description web
+This package will allow for a simple web interface to view rrd files created by
+collectd.
+
+%ifnarch ppc ppc64 sparc sparc64
 %package virt
 Summary:       Libvirt plugin for collectd
 Group:         System Environment/Daemons
@@ -154,12 +174,9 @@ Requires:      collectd = %{version}-%{release}
 This plugin collects information from virtualized guests.
 %endif
 
-
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p0
-%patch2 -p1
+%patch0 -p0
 
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
@@ -170,7 +187,7 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
     --disable-static \
     --disable-ipvs \
     --enable-mysql \
-%ifarch %{ix86} x86_64
+%ifnarch ppc ppc64 sparc sparc64
     --enable-sensors \
 %endif
     --enable-email \
@@ -181,6 +198,9 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
     --enable-nut \
     --enable-postgresql \
     --enable-iptables \
+    --enable-ping \
+    --with-libiptc \
+    --with-python \
     --with-perl-bindings=INSTALLDIRS=vendor
 %{__make} %{?_smp_mflags}
 
@@ -194,6 +214,9 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 %{__install} -Dp -m0755 contrib/fedora/init.d-collectd %{buildroot}%{_initrddir}/collectd
 
 %{__install} -d -m0755 %{buildroot}%{_localstatedir}/lib/collectd/
+%{__install} -d -m0755 %{buildroot}/%{_datadir}/collectd/collection3/
+%{__install} -d -m0755 %{buildroot}/%{_sysconfdir}/httpd/conf.d/
+
 
 # Convert docs to UTF-8
 find contrib/ -type f -exec %{__chmod} a-x {} \;
@@ -205,6 +228,14 @@ done
 find %{buildroot} -name .packlist -exec rm {} \;
 # Remove Perl temporary file perllocal.pod
 find %{buildroot} -name perllocal.pod -exec rm {} \;
+
+# copy web interface
+cp -ad contrib/collection3/* %{buildroot}/%{_datadir}/collectd/collection3/
+rm -f %{buildroot}/%{_datadir}/collectd/collection3/etc/collection.conf
+cp %{SOURCE1} %{buildroot}/%{_sysconfdir}/httpd/conf.d/collectd.conf
+cp %{SOURCE2} %{buildroot}%{_sysconfdir}/collection.conf
+ln -s %{_sysconfdir}/collection.conf %{buildroot}/%{_datadir}/collectd/collection3/etc/collection.conf
+chmod +x %{buildroot}/%{_datadir}/collectd/collection3/bin/*.cgi
 
 # Move the Perl examples to a separate directory.
 mkdir perl-examples
@@ -223,7 +254,7 @@ cp contrib/redhat/sensors.conf %{buildroot}/etc/collectd.d/sensors.conf
 cp contrib/redhat/snmp.conf %{buildroot}/etc/collectd.d/snmp.conf
 
 # configs for subpackaged plugins
-for p in dns ipmi nut libvirt perl postgresql rrdtool
+for p in dns ipmi libvirt nut perl ping postgresql rrdtool
 do
 %{__cat} > %{buildroot}/etc/collectd.d/$p.conf <<EOF
 LoadPlugin $p
@@ -232,7 +263,7 @@ done
 
 
 # *.la files shouldn't be distributed.
-rm -f %{buildroot}/%{_libdir}/collectd/*.la
+rm -f %{buildroot}/%{_libdir}/{collectd/,}*.la
 
 
 %post
@@ -268,6 +299,7 @@ fi
 %exclude %{_sysconfdir}/collectd.d/nginx.conf
 %exclude %{_sysconfdir}/collectd.d/nut.conf
 %exclude %{_sysconfdir}/collectd.d/perl.conf
+%exclude %{_sysconfdir}/collectd.d/ping.conf
 %exclude %{_sysconfdir}/collectd.d/postgresql.conf
 %exclude %{_sysconfdir}/collectd.d/rrdtool.conf
 %exclude %{_sysconfdir}/collectd.d/sensors.conf
@@ -282,9 +314,11 @@ fi
 %dir %{_libdir}/collectd
 %{_libdir}/collectd/apcups.so
 %{_libdir}/collectd/battery.so
+%{_libdir}/collectd/contextswitch.so
 %{_libdir}/collectd/cpu.so
 %{_libdir}/collectd/cpufreq.so
 %{_libdir}/collectd/csv.so
+%{_libdir}/collectd/curl_xml.so
 %{_libdir}/collectd/df.so
 %{_libdir}/collectd/disk.so
 %{_libdir}/collectd/entropy.so
@@ -296,6 +330,9 @@ fi
 %{_libdir}/collectd/irq.so
 %{_libdir}/collectd/load.so
 %{_libdir}/collectd/logfile.so
+%{_libdir}/collectd/madwifi.so
+%{_libdir}/collectd/match_empty_counter.so
+%{_libdir}/collectd/match_hashed.so
 %{_libdir}/collectd/mbmon.so
 %{_libdir}/collectd/memcached.so
 %{_libdir}/collectd/memory.so
@@ -303,13 +340,15 @@ fi
 %{_libdir}/collectd/network.so
 %{_libdir}/collectd/nfs.so
 %{_libdir}/collectd/ntpd.so
-%{_libdir}/collectd/ping.so
+%{_libdir}/collectd/olsrd.so
 %{_libdir}/collectd/powerdns.so
 %{_libdir}/collectd/processes.so
+%{_libdir}/collectd/python.so
 %{_libdir}/collectd/serial.so
 %{_libdir}/collectd/swap.so
 %{_libdir}/collectd/syslog.so
 %{_libdir}/collectd/tail.so
+%{_libdir}/collectd/target_scale.so
 %{_libdir}/collectd/tcpconns.so
 %{_libdir}/collectd/teamspeak2.so
 %{_libdir}/collectd/thermal.so
@@ -319,7 +358,33 @@ fi
 %{_libdir}/collectd/vmem.so
 %{_libdir}/collectd/vserver.so
 %{_libdir}/collectd/wireless.so
-%{_libdir}/collectd/types.db
+%{_libdir}/collectd/write_http.so
+
+%{_libdir}/collectd/bind.so
+%{_libdir}/collectd/conntrack.so
+%{_libdir}/collectd/curl.so
+%{_libdir}/collectd/fscache.so
+%{_libdir}/collectd/match_regex.so
+%{_libdir}/collectd/match_timediff.so
+%{_libdir}/collectd/match_value.so
+%{_libdir}/collectd/openvpn.so
+%{_libdir}/collectd/protocols.so
+%{_libdir}/collectd/table.so
+%{_libdir}/collectd/target_notification.so
+%{_libdir}/collectd/target_replace.so
+%{_libdir}/collectd/target_set.so
+%{_libdir}/collectd/ted.so
+%{_libdir}/collectd/uptime.so
+
+%{_datadir}/collectd/types.db
+
+# collectdclient - TBD reintroduce -devel subpackage?
+%{_libdir}/libcollectdclient.so
+%{_libdir}/libcollectdclient.so.0
+%{_libdir}/libcollectdclient.so.0.0.0
+%{_libdir}/pkgconfig/libcollectdclient.pc
+%{_includedir}/collectd/client.h
+%{_includedir}/collectd/lcc_features.h
 
 %doc AUTHORS ChangeLog COPYING INSTALL README
 %doc %{_mandir}/man1/collectd.1*
@@ -327,6 +392,8 @@ fi
 %doc %{_mandir}/man1/collectdmon.1*
 %doc %{_mandir}/man5/collectd.conf.5*
 %doc %{_mandir}/man5/collectd-exec.5*
+%doc %{_mandir}/man5/collectd-java.5*
+%doc %{_mandir}/man5/collectd-python.5*
 %doc %{_mandir}/man5/collectd-unixsock.5*
 %doc %{_mandir}/man5/types.db.5*
 
@@ -385,6 +452,12 @@ fi
 %doc %{_mandir}/man3/Collectd::Unixsock.3pm*
 
 
+%files ping
+%defattr(-, root, root, -)
+%{_libdir}/collectd/ping.so
+%config(noreplace) %{_sysconfdir}/collectd.d/ping.conf
+
+
 %files postgresql
 %defattr(-, root, root, -)
 %{_libdir}/collectd/postgresql.so
@@ -398,13 +471,12 @@ fi
 %config(noreplace) %{_sysconfdir}/collectd.d/rrdtool.conf
 
 
-%ifarch %{ix86} x86_64
+%ifnarch ppc ppc64 sparc sparc64
 %files sensors
 %defattr(-, root, root, -)
 %{_libdir}/collectd/sensors.so
 %config(noreplace) %{_sysconfdir}/collectd.d/sensors.conf
 %endif
-
 
 %files snmp
 %defattr(-, root, root, -)
@@ -413,17 +485,73 @@ fi
 %doc %{_mandir}/man5/collectd-snmp.5*
 
 
-%ifarch %{ix86} x86_64
+%files web
+%defattr(-, root, root, -)
+%{_datadir}/collectd/collection3/
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/collectd.conf
+%config(noreplace) %{_sysconfdir}/collection.conf
+
+%ifnarch ppc ppc64 sparc sparc64
 %files virt
 %defattr(-, root, root, -)
 %{_libdir}/collectd/libvirt.so
 %config(noreplace) %{_sysconfdir}/collectd.d/libvirt.conf
 %endif
 
-
 %changelog
-* Wed Mar 25 2009 Lubomir Rintel <lkundrak@v3.sk> - 4.5.3-2.1
-- Disable sensors and libvirt for EL5 on ppc, VT is x86 only
+* Thu Jun 10 2010 Mike McGrath <mmcgrath@redhat.com> 4.10.0-1
+- New upstram version
+
+* Tue Jun 08 2010 Alan Pevec <apevec@redhat.com> 4.8.5-1
+- New upstream version 4.8.5
+  http://collectd.org/news.shtml#news83
+
+* Fri Mar 26 2010 Alan Pevec <apevec@redhat.com> 4.8.3-3
+- enable ping plugin bz#541744
+
+* Wed Mar 17 2010 Mike McGrath <mmcgrath@redhat.com> 4.8.3-2
+- Added web interface
+
+* Tue Feb 16 2010 Alan Pevec <apevec@redhat.com> 4.8.3-1
+- New upstream version 4.8.3
+  http://collectd.org/news.shtml#news81
+- FTBFS bz#564943 - system libiptc is not usable and owniptc fails to compile:
+  add a patch from upstream iptables.git to fix owniptc compilation
+
+* Fri Dec  4 2009 Stepan Kasal <skasal@redhat.com> - 4.8.1-3
+- rebuild against perl 5.10.1
+
+* Fri Nov 27 2009 Alan Pevec <apevec@redhat.com> 4.8.1-2
+- use Fedora libiptc, owniptc in collectd sources fails to compile
+
+* Wed Nov 25 2009 Alan Pevec <apevec@redhat.com> 4.8.1-1
+- update to 4.8.1 (Florian La Roche) bz# 516276
+- disable ping plugin until liboping is packaged bz# 541744
+
+* Fri Sep 11 2009 Tom "spot" Callaway <tcallawa@redhat.com> 4.6.5-1
+- update to 4.6.5
+- disable ppc/ppc64 due to compile error
+
+* Wed Sep 02 2009 Alan Pevec <apevec@redhat.com> 4.6.4-1
+- fix condrestart: on upgrade collectd is not restarted, bz# 516273
+- collectd does not re-connect to libvirtd, bz# 480997
+- fix unpackaged files https://bugzilla.redhat.com/show_bug.cgi?id=516276#c4
+- New upstream version 4.6.4
+  http://collectd.org/news.shtml#news69
+
+* Fri Aug 21 2009 Tomas Mraz <tmraz@redhat.com> - 4.6.2-5
+- rebuilt with new openssl
+
+* Thu Aug  6 2009 Richard W.M. Jones <rjones@redhat.com> - 4.6.2-4
+- Force rebuild to test FTBFS issue.
+- lib/collectd/types.db seems to have moved to share/collectd/types.db
+
+* Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.6.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
+* Wed May 20 2009 Alan Pevec <apevec@redhat.com> 4.6.2-1
+- New upstream version 4.6.2
+  http://collectd.org/news.shtml#news64
 
 * Tue Mar 03 2009 Alan Pevec <apevec@redhat.com> 4.5.3-2
 - patch for strict-aliasing issue in liboping.c
