@@ -1,6 +1,6 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   0.40
+Version:   0.42
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -110,6 +110,9 @@ you will need to install %{name}-devel.
 
 
 %changelog
+* Wed Jul 07 2010 Remi Collet <Fedora@famillecollet.com> - 0.42-1
+- update to 0.42
+
 * Tue May 04 2010 Remi Collet <Fedora@famillecollet.com> - 0.40-1
 - update to 0.40 (new soname for libmemcached.so.5)
 - new URI (site + source)
