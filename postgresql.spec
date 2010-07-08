@@ -626,6 +626,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files libs -f libs.lst
 %defattr(-,root,root)
+%doc COPYRIGHT
 %{_libdir}/libpq.so.*
 %{_libdir}/libecpg.so.*
 %{_libdir}/libpgtypes.so.*
@@ -713,6 +714,8 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+- Duplicate COPYRIGHT in -libs subpackage, per revised packaging guidelines
+
 * Wed Jun 02 2010 Marcela Maslanova <mmaslano@redhat.com> - 8.4.4-2
 - Mass rebuild with perl-5.12.0
 
