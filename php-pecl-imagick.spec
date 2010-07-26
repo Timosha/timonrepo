@@ -6,8 +6,8 @@
 
 Summary:		Provides a wrapper to the ImageMagick library
 Name:		php-pecl-%peclName
-Version:		2.2.2
-Release:		4.1%{?dist}
+Version:		3.0.0
+Release:		6%{?dist}
 License:		PHP
 Group:		Development/Libraries
 Source0:		http://pecl.php.net/get/%peclName-%{version}.tgz
@@ -25,6 +25,8 @@ Requires:		php(api) = %{php_core_api}
 Requires:		php-api = %{php_apiver}
 %endif
 Provides:		php-pecl(%peclName) = %{version}
+
+Conflicts:	php-pecl-gmagick
 
 %description
 %peclName is a native php extension to create and modify images using the
@@ -56,6 +58,8 @@ install -m 0664 ../package.xml %{buildroot}%{pecl_xmldir}/%peclName.xml
 install -d %{buildroot}%{_sysconfdir}/php.d/
 install -m 0664 %{SOURCE1} %{buildroot}%{_sysconfdir}/php.d/%peclName.ini
 
+rm -rf %{buildroot}/%{_includedir}/php/ext/%peclName/
+
 %clean
 rm -rf %{buildroot}
 
@@ -79,6 +83,14 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.d/%peclName.ini
 
 %changelog
+* Fri Jul 23 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 3.0.0-6
+- Update to 3.0.0
+- Add Conflicts: php-pecl-gmagick - BZ#559675
+- Delete new and unneeded files "rm -rf %%{buildroot}/%%{_includedir}/php/ext/%%peclName/"
+
+* Sat May 15 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 2.3.0-5
+- New version 2.3.0
+
 * Wed Mar 24 2010 Mike McGrath <mmcgrath@redhat.com> - 2.2.2-4.1
 - Rebuilt for broken dep fix
 
