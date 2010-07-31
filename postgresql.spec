@@ -53,7 +53,7 @@ Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 8.4
 Version: 8.4.4
-Release: 2%{?dist}
+Release: 3%{?dist}
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
 License: PostgreSQL
@@ -714,6 +714,8 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sat Jul 31 2010 Orcan Ogetbil <oget[dot]fedora[at]gmail[dot]com> - 8.4.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
 - Duplicate COPYRIGHT in -libs subpackage, per revised packaging guidelines
 
 * Wed Jun 02 2010 Marcela Maslanova <mmaslano@redhat.com> - 8.4.4-2
