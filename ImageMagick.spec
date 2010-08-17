@@ -3,7 +3,7 @@
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -279,6 +279,7 @@ rm -rf $RPM_BUILD_ROOT
 %files doc
 %defattr(-,root,root,-)
 %doc %{_datadir}/doc/%{name}-%{VER}
+%doc LICENSE
 
 %files c++
 %defattr(-,root,root,-)
@@ -304,6 +305,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Jul 30 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 6.6.2.1-12
+- Add %%doc LICENSE as it required new Licensing Guidelines Update
+	( https://fedoraproject.org/wiki/Packaging:LicensingGuidelines )
+
 * Wed Jun 23 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 6.6.2.1-11
 - Rebuild (to fix downgrade after perl-5.12.0-rebuild tag)
 
