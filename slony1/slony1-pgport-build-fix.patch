@@ -1,0 +1,10 @@
+--- ../slony1-2.0.4.orig/src/slonik/Makefile	2010-05-28 02:38:32.000000000 +0600
++++ src/slonik/Makefile	2010-08-10 20:46:10.911101258 +0600
+@@ -20,7 +20,6 @@
+ 
+ PROG		= slonik
+ 
+-LDFLAGS += -lpgport
+ ifeq ($(PORTNAME), win)
+ PROG            = slonik.exe
+ endif
