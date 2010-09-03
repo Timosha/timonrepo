@@ -12,6 +12,7 @@ Source0:	%{name}-%{version}.tar.bz2
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:	fcgi-devel
+BuildRequires:	autoconf automake
 
 %description
 fcgiwrap is a simple server for running CGI applications over FastCGI.
@@ -37,8 +38,6 @@ autoreconf -i
 %{__make} %{?_smp_mflags}
 
 %install
-#%{__make} %{?_smp_mflags} DESTDIR=%{buildroot} install
-
 %{__install} -D -m 0755 fcgiwrap %{buildroot}%{_bindir}/fcgiwrap
 
 %clean
