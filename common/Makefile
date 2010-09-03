@@ -3,22 +3,43 @@ RPMDEFINES := --define "_sourcedir $(SRCDIR)" \
               --define "_srcrpmdir $(SRCDIR)" \
               --define "_rpmdir $(SRCDIR)"
 
-SRCDEFINES := --define "dist .timon" \
-              --define "_source_filedigest_algorithm 1" \
-              --define "_binary_filedigest_algorithm 1"
+REPODIR := /home/timon/development/repo
+RELEASE := 13
+ARCH := x86_64
 
-arch:
-	mv *.src.rpm /home/timon/development/rpms/SRPMS.timon/ && echo done || echo Nothing to do
+repo:
+	ARCH := x86_64
+	RELEASE := 13
+	make arch
+	ARCH := i386
+	make arch
+	ARCH := x86_64
+	RELEASE := 12
+	make arch
+	ARCH := i386
+	make arch
+
+arch:	
+	make mock && \
+		mkdir -p $(REPODIR)/$(RELEASE)/{SRPMS,$(ARCH)} && \
+		mkdir -p $(REPODIR)/$(RELEASE)/$(ARCH)/{os,debug} && \
+		mv /var/lib/mock/fedora-$(RELEASE)-$(ARCH)/result/$(NAME)-debuginfo-*.rpm  $(REPODIR)/$(RELEASE)/$(ARCH)/debug && \
+		mv /var/lib/mock/fedora-$(RELEASE)-$(ARCH)/result/$(NAME)-*.src.rpm  $(REPODIR)/$(RELEASE)/SRPMS && \
+		mv /var/lib/mock/fedora-$(RELEASE)-$(ARCH)/result/$(NAME)-*.rpm  $(REPODIR)/$(RELEASE)/$(ARCH)/os && \
+		cd $(REPODIR)/$(RELEASE)/$(ARCH)/os && createrepo --update . && \
+		cd $(REPODIR)/$(RELEASE)/$(ARCH)/debug && createrepo --update . && \
+		cd $(REPODIR)/$(RELEASE)/SRPMS && createrepo --update .
+
+mock:
+	make srpm
+	mock -r fedora-$(RELEASE)-$(ARCH) rebuild $(NAME)*.src.rpm 
 
 clean:
 	@echo Clean $(NAME) in $(SRCDIR)
 	@rm -rfv *~ noarch x86_64 *.src.rpm
 
 srpm:
-	rpmbuild $(RPMDEFINES) $(SRCDEFINES) -bs $(NAME).spec
-
-devsrpm:
-	rpmbuild $(RPMDEFINES) $(SRCDEFINES) -bs $(NAME)-dev.spec
+	rpmbuild $(RPMDEFINES) -bs $(NAME).spec
 
 build:
 	rpmbuild $(RPMDEFINES) -bb $(NAME).spec
@@ -31,9 +52,6 @@ bc:
 
 bi:
 	rpmbuild $(RPMDEFINES) -bi --short-circuit $(NAME).spec
-
-devbi:
-	rpmbuild $(RPMDEFINES)  --define "runselftest 0" -bi --short-circuit $(NAME)-dev.spec
 
 devbl:
 	rpmbuild $(RPMDEFINES) -bl --short-circuit $(NAME)-dev.spec
