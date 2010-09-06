@@ -1,0 +1,13 @@
+CWD=/usr/share/dklab_realplexor
+
+# Same as with additional config: better create symlink in /etc.
+#ADDCONFIG="/etc/dklab_realplexor.conf"
+
+# Logging options. By default syslog is used, it allows easy log rotation.
+# You may use $CONF variable to refer to the full config file path.
+#LOGTAG='realplexor/`basename $CONF`'
+LOGPRI=local3.info
+
+NAME=realplexor
+
+
