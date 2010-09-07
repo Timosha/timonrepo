@@ -1,7 +1,7 @@
 %global         daemon mongod
 Name:           mongodb
 Version:        1.6.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -36,6 +36,7 @@ Requires(pre):  shadow-utils
 # This is for /sbin/service
 Requires(postun): initscripts
 
+ExcludeArch:    ppc ppc64
 
 %description
 Mongo (from "humongous") is a high-performance, open source, schema-free
@@ -182,6 +183,9 @@ fi
 %{_libdir}/libmongoclient.a
 
 %changelog
+* Tue Sep  7 2010 Ionuț C. Arțăriși <mapleoin@fedoraproject.org> - 1.6.2-2
+- added ExcludeArch for ppc
+
 * Fri Sep  3 2010 Ionuț C. Arțăriși <mapleoin@fedoraproject.org> - 1.6.2-1
 - new upstream release 1.6.2
 - send mongod the USR1 signal when doing logrotate
