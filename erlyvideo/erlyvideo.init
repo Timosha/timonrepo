@@ -1,0 +1,146 @@
+#!/bin/bash
+#
+# erlyvideo    Start and stop erlyvideo.
+
+# chkconfig: - 40 60
+# description: erlyvideo
+# processname: erlyvideo
+# pidfile: /var/run/erlyvideo.pid
+
+### BEGIN INIT INFO
+# Provides: erlyvideo
+# Required-Start: network
+# Required-Stop: network
+# Default-Start:
+# Default-Stop: 0 1 6
+# Short-Description: Start and stop erlyvideo
+# Description: Flash streaming server, written in erlang
+### END INIT INFO
+
+. /etc/rc.d/init.d/functions
+
+# define default configuration
+POLL=true
+SMP=auto
+ERL_MAX_PORTS=32000
+ERL_PROCESSES=250000
+ERL_MAX_ETS_TABLES=1400
+
+if [ -r /etc/sysconfig/erlyvideo ]; then
+	. /etc/sysconfig/erlyvideo
+fi
+
+# define default environment variables
+NODE=erlyvideo
+HOST=`hostname -s 2>/dev/null || echo "localhost"`
+ERLANG_NODE=$NODE@$HOST
+ERL=/usr/bin/erl
+INSTALLUSER=erlyvideo
+
+# Define erlyvideo variable if they have not been defined from the command line
+if [ ! "$ETCDIR" ] ; then
+	ETCDIR=/etc/erlyvideo
+fi
+
+if [ ! "$CONFIG_FILE" ] ; then
+	CONFIG_FILE=$ETCDIR/erlyvideo.conf
+fi
+
+if [ "$ERLANG_NODE_ARG" ] ; then
+	ERLANG_NODE=$ERLANG_NODE_ARG
+fi
+
+NAME=-name
+[ "$ERLANG_NODE" = "${ERLANG_NODE%.*}" ] && NAME=-sname
+
+if [ ! "$KERNEL_OPTS" ] ; then
+	KERNEL_OPTS=""
+fi
+
+ERLANG_OPTS="+K $POLL -smp $SMP +P $ERL_PROCESSES $ERL_OPTIONS $KERNEL_OPTS"
+
+# define additional environment variables
+if [ "$ERLYVIDEODIR" = "" ]; then
+	ERLYVIDEODIR=/usr/lib64/erlyvideo
+fi
+if [ "$ERLYVIDEO_EBIN_PATH" = "" ]; then
+	ERLYVIDEO_EBIN_PATH=$ERLYVIDEODIR/ebin
+fi
+
+start() {
+        echo -n $"Starting erlyvideo: "
+	if [ "$ULIMIT_MAX_FILES" ]; then
+		ulimit -n $ULIMIT_MAX_FILES
+	fi
+	
+	/sbin/runuser -s /bin/bash erlyvideo -c "ERL_LIBS=$ERLYVIDEODIR/lib $ERL \
+		$NAME $ERLANG_NODE \
+		-noinput -detached \
+		-pa $ERLYVIDEO_EBIN_PATH \
+		-s erlyvideo \
+		-boot start_sasl \
+		$ERLANG_OPTS"
+
+        RETVAL=$?
+        [ $RETVAL -eq 0 ] && touch /var/lock/subsys/erlyvideo
+        echo
+
+	# it takes some time to actually start necessary nodes
+	sleep 5
+
+        return $RETVAL
+}
+
+stop() {
+        # Stop daemons.
+        echo -n "Shutting down erlyvideo: "	
+	echo "kill'em all"
+
+#	$ERL \
+#		-sname ctlerlyvideo@timon.local \
+#		-pa ebin \
+#		-noinput \
+#		-hidden \
+#		-s erlyvideo_ctl -extra $NODE stop
+
+#        RETVAL=$?
+#        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/erlyvideo
+        echo
+
+	# it takes some time to actually stop necessary nodes
+	sleep 5
+
+        return $RETVAL
+}
+
+restart() {
+        stop
+	sleep 5
+        start
+}
+
+# See how we were called.
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart|force-reload)
+        restart
+        ;;
+  condrestart|try-restart)
+        [ -f /var/lock/subsys/erlyvideo ] && restart || :
+        ;;
+#  status)
+#	$progctl status
+#        ;;
+  *)
+        echo "Usage: erlyvideo {start|stop|restart|force-reload|condrestart|try-restart|status}"
+        exit 2
+esac
+
+exit $?
+
+
