@@ -4,20 +4,20 @@
 Summary:	MpegTS support for Erlang
 Name:		erlang-mpegts
 Version:	2.3.4
-Release:	1%{?dist}
+Release:	2%{?dist}
 Group:		Development/Libraries
 License:	GPLv3
-URL:		http://github.com/erlyvideo/ertsp
+URL:		http://github.com/erlyvideo/mpegts
 # git clone http://github.com/erlyvideo/mpegts.git mpegts
 # GIT_DIR=mpegts/.git git archive --format=tar --prefix=mpegts-2.3.4/ v2.3.4 | bzip2 > mpegts-2.3.4.tar.bz2
 Source:		%{realname}-%{version}.tar.bz2
 
-BuildRequires:	erlang ruby
-BuildRequires:	erlang-erlmedia-devel
+BuildRequires:	erlang
+#BuildRequires:	erlang-erlmedia-devel
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Requires:	erlang-erlmedia
+#Requires:	erlang-erlmedia
 
 
 %description
@@ -61,6 +61,6 @@ Development files for erlang-mpegts.
 %{_libdir}/erlang/lib/%{realname}-%{version}/src
 
 %changelog
-* Thu Sep 07 2010 Timon <timosha@gmail.com> - 2.3.4-1
+* Thu Sep 07 2010 Timon <timosha@gmail.com> - 2.3.4-2
 - initial commit
 	
