@@ -17,6 +17,8 @@ BuildRequires:	postgresql-devel
 BuildRequires:	postgresql-server
 BuildRequires:	byacc
 BuildRequires:	flex
+BuildRequires:	autoconf automake
+
 Requires:	postgresql perl-DBD-Pg
 
 %description
