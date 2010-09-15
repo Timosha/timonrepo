@@ -1,9 +1,9 @@
-%global VER 6.6.2
+%global VER 6.6.4
 %global Patchlevel 1
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        12%{?dist}
+Release:        13%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -305,6 +305,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Sep 14 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 6.6.4.1-13
+- Update to 6.6.4-1 with hope it fix FBFS BZ#631169.
+
 * Fri Jul 30 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 6.6.2.1-12
 - Add %%doc LICENSE as it required new Licensing Guidelines Update
 	( https://fedoraproject.org/wiki/Packaging:LicensingGuidelines )
