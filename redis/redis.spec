@@ -64,7 +64,7 @@ EOF
 %{__install} -Dp -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/redis
 
 %{__install} -p -d -m 0750 %{buildroot}%{_sharedstatedir}/redis
-%{__install} -p -d -m 0755 %{buildroot}%{_localstatedir}/log/redis
+#%{__install} -p -d -m 0755 %{buildroot}%{_localstatedir}/log/redis
 
 %pre
 %{__fe_groupadd} %{uid} -r %{name} &>/dev/null || :
@@ -106,9 +106,12 @@ fi
 %config(noreplace) %{_sysconfdir}/redis.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/redis
 %dir %attr(0750,redis,redis) %{_localstatedir}/lib/redis
-%dir %attr(0755,redis,redis) %{_localstatedir}/log/redis
+#%dir %attr(0755,redis,redis) %{_localstatedir}/log/redis
 
 %changelog
+* Thu Sep 16 2010 Timon <timosha@gmail.com> 2.0.1-2
+- fix logs
+
 * Wed Sep 15 2010 Timon <timosha@gmail.com> 2.0.1-1
 - updated to 2.0.1 
 - first fedora release
