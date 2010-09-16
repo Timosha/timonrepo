@@ -98,6 +98,7 @@ fi
 %files
 %defattr(-, root, root, 0755)
 %doc doc/*.html
+%doc Changelog 00-RELEASENOTES COPYING README TODO
 %{_sbindir}/redis-server
 %{_bindir}/redis-benchmark
 %{_bindir}/redis-cli
