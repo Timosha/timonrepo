@@ -5,15 +5,16 @@
 Summary:	Advanced key-value store
 Name:		redis
 Version:	2.0.1
-Release:	1%{?dist}
+Release:	5%{?dist}
 License:	BSD
 Group:		Applications/Databases
 URL:		http://code.google.com/p/redis/
 
 Source0:	http://redis.googlecode.com/files/redis-%{version}.tar.gz
-Source1:	redis.conf
+#Source1:	redis.conf
 Source2:	redis.init
 Source3:	redis.logrotate
+Patch1:		redis-2.0.1.conf.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -43,11 +44,7 @@ and so on. Redis is free software released under the very liberal BSD license.
 
 %prep
 %setup -q
-
-%{__cat} <<'EOF' >redis.sysv
-
-EOF
-
+%patch1 -p1 -b redis.conf
 
 %build
 %{__make} %{?_smp_mflags}
@@ -59,12 +56,12 @@ EOF
 %{__install} -Dp -m 0755 redis-benchmark %{buildroot}%{_bindir}/redis-benchmark
 %{__install} -Dp -m 0755 redis-cli %{buildroot}%{_bindir}/redis-cli
 
-%{__install} -Dp -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/redis.conf
+%{__install} -Dp -m 0644 redis.conf %{buildroot}%{_sysconfdir}/redis.conf
 %{__install} -Dp -m 0755 %{SOURCE2} %{buildroot}%{_sysconfdir}/init.d/redis
 %{__install} -Dp -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/logrotate.d/redis
 
 %{__install} -p -d -m 0750 %{buildroot}%{_sharedstatedir}/redis
-#%{__install} -p -d -m 0755 %{buildroot}%{_localstatedir}/log/redis
+%{__install} -p -d -m 0755 %{buildroot}%{_localstatedir}/log/redis
 
 %pre
 %{__fe_groupadd} %{uid} -r %{name} &>/dev/null || :
@@ -106,11 +103,13 @@ fi
 %config(noreplace) %{_sysconfdir}/redis.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/redis
 %dir %attr(0750,redis,redis) %{_localstatedir}/lib/redis
-#%dir %attr(0755,redis,redis) %{_localstatedir}/log/redis
+%dir %attr(0755,redis,redis) %{_localstatedir}/log/redis
 
 %changelog
-* Thu Sep 16 2010 Timon <timosha@gmail.com> 2.0.1-2
+* Thu Sep 16 2010 Timon <timosha@gmail.com> 2.0.1-5
 - fix logs
+- fix data dir
+- fix config
 
 * Wed Sep 15 2010 Timon <timosha@gmail.com> 2.0.1-1
 - updated to 2.0.1 
