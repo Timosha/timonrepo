@@ -3,7 +3,7 @@
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -243,8 +243,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc QuickStart.txt ChangeLog Platforms.txt
 %doc README.txt LICENSE NOTICE AUTHORS.txt NEWS.txt
-%{_libdir}/libMagickCore.so.*
-%{_libdir}/libMagickWand.so.*
+%{_libdir}/libMagickCore.so.4*
+%{_libdir}/libMagickWand.so.4*
 %{_bindir}/[a-z]*
 %{_libdir}/%{name}-%{VER}
 %{_datadir}/%{name}-%{VER}
@@ -285,7 +285,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc Magick++/AUTHORS Magick++/ChangeLog Magick++/NEWS Magick++/README
 %doc www/Magick++/COPYING
-%{_libdir}/libMagick++.so.*
+%{_libdir}/libMagick++.so.4*
 
 %files c++-devel
 %defattr(-,root,root,-)
@@ -305,6 +305,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Sep 17 2010 Rex Dieter <rdieter@fedoraproject.org> - 6.6.4.1-14
+- %%files: track sonames, so as not to be surprised by future ABI breaks
+
 * Tue Sep 14 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 6.6.4.1-13
 - Update to 6.6.4-1 to fix FBFS BZ#631169.
 
