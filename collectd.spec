@@ -11,6 +11,7 @@ Source1: collectd-httpd.conf
 Source2: collection.conf
 # bug 468067 "pkg-config --libs OpenIPMIpthread" fails
 Patch0: %{name}-4.6.2-configure-OpenIPMI.patch
+Patch1: %{name}-4.10.0-include-collectd.d.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -177,6 +178,7 @@ This plugin collects information from virtualized guests.
 %prep
 %setup -q
 %patch0 -p0
+%patch1 -p1
 
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 

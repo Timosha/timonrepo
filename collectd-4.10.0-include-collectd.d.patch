@@ -1,0 +1,10 @@
+--- collectd-4.10.0/src/collectd.conf.in	2010-05-01 11:15:45.000000000 +0200
++++ collectd-4.10.0/src/collectd.conf.in	2010-09-19 15:00:15.893887909 +0200
+@@ -709,6 +709,7 @@
+ #	CreateFiles true
+ #	CollectStatistics true
+ #</Plugin>
++Include "/etc/collectd.d"
+ 
+ #<Plugin rrdtool>
+ #	DataDir "@prefix@/var/lib/@PACKAGE_NAME@/rrd"
