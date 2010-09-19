@@ -1,19 +1,25 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.9.2
+Version: 4.10.0
 Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
 
 Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
-Patch0: %{name}-4.9.1-include-collectd.d.patch
+Source1: collectd-httpd.conf
+Source2: collection.conf
+# bug 468067 "pkg-config --libs OpenIPMIpthread" fails
+Patch0: %{name}-4.6.2-configure-OpenIPMI.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
-BuildRequires: libvirt-devel, libxml2-devel
-BuildRequires: rrdtool-devel
+%ifnarch ppc ppc64 sparc sparc64
+BuildRequires: libvirt-devel
 BuildRequires: lm_sensors-devel
+%endif
+BuildRequires: libxml2-devel
+BuildRequires: rrdtool-devel
 BuildRequires: curl-devel
 %if 0%{?fedora} >= 8
 BuildRequires: perl-libs, perl-devel
@@ -28,8 +34,9 @@ BuildRequires: mysql-devel
 BuildRequires: OpenIPMI-devel
 BuildRequires: postgresql-devel
 BuildRequires: nut-devel
-BuildRequires: iptables-devel
+#BuildRequires: iptables-devel
 BuildRequires: liboping-devel
+BuildRequires: python-devel
 
 %description
 collectd is a small daemon written in C for performance.  It reads various
@@ -130,6 +137,7 @@ Requires:      collectd = %{version}-%{release}, rrdtool
 This plugin for collectd provides rrdtool support.
 
 
+%ifnarch ppc ppc64 sparc sparc64
 %package sensors
 Summary:       Libsensors module for collectd
 Group:         System Environment/Daemons
@@ -137,7 +145,7 @@ Requires:      collectd = %{version}-%{release}, lm_sensors
 %description sensors
 This plugin for collectd provides querying of sensors supported by
 lm_sensors.
-
+%endif
 
 %package snmp
 Summary:        SNMP module for collectd
@@ -147,17 +155,28 @@ Requires:       collectd = %{version}-%{release}, net-snmp
 This plugin for collectd provides querying of net-snmp.
 
 
+%package web
+Summary:        Contrib web interface to viewing rrd files
+Group:          System Environment/Daemons
+Requires:       collectd = %{version}-%{release}
+Requires:       collectd-rrdtool = %{version}-%{release}
+Requires:       perl-HTML-Parser, perl-Regexp-Common, rrdtool-perl, httpd
+%description web
+This package will allow for a simple web interface to view rrd files created by
+collectd.
+
+%ifnarch ppc ppc64 sparc sparc64
 %package virt
 Summary:       Libvirt plugin for collectd
 Group:         System Environment/Daemons
 Requires:      collectd = %{version}-%{release}
 %description virt
 This plugin collects information from virtualized guests.
-
+%endif
 
 %prep
 %setup -q
-%patch0 -p1
+%patch0 -p0
 
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
@@ -168,7 +187,9 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
     --disable-static \
     --disable-ipvs \
     --enable-mysql \
+%ifnarch ppc ppc64 sparc sparc64
     --enable-sensors \
+%endif
     --enable-email \
     --enable-apache \
     --enable-perl \
@@ -179,6 +200,7 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
     --enable-iptables \
     --enable-ping \
     --with-libiptc \
+    --with-python \
     --with-perl-bindings=INSTALLDIRS=vendor
 %{__make} %{?_smp_mflags}
 
@@ -192,6 +214,9 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 %{__install} -Dp -m0755 contrib/fedora/init.d-collectd %{buildroot}%{_initrddir}/collectd
 
 %{__install} -d -m0755 %{buildroot}%{_localstatedir}/lib/collectd/
+%{__install} -d -m0755 %{buildroot}/%{_datadir}/collectd/collection3/
+%{__install} -d -m0755 %{buildroot}/%{_sysconfdir}/httpd/conf.d/
+
 
 # Convert docs to UTF-8
 find contrib/ -type f -exec %{__chmod} a-x {} \;
@@ -203,6 +228,14 @@ done
 find %{buildroot} -name .packlist -exec rm {} \;
 # Remove Perl temporary file perllocal.pod
 find %{buildroot} -name perllocal.pod -exec rm {} \;
+
+# copy web interface
+cp -ad contrib/collection3/* %{buildroot}/%{_datadir}/collectd/collection3/
+rm -f %{buildroot}/%{_datadir}/collectd/collection3/etc/collection.conf
+cp %{SOURCE1} %{buildroot}/%{_sysconfdir}/httpd/conf.d/collectd.conf
+cp %{SOURCE2} %{buildroot}%{_sysconfdir}/collection.conf
+ln -s %{_sysconfdir}/collection.conf %{buildroot}/%{_datadir}/collectd/collection3/etc/collection.conf
+chmod +x %{buildroot}/%{_datadir}/collectd/collection3/bin/*.cgi
 
 # Move the Perl examples to a separate directory.
 mkdir perl-examples
@@ -282,9 +315,10 @@ fi
 %{_libdir}/collectd/apcups.so
 %{_libdir}/collectd/battery.so
 %{_libdir}/collectd/contextswitch.so
-%{_libdir}/collectd/cpufreq.so
 %{_libdir}/collectd/cpu.so
+%{_libdir}/collectd/cpufreq.so
 %{_libdir}/collectd/csv.so
+%{_libdir}/collectd/curl_xml.so
 %{_libdir}/collectd/df.so
 %{_libdir}/collectd/disk.so
 %{_libdir}/collectd/entropy.so
@@ -309,6 +343,7 @@ fi
 %{_libdir}/collectd/olsrd.so
 %{_libdir}/collectd/powerdns.so
 %{_libdir}/collectd/processes.so
+%{_libdir}/collectd/python.so
 %{_libdir}/collectd/serial.so
 %{_libdir}/collectd/swap.so
 %{_libdir}/collectd/syslog.so
@@ -358,6 +393,7 @@ fi
 %doc %{_mandir}/man5/collectd.conf.5*
 %doc %{_mandir}/man5/collectd-exec.5*
 %doc %{_mandir}/man5/collectd-java.5*
+%doc %{_mandir}/man5/collectd-python.5*
 %doc %{_mandir}/man5/collectd-unixsock.5*
 %doc %{_mandir}/man5/collectd-python.5*
 %doc %{_mandir}/man5/types.db.5*
@@ -435,11 +471,12 @@ fi
 %config(noreplace) %{_sysconfdir}/collectd.d/rrdtool.conf
 
 
+%ifnarch ppc ppc64 sparc sparc64
 %files sensors
 %defattr(-, root, root, -)
 %{_libdir}/collectd/sensors.so
 %config(noreplace) %{_sysconfdir}/collectd.d/sensors.conf
-
+%endif
 
 %files snmp
 %defattr(-, root, root, -)
@@ -448,13 +485,23 @@ fi
 %doc %{_mandir}/man5/collectd-snmp.5*
 
 
+%files web
+%defattr(-, root, root, -)
+%{_datadir}/collectd/collection3/
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/collectd.conf
+%config(noreplace) %{_sysconfdir}/collection.conf
+
+%ifnarch ppc ppc64 sparc sparc64
 %files virt
 %defattr(-, root, root, -)
 %{_libdir}/collectd/libvirt.so
 %config(noreplace) %{_sysconfdir}/collectd.d/libvirt.conf
-
+%endif
 
 %changelog
+* Sun Sep 19 2010 Robert Scheck <robert@fedoraproject.org> 4.10.0-1
+- New upstream version 4.10.0 (thanks to Mike McGrath)
+
 * Tue Jun 08 2010 Alan Pevec <apevec@redhat.com> 4.9.2-1
 - New upstream version 4.9.2
   http://collectd.org/news.shtml#news83
