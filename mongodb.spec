@@ -93,12 +93,12 @@ sed -i 's/\r//' db/resource.h
 sed -i 's/\r//' README
 
 %build
-scons %{?_smp_mflags} --cppflags="%{optflags}"  .
+scons %{?_smp_mflags} --cppflags="%{optflags} -fno-strict-aliasing"  .
 
 
 %install
 rm -rf %{buildroot}
-scons install . --prefix=%{buildroot}%{_prefix} --nostrip --full
+scons install . --cppflags="%{optflags} -fno-strict-aliasing" --prefix=%{buildroot}%{_prefix} --nostrip --full
 
 mkdir -p %{buildroot}%{_sharedstatedir}/%{name}
 
