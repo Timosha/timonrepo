@@ -33,10 +33,10 @@ bl:
 	rpmbuild $(RPMDEFINES) -bl --short-circuit $(NAME).spec
 
 
-mock: srpm
+mock: clean srpm
 	mock -r fedora-$(RELEASE)-$(ARCH) rebuild $(NAME)*.src.rpm 
 
-repo: f13 f12
+repo: clean f13 f12
 
 f13: f13-x86_64 f13-i386
 
