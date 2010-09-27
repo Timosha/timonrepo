@@ -1,26 +1,95 @@
 #!/bin/sh
-#
 # postgresql	This is the init script for starting up the PostgreSQL
-#		server.
+#		server
 #
 # chkconfig: - 64 36
-# description: PostgreSQL database server.
+# description: Starts and stops the PostgreSQL backend daemon that handles \
+#	       all database requests.
 # processname: postmaster
-# pidfile: /var/run/postmaster.PORT.pid
+# pidfile: /var/run/postmaster-9.0.pid
 
-# This script is slightly unusual in that the name of the daemon (postmaster)
-# is not the same as the name of the subsystem (postgresql)
+# Version 6.5.3-2 Lamar Owen
+# Added code to determine if PGDATA exists, whether it is current version
+#     or not, and initdb if no PGDATA (initdb will not overwrite a database).
+
+# Version 7.0 Lamar Owen
+# Added logging code
+# Changed PGDATA.
+
+# Version 7.0.2 Trond Eivind Glomsrd <teg@redhat.com>
+# use functions, add conditional restart
+          
+# Version 7.0.3 Lamar Owen <lamar@postgresql.org>
+# Check for the existence of functions before blindly using them 
+# in particular -- check for success () and failure () before using.
+# More Cross-distribution support -- PGVERSION variable, and docdir checks.
+
+# Version 7.1 Release Candidate Lamar Owen <lamar@postgresql.org>
+# initdb parameters have changed.
+
+# Version 7.1.2 Trond Eivind Glomsrd <teg@redhat.com>
+# Specify shell for su
+# Handle stop better - kill unwanted output, make it wait until the database is ready
+# Handle locales slightly differently - always using "C" isn't a valid option 
+# Kill output from database initialization 
+# Mark messages for translation
+
+# Version 7.1.2-2.PGDG Lamar Owen <lamar.owen@wgcr.org>
+# sync up.
+# Karl's fixes for some quoting issues.
+
+# Version 7.2b2 Lamar Owen <lamar.owen@wgcr.org>
+# version change.
+
+# Version 7.2 final.  Lamar Owen <lamar.owen@wgcr.org>
+# reload from Peter E.
+# Eliminate the pidof postmaster test in stop -- we're using pg_ctl so we don't need pidof.
+# Tested the $? return for the stop script -- it does in fact propagate.
+# TODO: multiple postmasters.
+
+# Version 7.3 Lamar Owen <lamar.owen@ramifordistat.net>
+# Multiple postmasters, courtesy Karl DeBisschop
+
+# Version 7.4 Lamar Owen.
+
+# Version 7.4.3 Tom Lane <tgl@sss.pgh.pa.us>
+# Support condstop for uninstall
+# Minor other changes suggested by Fernando Nasser.
+
+# Version 7.4.5 Tom Lane <tgl@sss.pgh.pa.us>
+# Rewrite to start postmaster directly, rather than via pg_ctl; this avoids
+# fooling the postmaster's stale-lockfile check by having too many
+# postgres-owned processes laying about.
+
+# Version 8.1 Devrim Gunduz <devrim@PostgreSQL.org>
+# Increased sleep time from 1 sec to 2 sec.
+
+# Version 8.2 Devrim Gunduz <devrim@CommandPrompt.com>
+# Set initdb as a seperate option.
+
+# Version 8.3 Devrim Gunduz <devrim@CommandPrompt.com>
+
+# Version 8.4 Devrim Gunduz <devrim@CommandPrompt.com>
+# Remove "sameuser" from initdb, to match the new hba conf file.
+
+# Version 8.5 Devrim Gunduz <devrim@CommandPrompt.com>
+# Get rid of duplicate PGDATA assignment.
+# Ensure pgstartup.log gets the right ownership/permissions during initdb
 
 # PGVERSION is the full package version, e.g., 8.4.0
-# Note: the specfile inserts the correct value during package build
+# Note: the specfile ordinarily updates this during install
 PGVERSION=xxxx
 # PGMAJORVERSION is major version, e.g., 8.4 (this should match PG_VERSION)
 PGMAJORVERSION=`echo "$PGVERSION" | sed 's/^\([0-9]*\.[0-9]*\).*$/\1/'`
 
 # Source function library.
-. /etc/rc.d/init.d/functions
+INITD=/etc/rc.d/init.d
+. $INITD/functions
 
-# Get network config.
+# Get function listing for cross-distribution logic.
+TYPESET=`typeset -f|grep "declare"`
+
+# Get config.
 . /etc/sysconfig/network
 
 # Find the name of the script
@@ -44,8 +113,6 @@ PGENGINE=/usr/bin
 PGPORT=5432
 PGDATA=/var/lib/pgsql/data
 PGLOG=/var/lib/pgsql/pgstartup.log
-# Value to set as postmaster process's oom_adj
-PG_OOM_ADJ=-17
 
 # Override defaults from /etc/sysconfig/pgsql if file is present
 [ -f /etc/sysconfig/pgsql/${NAME} ] && . /etc/sysconfig/pgsql/${NAME}
@@ -53,20 +120,21 @@ PG_OOM_ADJ=-17
 export PGDATA
 export PGPORT
 
-lockfile="/var/lock/subsys/${NAME}"
-pidfile="/var/run/postmaster.${PGPORT}.pid"
+# Check that networking is up.
+# Pretty much need it for postmaster.
+[ "${NETWORKING}" = "no" ] && exit 0
+
+[ -f "$PGENGINE/postmaster" ] || exit 1
 
 script_result=0
 
 start(){
-	[ -x "$PGENGINE/postmaster" ] || exit 5
-
 	PSQL_START=$"Starting ${NAME} service: "
 
 	# Make sure startup-time log file is valid
 	if [ ! -e "$PGLOG" -a ! -h "$PGLOG" ]
 	then
-		touch "$PGLOG" || exit 4
+		touch "$PGLOG" || exit 1
 		chown postgres:postgres "$PGLOG"
 		chmod go-rwx "$PGLOG"
 		[ -x /sbin/restorecon ] && /sbin/restorecon "$PGLOG"
@@ -75,7 +143,8 @@ start(){
 	# Check for the PGDATA structure
 	if [ -f "$PGDATA/PG_VERSION" ] && [ -d "$PGDATA/base" ]
 	then
-		# Check version of existing PGDATA
+	# Check version of existing PGDATA
+
 		if [ x`cat "$PGDATA/PG_VERSION"` != x"$PGMAJORVERSION" ]
 		then
 			SYSDOCDIR="(Your System's documentation directory)"
@@ -101,25 +170,26 @@ start(){
 			echo $"See $SYSDOCDIR/postgresql-$PGVERSION/README.rpm-dist for more information."
 			exit 1
 		fi
+
+	# No existing PGDATA! Warn the user to initdb it.
+
 	else
-		# No existing PGDATA! Warn the user to initdb it.
 		echo
-                echo "$PGDATA is missing. Use \"service postgresql initdb\" to initialize the cluster first."
+		echo "$PGDATA is missing. Use \"service postgresql initdb\" to initialize the cluster first."
 		echo_failure
 		echo
 		exit 1
  	fi
 
 	echo -n "$PSQL_START"
-	test x"$PG_OOM_ADJ" != x && echo "$PG_OOM_ADJ" > /proc/self/oom_adj
 	$SU -l postgres -c "$PGENGINE/postmaster -p '$PGPORT' -D '$PGDATA' ${PGOPTS} &" >> "$PGLOG" 2>&1 < /dev/null
 	sleep 2
-	pid=`head -n 1 "$PGDATA/postmaster.pid" 2>/dev/null`
-	if [ "x$pid" != x ]
+	pid=`pidof -s "$PGENGINE/postmaster"`
+	if [ $pid ] && [ -f "$PGDATA/postmaster.pid" ]
 	then
 		success "$PSQL_START"
-		touch "$lockfile"
-		echo $pid > "$pidfile"
+		touch /var/lock/subsys/${NAME}
+		head -n 1 "$PGDATA/postmaster.pid" > "/var/run/postmaster.${PGPORT}.pid"
 		echo
 	else
 		failure "$PSQL_START"
@@ -130,24 +200,18 @@ start(){
 
 stop(){
 	echo -n $"Stopping ${NAME} service: "
-	if [ -e "$lockfile" ]
+	$SU -l postgres -c "$PGENGINE/pg_ctl stop -D '$PGDATA' -s -m fast" > /dev/null 2>&1 < /dev/null
+	ret=$? 
+	if [ $ret -eq 0 ]
 	then
-	    $SU -l postgres -c "$PGENGINE/pg_ctl stop -D '$PGDATA' -s -m fast" > /dev/null 2>&1 < /dev/null
-	    ret=$? 
-	    if [ $ret -eq 0 ]
-	    then
 		echo_success
-		rm -f "$pidfile"
-		rm -f "$lockfile"
-	    else
+	else
 		echo_failure
 		script_result=1
-	    fi
-	else
-	    # not running; per LSB standards this is "ok"
-	    echo_success
 	fi
 	echo
+	rm -f "/var/run/postmaster.${PGPORT}.pid"
+	rm -f "/var/lock/subsys/${NAME}"
 }
 
 restart(){
@@ -155,59 +219,58 @@ restart(){
     start
 }
 
+initdb(){
+		if [ -f "$PGDATA/PG_VERSION" ]
+		then
+			echo "Data directory is not empty!"
+			echo_failure
+		else
+			echo -n $"Initializing database: "
+			if [ ! -e "$PGDATA" -a ! -h "$PGDATA" ]
+			then
+				mkdir -p "$PGDATA" || exit 1
+				chown postgres:postgres "$PGDATA"
+				chmod go-rwx "$PGDATA"
+			fi
+			# Clean up SELinux tagging for PGDATA
+			[ -x /sbin/restorecon ] && /sbin/restorecon "$PGDATA"
+
+			# Make sure the startup-time log file is OK, too
+			if [ ! -e "$PGLOG" -a ! -h "$PGLOG" ]
+			then
+				touch "$PGLOG" || exit 1
+				chown postgres:postgres "$PGLOG"
+				chmod go-rwx "$PGLOG"
+				[ -x /sbin/restorecon ] && /sbin/restorecon "$PGLOG"
+			fi
+
+			# Initialize the database
+			$SU -l postgres -c "$PGENGINE/initdb --pgdata='$PGDATA' --auth='ident'" >> "$PGLOG" 2>&1 < /dev/null
+
+			# Create directory for postmaster log
+			mkdir "$PGDATA/pg_log"
+			chown postgres:postgres "$PGDATA/pg_log"
+			chmod go-rwx "$PGDATA/pg_log"
+
+			[ -f "$PGDATA/PG_VERSION" ] && echo_success
+			[ ! -f "$PGDATA/PG_VERSION" ] && echo_failure
+			echo
+		fi
+}
 condrestart(){
-    [ -e "$lockfile" ] && restart || :
+    [ -e /var/lock/subsys/${NAME} ] && restart
+}
+
+condstop(){
+    [ -e /var/lock/subsys/${NAME} ] && stop
 }
 
 reload(){
     $SU -l postgres -c "$PGENGINE/pg_ctl reload -D '$PGDATA' -s" > /dev/null 2>&1 < /dev/null
 }
 
-initdb(){
-    if [ -f "$PGDATA/PG_VERSION" ]
-    then
-	echo -n "Data directory is not empty!"
-	echo_failure
-	echo
-	script_result=1
-    else
-	echo -n $"Initializing database: "
-	if [ ! -e "$PGDATA" -a ! -h "$PGDATA" ]
-	then
-		mkdir -p "$PGDATA" || exit 1
-		chown postgres:postgres "$PGDATA"
-		chmod go-rwx "$PGDATA"
-	fi
-	# Clean up SELinux tagging for PGDATA
-	[ -x /sbin/restorecon ] && /sbin/restorecon "$PGDATA"
-
-	# Make sure the startup-time log file is OK, too
-	if [ ! -e "$PGLOG" -a ! -h "$PGLOG" ]
-	then
-		touch "$PGLOG" || exit 1
-		chown postgres:postgres "$PGLOG"
-		chmod go-rwx "$PGLOG"
-		[ -x /sbin/restorecon ] && /sbin/restorecon "$PGLOG"
-	fi
-
-	# Initialize the database
-	$SU -l postgres -c "$PGENGINE/initdb --pgdata='$PGDATA' --auth='ident'" >> "$PGLOG" 2>&1 < /dev/null
-
-	# Create directory for postmaster log
-	mkdir "$PGDATA/pg_log"
-	chown postgres:postgres "$PGDATA/pg_log"
-	chmod go-rwx "$PGDATA/pg_log"
-
-	if [ -f "$PGDATA/PG_VERSION" ]
-	then
-	    echo_success
-	else
-	    echo_failure
-	    script_result=1
-	fi
-	echo
-    fi
-}
+# This script is slightly unusual in that the name of the daemon (postmaster)
+# is not the same as the name of the subsystem (postgresql)
 
 # See how we were called.
 case "$1" in
@@ -218,27 +281,27 @@ case "$1" in
 	stop
 	;;
   status)
-	status postmaster
+	status -p /var/run/postmaster.${PGPORT}.pid
 	script_result=$?
 	;;
   restart)
 	restart
 	;;
-  condrestart|try-restart)
-	condrestart
-	;;
-  reload)
-	reload
-	;;
-  force-reload)
-	restart
-	;;
   initdb)
 	initdb
 	;;
+  condrestart)
+	condrestart
+	;;
+  condstop)
+	condstop
+	;;
+  reload|force-reload)
+	reload
+	;;
   *)
-	echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload|initdb}"
-	exit 2
+	echo $"Usage: $0 {start|stop|status|restart|condrestart|condstop|reload|force-reload|initdb}"
+	exit 1
 esac
 
 exit $script_result
