@@ -1,12 +1,12 @@
 Summary:	Graphical client for PostgreSQL
 Name:		pgadmin3
-Version:	1.12
-Release:	0.1.rc1%{?dist}
+Version:	1.12.1
+Release:	0.1%{?dist}
 License:	BSD
 Group:		Applications/Databases
-#Source:		ftp://ftp.postgresql.org/pub/pgadmin3/release/v%{version}/src/%{name}-%{version}.tar.gz
+#Source:	ftp://ftp.postgresql.org/pub/pgadmin3/release/v%{version}/src/%{name}-%{version}.tar.gz
 #git clone git://git.postgresql.org/git/pgadmin3.git pgadmin3
-#GIT_DIR=pgadmin3/.git git archive --format=tar --prefix=pgadmin3-1.12/ REL-1_12_0-RC1 | bzip2 > pgadmin3-1.12.tar.bz2
+#GIT_DIR=pgadmin3/.git git archive --format=tar --prefix=pgadmin3-1.12.1/ origin/REL-1_12_0_PATCHES | bzip2 > pgadmin3-1.12.1.tar.bz2
 Source:		%{name}-%{version}.tar.bz2
 #Patch0:	%{name}-1.10.0-optflags.patch
 URL:		http://www.pgadmin.org/
@@ -89,6 +89,12 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*
 
 %changelog
+* Wed Sep 22 2010 Timon <timosha@gmail.com> - 1.12.1-0.1
+- 1.12 development version with fixed Russian translation
+
+* Fri Sep 17 2010 Timon <timosha@gmail.com> - 1.12-1
+- 1.12 release
+
 * Wed Sep 15 2010 Timon <timosha@gmail.com> - 1.12-0.rc1
 - Update to 1.12rc1
 
