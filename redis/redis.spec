@@ -1,5 +1,3 @@
-%define pid_dir %{_localstatedir}/run/redis
-%define pid_file %{pid_dir}/redis.pid
 %global uid	52
 
 Summary:	Advanced key-value store
