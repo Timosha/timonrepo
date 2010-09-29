@@ -7,7 +7,7 @@
 Summary:		Provides a wrapper to the ImageMagick library
 Name:		php-pecl-%peclName
 Version:		3.0.0
-Release:		7%{?dist}
+Release:		8%{?dist}
 License:		PHP
 Group:		Development/Libraries
 Source0:		http://pecl.php.net/get/%peclName-%{version}.tgz
@@ -83,6 +83,9 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.d/%peclName.ini
 
 %changelog
+* Wed Sep 29 2010 jkeating - 3.0.0-8
+- Rebuilt for gcc bug 634757
+
 * Thu Sep 16 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 3.0.0-7
 - Rebuild against new ImageMagick
 
