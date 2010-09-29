@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.10.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -501,6 +501,9 @@ fi
 %endif
 
 %changelog
+* Wed Sep 29 2010 jkeating - 4.10.0-2
+- Rebuilt for gcc bug 634757
+
 * Sun Sep 19 2010 Robert Scheck <robert@fedoraproject.org> 4.10.0-1
 - New upstream version 4.10.0 (thanks to Mike McGrath)
 
