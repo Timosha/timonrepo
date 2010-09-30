@@ -1,9 +1,9 @@
 %global VER 6.6.4
-%global Patchlevel 1
+%global Patchlevel 8
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -305,6 +305,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Sep 30 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 6.6.4.8-16
+- Rebuild against new ghostscript in rawhide.
+- Update to 6.6.4-8 version.
+
 * Wed Sep 29 2010 Tom "spot" Callaway <tcallawa@redhat.com> - 6.6.4.1-15
 - rebuild against new ghostscript
 
