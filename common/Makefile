@@ -44,7 +44,7 @@ f13: f13-x86_64 f13-i386
 
 f12: f12-x86_64 f12-i386
 
-arch:	f$(RELEASE)-$(ARCH)
+arch: clean f$(RELEASE)-$(ARCH)
 
 f14-x86_64: srpm
 	mock -r fedora-14-x86_64 rebuild $(NAME)*.src.rpm && \
@@ -57,11 +57,11 @@ f14-x86_64: srpm
 	cd $(REPODIR)/14/x86_64/debug && createrepo --update . && \
 	cd $(REPODIR)/14/SRPMS && createrepo --update .
 
-f13-i386: srpm
+f14-i386: srpm
 	mock -r fedora-14-i386 rebuild $(NAME)*.src.rpm && \
 	mkdir -p $(REPODIR)/14/{SRPMS,i386} && \
 	mkdir -p $(REPODIR)/14/i386/{os,debug} && \
-	( mv /var/lib/mock/fedora-14-i386/result/*-debuginfo-*.rpm  $(REPODIR)/14/i386/debug || echo noarch) && \z
+	( mv /var/lib/mock/fedora-14-i386/result/*-debuginfo-*.rpm  $(REPODIR)/14/i386/debug || echo noarch) && \
 	mv /var/lib/mock/fedora-14-i386/result/$(NAME)-*.src.rpm  $(REPODIR)/14/SRPMS && \
 	mv /var/lib/mock/fedora-14-i386/result/*-*.rpm  $(REPODIR)/14/i386/os && \
 	cd $(REPODIR)/14/i386/os && createrepo --update . && \
