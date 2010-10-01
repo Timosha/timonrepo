@@ -1,6 +1,6 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   0.43
+Version:   0.44
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -87,10 +87,10 @@ you will need to install %{name}-devel.
 %exclude %{_libdir}/libmemcachedprotocol.la
 %exclude %{_libdir}/libmemcachedutil.la
 %exclude %{_libdir}/libhashkit.la
-%{_libdir}/libhashkit.so.*
-%{_libdir}/libmemcached.so.*
-%{_libdir}/libmemcachedprotocol.so.*
-%{_libdir}/libmemcachedutil.so.*
+%{_libdir}/libhashkit.so.0*
+%{_libdir}/libmemcached.so.6*
+%{_libdir}/libmemcachedprotocol.so.0*
+%{_libdir}/libmemcachedutil.so.1*
 %{_mandir}/man1/mem*
 
 
@@ -110,6 +110,10 @@ you will need to install %{name}-devel.
 
 
 %changelog
+* Fri Oct 01 2010 Remi Collet <Fedora@famillecollet.com> - 0.44-1
+- update to 0.44
+- add soname version in %%file to detect change
+
 * Fri Jul 30 2010 Remi Collet <Fedora@famillecollet.com> - 0.43-1
 - update to 0.43
 
