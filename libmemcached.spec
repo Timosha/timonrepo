@@ -1,7 +1,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
 Version:   0.44
-Release:   2%{?dist}
+Release:   3%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -11,11 +11,12 @@ Source0:   http://launchpad.net/libmemcached/1.0/%{version}/+download/libmemcach
 # See http://lists.libmemcached.org/pipermail/libmemcached-discuss/2010-October/002207.html
 Patch0:    libmemcached-sasl.patch
 
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: cyrus-sasl-devel
 # checked during configure (for test suite)
 BuildRequires: memcached
-
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+# We patch .m4 files
+BuildRequires: libtool autoconf automake
 
 
 %description
@@ -59,6 +60,7 @@ you will need to install %{name}-devel.
 
 
 %build
+config/autorun.sh
 %configure
 %{__make} %{_smp_mflags}
 
@@ -117,6 +119,9 @@ you will need to install %{name}-devel.
 
 
 %changelog
+* Sat Oct 02 2010 Remi Collet <Fedora@famillecollet.com> - 0.44-3
+- improves SASL patch
+
 * Sat Oct 02 2010 Remi Collet <Fedora@famillecollet.com> - 0.44-2
 - enable SASL support
 
