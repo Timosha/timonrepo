@@ -1,14 +1,13 @@
 Summary:	Graphical client for PostgreSQL
 Name:		pgadmin3
 Version:	1.12.1
-Release:	0.1%{?dist}
+Release:	1%{?dist}
 License:	BSD
 Group:		Applications/Databases
 #Source:	ftp://ftp.postgresql.org/pub/pgadmin3/release/v%{version}/src/%{name}-%{version}.tar.gz
 #git clone git://git.postgresql.org/git/pgadmin3.git pgadmin3
-#GIT_DIR=pgadmin3/.git git archive --format=tar --prefix=pgadmin3-1.12.1/ origin/REL-1_12_0_PATCHES | bzip2 > pgadmin3-1.12.1.tar.bz2
-Source:		%{name}-%{version}.tar.bz2
-#Patch0:	%{name}-1.10.0-optflags.patch
+#GIT_DIR=pgadmin3/.git git archive --format=tar --prefix=pgadmin3-1.12.1/ REL-1_12_1 | bzip2 > pgadmin3-1.12.1.tar.bz2
+Source0:	%{name}-%{version}.tar.bz2
 URL:		http://www.pgadmin.org/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	wxGTK-devel postgresql-devel desktop-file-utils openssl-devel libxml2-devel libxslt-devel
@@ -35,23 +34,19 @@ required to communicate with the database server.
 %prep
 %setup -q
 bash bootstrap
-# touch to avoid autotools re-run
-#for f in configure{,.ac} ; do touch -r $f $f.stamp ; done
-#%patch0 -p1
-#for f in configure{,.ac} ; do touch -r $f.stamp $f ; done
 
 %build
 export LIBS="-lwx_gtk2u_core-2.8"
 %configure --disable-debug --disable-dependency-tracking --with-wx-version=2.8 --with-wx=%{_prefix}
-make %{?_smp_mflags} all
+%{__make} %{?_smp_mflags} all
 
 %install
-rm -rf %{buildroot}
-make DESTDIR=%{buildroot} install
+%{__rm} -rf %{buildroot}
+%{__make} DESTDIR=%{buildroot} install
 
-cp -f ./pkg/debian/pgadmin3.xpm %{buildroot}/%{_datadir}/%{name}/%{name}.xpm
+%{__cp} -f ./pkg/debian/pgadmin3.xpm %{buildroot}/%{_datadir}/%{name}/%{name}.xpm
 
-mkdir -p %{buildroot}/%{_datadir}/applications
+%{__mkdir} -p %{buildroot}/%{_datadir}/applications
 
 desktop-file-install --dir %{buildroot}%{_datadir}/applications \
 %if 0%{?rhel}
@@ -60,26 +55,26 @@ desktop-file-install --dir %{buildroot}%{_datadir}/applications \
 	--add-category Development pkg/%{name}.desktop
 
 # Convert changelog, fix incorrect end-of-line encoding
-iconv -f iso-8859-1 -t utf-8 -o CHANGELOG.utf8 CHANGELOG
-sed -i 's/\r$//' CHANGELOG.utf8
-touch -c -r CHANGELOG CHANGELOG.utf8
-mv -f CHANGELOG.utf8 CHANGELOG
+#iconv -f iso-8859-1 -t utf-8 -o CHANGELOG.utf8 CHANGELOG
+#sed -i 's/\r$//' CHANGELOG.utf8
+#touch -c -r CHANGELOG CHANGELOG.utf8
+#mv -f CHANGELOG.utf8 CHANGELOG
 
 # Remove unwanted and double files
-rm -f docs/{Docs.vcproj,builddocs.bat}
-rm -f %{buildroot}%{_datadir}/%{name}/i18n/{*,.}/wxstd.mo
+%{__rm} -f docs/{Docs.vcproj,builddocs.bat}
+%{__rm} -f %{buildroot}%{_datadir}/%{name}/i18n/{*,.}/wxstd.mo
 
 # Correct permissions to solve rpmlint debuginfo noise
 chmod 644 pgadmin/include/images/{package,synonym}{,s}.xpm
 
 # Move locales to their correct place
-mkdir -p %{buildroot}%{_datadir}/locale
-mv -f %{buildroot}%{_datadir}/%{name}/i18n/??_?? %{buildroot}%{_datadir}/locale
+%{__mkdir} -p %{buildroot}%{_datadir}/locale
+%{__mv} -f %{buildroot}%{_datadir}/%{name}/i18n/??_?? %{buildroot}%{_datadir}/locale
 
 %find_lang %{name}
 
 %clean
-rm -rf %{buildroot}
+%{__rm} -rf %{buildroot}
 
 %files -f %{name}.lang
 %defattr(-,root,root)
@@ -89,6 +84,15 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*
 
 %changelog
+* Tue Oct 5 2010 Timon <timosha@gmail.com> - 1.12.1-1
+- 1.12.1 release
+
+* Wed Sep 29 2010 Timon <timosha@gmail.com> - 1.12.1-0.3.git290910
+- Some fixes
+
+* Thu Sep 28 2010 Timon <timosha@gmail.com> - 1.12.1-0.2.git280910
+- Pre 1.12.1 development version
+
 * Wed Sep 22 2010 Timon <timosha@gmail.com> - 1.12.1-0.1
 - 1.12 development version with fixed Russian translation
 
