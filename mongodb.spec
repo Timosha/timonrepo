@@ -1,7 +1,7 @@
 %global         daemon mongod
 Name:           mongodb
-Version:        1.6.2
-Release:        2%{?dist}
+Version:        1.6.3
+Release:        1%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -27,7 +27,6 @@ BuildRequires:  libpcap-devel
 # to run tests
 BuildRequires:  unittest
 
-Requires:       js
 Requires(post): chkconfig
 Requires(preun): chkconfig
 
@@ -36,7 +35,8 @@ Requires(pre):  shadow-utils
 # This is for /sbin/service
 Requires(postun): initscripts
 
-ExcludeArch:    ppc ppc64
+# Mongodb must run on a little-endian CPU (see bug #630898)
+ExcludeArch:    ppc ppc64 %{sparc} s390 s390x
 
 %description
 Mongo (from "humongous") is a high-performance, open source, schema-free
@@ -93,7 +93,7 @@ sed -i 's/\r//' db/resource.h
 sed -i 's/\r//' README
 
 %build
-scons %{?_smp_mflags} --cppflags="%{optflags} -fno-strict-aliasing"  .
+scons %{?_smp_mflags} --cppflags="%{optflags} -fno-strict-aliasing" .
 
 
 %install
@@ -183,6 +183,11 @@ fi
 %{_libdir}/libmongoclient.a
 
 %changelog
+* Thu Oct  7 2010 Ionuț C. Arțăriși <mapleoin@fedoraproject.org> - 1.6.3-1
+- removed js Requires
+- new upstream release
+- added more excludearches: sparc s390, s390x and bugzilla pointer
+
 * Tue Sep  7 2010 Ionuț C. Arțăriși <mapleoin@fedoraproject.org> - 1.6.2-2
 - added ExcludeArch for ppc
 
