@@ -103,7 +103,7 @@ scons install . --cppflags="%{optflags} -fno-strict-aliasing" --prefix=%{buildro
 mkdir -p %{buildroot}%{_sharedstatedir}/%{name}
 
 mkdir -p %{buildroot}%{_localstatedir}/log/%{name}
-install -p -D -m 755 %{SOURCE1} %{buildroot}%{_initddir}/%{daemon}
+install -p -D -m 755 %{SOURCE1} %{buildroot}%{_initrddir}/%{daemon}
 install -p -D -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 install -p -D -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/mongodb.conf
 
@@ -166,7 +166,7 @@ fi
 
 %files server
 %defattr(-,root,root,-)
-%{_initddir}/%{daemon}
+%{_initrddir}/%{daemon}
 %{_bindir}/mongod
 %{_bindir}/mongos
 %{_mandir}/man1/mongod.1*
