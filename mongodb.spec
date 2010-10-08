@@ -1,7 +1,7 @@
 %global         daemon mongod
 Name:           mongodb
 Version:        1.6.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -98,7 +98,7 @@ scons %{?_smp_mflags} --cppflags="%{optflags} -fno-strict-aliasing" .
 
 %install
 rm -rf %{buildroot}
-scons install . --cppflags="%{optflags} -fno-strict-aliasing" --prefix=%{buildroot}%{_prefix} --nostrip --full
+scons install . --cppflags="%{optflags} -fno-strict-aliasing -fPIC" --prefix=%{buildroot}%{_prefix} --nostrip --full
 
 mkdir -p %{buildroot}%{_sharedstatedir}/%{name}
 
@@ -183,6 +183,9 @@ fi
 %{_libdir}/libmongoclient.a
 
 %changelog
+* Fri Oct 08 2010 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.6.3-2
+- Added -fPIC build option which was dropped by accident
+
 * Thu Oct  7 2010 Ionuț C. Arțăriși <mapleoin@fedoraproject.org> - 1.6.3-1
 - removed js Requires
 - new upstream release
