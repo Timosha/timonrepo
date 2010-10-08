@@ -1,7 +1,10 @@
+# Make sure initddir is defined on el5 and possibly other distros
+%{!?_initddir: %define _initddir %{_initrddir}}
+
 %global         daemon mongod
 Name:           mongodb
 Version:        1.6.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -183,6 +186,9 @@ fi
 %{_libdir}/libmongoclient.a
 
 %changelog
+* Fri Oct 08 2010 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.6.3-3
+- Define _initddir when it doesn't exist for el5 and others
+
 * Fri Oct 08 2010 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.6.3-2
 - Added -fPIC build option which was dropped by accident
 
