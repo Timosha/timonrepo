@@ -4,7 +4,7 @@
 %global         daemon mongod
 Name:           mongodb
 Version:        1.6.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -96,7 +96,7 @@ sed -i 's/\r//' db/resource.h
 sed -i 's/\r//' README
 
 %build
-scons %{?_smp_mflags} --cppflags="%{optflags} -fno-strict-aliasing" .
+scons %{?_smp_mflags} --cppflags="%{optflags} -fno-strict-aliasing -fPIC" .
 
 
 %install
@@ -186,6 +186,9 @@ fi
 %{_libdir}/libmongoclient.a
 
 %changelog
+* Fri Oct 08 2010 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.6.3-4
+- Put -fPIC onto both the build and install scons calls
+
 * Fri Oct 08 2010 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.6.3-3
 - Define _initddir when it doesn't exist for el5 and others
 
