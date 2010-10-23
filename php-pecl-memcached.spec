@@ -5,7 +5,7 @@
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
 Version:      1.0.2
-Release:      2%{?dist}
+Release:      3%{?dist}
 License:      PHP
 Group:        Development/Languages
 URL:          http://pecl.php.net/package/%{pecl_name}
@@ -26,6 +26,12 @@ Requires:     php(zend-abi) = %{php_zend_api}
 Requires:     php(api) = %{php_core_api}
 
 Provides:     php-pecl(%{pecl_name}) = %{version}-%{release}
+
+
+%{?filter_setup:
+%filter_provides_in %{php_extdir}/.*\.so$
+%filter_setup
+}
 
 
 %description
@@ -110,6 +116,9 @@ cd %{pecl_name}-%{version}
 
 
 %changelog
+* Sat Oct 23 2010  Remi Collet <Fedora@FamilleCollet.com> - 1.0.2-3
+- add filter_provides to avoid private-shared-object-provides memcached.so
+
 * Fri Oct 01 2010 Remi Collet <fedora@famillecollet.com> - 1.0.2-2
 - rebuild against libmemcached 0.44 with SASL support
 
