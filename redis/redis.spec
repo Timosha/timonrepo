@@ -2,8 +2,8 @@
 
 Summary:	Advanced key-value store
 Name:		redis
-Version:	2.0.1
-Release:	5%{?dist}
+Version:	2.0.3
+Release:	1%{?dist}
 License:	BSD
 Group:		Applications/Databases
 URL:		http://code.google.com/p/redis/
@@ -104,6 +104,9 @@ fi
 %dir %attr(0755,redis,redis) %{_localstatedir}/log/redis
 
 %changelog
+* Thu Sep 16 2010 Timon <timosha@gmail.com> 2.0.3-1
+- updated to 2.0.3
+
 * Thu Sep 16 2010 Timon <timosha@gmail.com> 2.0.1-5
 - fix logs
 - fix data dir
