@@ -3,7 +3,7 @@
 Summary:	Advanced key-value store
 Name:		redis
 Version:	2.0.3
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	BSD
 Group:		Applications/Databases
 URL:		http://code.google.com/p/redis/
@@ -12,7 +12,7 @@ Source0:	http://redis.googlecode.com/files/redis-%{version}.tar.gz
 #Source1:	redis.conf
 Source2:	redis.init
 Source3:	redis.logrotate
-Patch1:		redis-2.0.1.conf.patch
+Patch1:		redis-2.0.conf.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -60,6 +60,7 @@ and so on. Redis is free software released under the very liberal BSD license.
 
 %{__install} -p -d -m 0750 %{buildroot}%{_sharedstatedir}/redis
 %{__install} -p -d -m 0755 %{buildroot}%{_localstatedir}/log/redis
+%{__install} -p -d -m 0755 %{buildroot}%{_localstatedir}/run/redis
 
 %pre
 %{__fe_groupadd} %{uid} -r %{name} &>/dev/null || :
@@ -101,10 +102,14 @@ fi
 %config(noreplace) %{_sysconfdir}/redis.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/redis
 %dir %attr(0750,redis,redis) %{_localstatedir}/lib/redis
+%dir %attr(0755,redis,redis) %{_localstatedir}/run/redis
 %dir %attr(0755,redis,redis) %{_localstatedir}/log/redis
 
 %changelog
-* Thu Sep 16 2010 Timon <timosha@gmail.com> 2.0.3-1
+* Tue Oct 26 2010 Timon <timosha@gmail.com> 2.0.3-2
+- fix redis.pid
+
+* Tue Oct 26 2010 Timon <timosha@gmail.com> 2.0.3-1
 - updated to 2.0.3
 
 * Thu Sep 16 2010 Timon <timosha@gmail.com> 2.0.1-5

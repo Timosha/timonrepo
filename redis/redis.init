@@ -8,7 +8,7 @@
 # description: A persistent key-value database with network interface
 # processname: redis-server
 # config: /etc/redis.conf
-# pidfile: /var/run/redis.pid
+# pidfile: /var/run/redis/redis.pid
 
 . /etc/rc.d/init.d/functions
 
@@ -26,7 +26,7 @@ start() {
 }
 
 stop() {
-    PID=`cat /var/run/redis.pid 2>/dev/null`
+    PID=`cat /var/run/redis/redis.pid 2>/dev/null`
     if [ -n "$PID" ]; then
         echo "Shutdown may take a while; redis needs to save the entire database";
         echo -n $"Shutting down $prog: "
@@ -67,7 +67,7 @@ case "$1" in
   stop
   ;;
   status)
-  status -p /var/run/redis.pid $prog
+  status -p /var/run/redis/redis.pid $prog
   RETVAL=$?
   ;;
   restart)

@@ -9,6 +9,15 @@
  
  # When running daemonized, Redis writes a pid file in /var/run/redis.pid by
  # default. You can specify a custom pid file location here.
+@@ -18,7 +18,7 @@
+ 
+ # When running daemonized, Redis writes a pid file in /var/run/redis.pid by
+ # default. You can specify a custom pid file location here.
+-pidfile /var/run/redis.pid
++pidfile /var/run/redis/redis.pid
+ 
+ # Accept connections on the specified port, default is 6379
+ port 6379
 @@ -37,12 +37,12 @@
  # verbose (many rarely useful info, but not a mess like the debug level)
  # notice (moderately verbose, what you want in production probably)
