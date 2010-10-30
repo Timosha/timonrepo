@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.10.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -501,6 +501,9 @@ fi
 %endif
 
 %changelog
+* Sat Oct 30 2010 Richard W.M. Jones <rjones@redhat.com> 4.10.0-3
+- Bump and rebuild for updated libnetsnmp.so.
+
 * Wed Sep 29 2010 jkeating - 4.10.0-2
 - Rebuilt for gcc bug 634757
 
