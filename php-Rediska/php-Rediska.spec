@@ -1,9 +1,9 @@
 %global		realname	Rediska
-%global		realversion	0-5-0
+%global		realversion	0-5-1
 
 Name:		php-Rediska
 Summary:	PHP client for Redis
-Version:        0.5.0
+Version:        0.5.1
 Release:        1%{?dist}
 
 Source0:        http://rediska.geometria-lab.ru/download/%{realname}-%{realversion}.zip
@@ -56,5 +56,12 @@ PHP client for redis with features:
 %{_datadir}/php/%{realname}.php
 
 %changelog
+* Mon Nov 01 2010 Timon <timosha@gmail.com> 0.5.1-1
+- Implemented ZCOUNT
+- Added append and substring commands to Rediska_Key
+- Added setAndExpire command to Rediska_Key
+- Fixed warnings about empty namespace
+- Fixed GET parameter in sort command
+
 * Thu Sep 16 2010 Timon <timosha@gmail.com> 0.5.0-1
 - first rpm release
