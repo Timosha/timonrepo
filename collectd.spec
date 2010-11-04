@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.10.0
-Release: 3%{?dist}
+Version: 4.10.1
+Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -9,9 +9,7 @@ URL: http://collectd.org/
 Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
 Source1: collectd-httpd.conf
 Source2: collection.conf
-# bug 468067 "pkg-config --libs OpenIPMIpthread" fails
-Patch0: %{name}-4.6.2-configure-OpenIPMI.patch
-Patch1: %{name}-4.10.0-include-collectd.d.patch
+Patch1: %{name}-%{version}-include-collectd.d.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -177,7 +175,6 @@ This plugin collects information from virtualized guests.
 
 %prep
 %setup -q
-%patch0 -p0
 %patch1 -p1
 
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
@@ -188,6 +185,7 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
     --disable-ascent \
     --disable-static \
     --disable-ipvs \
+    --disable-notify_desktop \
     --enable-mysql \
 %ifnarch ppc ppc64 sparc sparc64
     --enable-sensors \
@@ -397,7 +395,6 @@ fi
 %doc %{_mandir}/man5/collectd-java.5*
 %doc %{_mandir}/man5/collectd-python.5*
 %doc %{_mandir}/man5/collectd-unixsock.5*
-%doc %{_mandir}/man5/collectd-python.5*
 %doc %{_mandir}/man5/types.db.5*
 
 %files apache
@@ -501,6 +498,10 @@ fi
 %endif
 
 %changelog
+* Thu Nov 04 2010 Alan Pevec <apevec@redhat.com> 4.10.1-1
+- New upstream version 4.10.1
+  http://collectd.org/news.shtml#news85
+
 * Sat Oct 30 2010 Richard W.M. Jones <rjones@redhat.com> 4.10.0-3
 - Bump and rebuild for updated libnetsnmp.so.
 
