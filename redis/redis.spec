@@ -106,6 +106,9 @@ fi
 %dir %attr(0755,redis,redis) %{_localstatedir}/log/redis
 
 %changelog
+* Mon Nov 15 2010 Timon <timosha@gmail.com> 2.0.4-1
+- new package built with tito
+
 * Tue Oct 26 2010 Timon <timosha@gmail.com> 2.0.4-1
 - new version
 
