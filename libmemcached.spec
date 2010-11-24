@@ -1,11 +1,17 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
 Version:   0.44
-Release:   3%{?dist}
+Release:   4%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
-Source0:   http://launchpad.net/libmemcached/1.0/%{version}/+download/libmemcached-%{version}.tar.gz
+# Original sources:
+#   http://launchpad.net/libmemcached/1.0/%{version}/+download/libmemcached-%{version}.tar.gz
+# The source tarball must be repackaged to remove the Hsieh hash
+# code, since the license is non-free.  When upgrading, download the new
+# source tarball, and run "./strip-hsieh.sh <version>" to produce the
+# "-exhsieh" tarball.
+Source0:   libmemcached-%{version}-exhsieh.tar.gz
 
 # Add -lsasl2 to libmemcached.pc
 # See http://lists.libmemcached.org/pipermail/libmemcached-discuss/2010-October/002207.html
@@ -52,8 +58,6 @@ you will need to install %{name}-devel.
 %setup -q
 
 %patch0 -p1 -b .sasl
-
-%{__rm} -f libmemcached/hsieh_hash.c 
 
 %{__mkdir} examples
 %{__cp} -p tests/*.{c,cpp,h} examples/
@@ -119,6 +123,9 @@ config/autorun.sh
 
 
 %changelog
+* Wed Nov 24 2010 Joe Orton <jorton@redhat.com> - 0.44-4
+- repackage source tarball to remove non-free Hsieh hash code
+
 * Sat Oct 02 2010 Remi Collet <Fedora@famillecollet.com> - 0.44-3
 - improves SASL patch
 
