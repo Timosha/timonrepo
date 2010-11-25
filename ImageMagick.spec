@@ -1,9 +1,9 @@
-%global VER 6.6.4
-%global Patchlevel 8
+%global VER 6.6.5
+%global Patchlevel 10
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        16%{?dist}
+Release:        17%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -305,6 +305,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Nov 25 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 6.6.5.10-17
+- New version 6.6.5-10.
+- Add --enable-hdri switch by request of Petr Vlašic.
+
 * Thu Sep 30 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 6.6.4.8-16
 - Rebuild against new ghostscript in rawhide.
 - Update to 6.6.4-8 version.
