@@ -3,8 +3,8 @@
 
 %global         daemon mongod
 Name:           mongodb
-Version:        1.6.3
-Release:        4%{?dist}
+Version:        1.6.4
+Release:        1%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -186,6 +186,9 @@ fi
 %{_libdir}/libmongoclient.a
 
 %changelog
+* Sat Dec 04 2010 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.6.4-1
+- New upstream release
+
 * Fri Oct 08 2010 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.6.3-4
 - Put -fPIC onto both the build and install scons calls
 
