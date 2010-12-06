@@ -36,7 +36,7 @@ bl:
 mock: clean srpm
 	mock -r fedora-$(RELEASE)-$(ARCH) rebuild $(NAME)*.src.rpm 
 
-repo: clean f14 f13 f12
+repo: clean f14 f13
 
 f14: f14-x86_64 f14-i386
 
