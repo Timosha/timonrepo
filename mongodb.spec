@@ -4,7 +4,7 @@
 %global         daemon mongod
 Name:           mongodb
 Version:        1.6.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -119,6 +119,9 @@ mkdir -p %{buildroot}%{_localstatedir}/run/%{name}
 %clean
 rm -rf %{buildroot}
 
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
 
 %pre server
 getent group %{name} >/dev/null || groupadd -r %{name}
@@ -126,7 +129,6 @@ getent passwd %{name} >/dev/null || \
 useradd -r -g %{name} -d %{_sharedstatedir}/%{name} -s /sbin/nologin \
 -c "MongoDB Database Server" %{name}
 exit 0
-
 
 %post server
 /sbin/chkconfig --add %{daemon}
@@ -187,6 +189,9 @@ fi
 %{_includedir}/mongo
 
 %changelog
+* Mon Dec 06 2010 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.6.4-3
+- Add post/postun ldconfig... oops!
+
 * Mon Dec 06 2010 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.6.4-2
 - Enable --sharedclient option, remove static lib
 
