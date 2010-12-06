@@ -4,7 +4,7 @@
 %global         daemon mongod
 Name:           mongodb
 Version:        1.6.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -96,12 +96,13 @@ sed -i 's/\r//' db/resource.h
 sed -i 's/\r//' README
 
 %build
-scons %{?_smp_mflags} --cppflags="%{optflags} -fno-strict-aliasing -fPIC" .
+scons %{?_smp_mflags} --cppflags="%{optflags} -fno-strict-aliasing -fPIC" --sharedclient .
 
 
 %install
 rm -rf %{buildroot}
-scons install . --cppflags="%{optflags} -fno-strict-aliasing -fPIC" --prefix=%{buildroot}%{_prefix} --nostrip --full
+scons install . --cppflags="%{optflags} -fno-strict-aliasing -fPIC" --sharedclient --prefix=%{buildroot}%{_prefix} --nostrip --full
+rm -f %{buildroot}%{_libdir}/libmongoclient.a
 
 mkdir -p %{buildroot}%{_sharedstatedir}/%{name}
 
@@ -156,6 +157,7 @@ fi
 %{_bindir}/mongostat
 %{_bindir}/mongosniff
 %{_bindir}/bsondump
+%{_libdir}/libmongoclient.so
 
 %{_mandir}/man1/mongo.1*
 %{_mandir}/man1/mongod.1*
@@ -183,9 +185,11 @@ fi
 %files devel
 %defattr(-,root,root,-)
 %{_includedir}/mongo
-%{_libdir}/libmongoclient.a
 
 %changelog
+* Mon Dec 06 2010 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.6.4-2
+- Enable --sharedclient option, remove static lib
+
 * Sat Dec 04 2010 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.6.4-1
 - New upstream release
 
