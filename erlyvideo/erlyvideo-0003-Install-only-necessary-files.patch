@@ -1,0 +1,31 @@
+From 35e52fa1be0bf94fd59ba1b298ca7c20f4bf4ee8 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Sun, 31 Oct 2010 11:50:08 +0300
+Subject: [PATCH 3/4] Install only necessary files
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ Makefile |    7 +++++--
+ 1 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 33cde7c..c942ae3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -76,8 +76,11 @@ start: priv/erlyvideo.conf
+ install: compile
+ 	mkdir -p $(DESTROOT)/var/lib/erlyvideo/movies
+ 	mkdir -p $(DESTROOT)/var/lib/erlyvideo/plugins
+-	mkdir -p $(DESTROOT)$(ERLDIR)
+-	cp -r ebin src include lib Emakefile $(DESTROOT)$(ERLDIR)/
++	mkdir -p $(DESTROOT)$(ERLDIR)/ebin
++	mkdir -p $(DESTROOT)$(ERLDIR)/include
++	install -p -m 0644 ebin/erlyvideo.app $(DESTROOT)$(ERLDIR)/ebin
++	install -p -m 0644 ebin/*.beam $(DESTROOT)$(ERLDIR)/ebin
++	install -p -m 0644 include/*.hrl $(DESTROOT)$(ERLDIR)/include
+ 	install -p -D -m 0755 contrib/reverse_mpegts $(DESTROOT)/usr/bin/reverse_mpegts
+ 	install -p -D -m 0755 contrib/erlyctl.debian $(DESTROOT)/usr/bin/erlyctl
+ 	mkdir -p $(DESTROOT)/etc/rc.d/init.d/
+-- 
+1.7.2.3
+

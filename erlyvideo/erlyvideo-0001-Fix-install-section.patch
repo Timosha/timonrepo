@@ -1,0 +1,41 @@
+From 64150391bcc79e6778ce3e0605b9b93d60411882 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Sun, 31 Oct 2010 11:48:18 +0300
+Subject: [PATCH 1/4] Fix install section
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ Makefile |   12 +++++-------
+ 1 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 667307e..91b5e79 100644
+--- a/Makefile
++++ b/Makefile
+@@ -78,18 +78,16 @@ install: compile
+ 	mkdir -p $(DESTROOT)/var/lib/erlyvideo/plugins
+ 	mkdir -p $(DESTROOT)$(ERLDIR)
+ 	cp -r ebin src include lib Emakefile $(DESTROOT)$(ERLDIR)/
+-	mkdir -p $(DESTROOT)/usr/bin/
+-	cp contrib/reverse_mpegts $(DESTROOT)/usr/bin/reverse_mpegts
+-	cp contrib/erlyctl.debian $(DESTROOT)/usr/bin/erlyctl
++	install -p -D -m 0755 contrib/reverse_mpegts $(DESTROOT)/usr/bin/reverse_mpegts
++	install -p -D -m 0755 contrib/erlyctl.debian $(DESTROOT)/usr/bin/erlyctl
+ 	mkdir -p $(DESTROOT)/etc/init.d/
+ 	ln -s /usr/bin/erlyctl $(DESTROOT)/etc/init.d/erlyvideo
+ 	cp -r wwwroot $(DESTROOT)/var/lib/erlyvideo/
+ 	rm -rf $(DESTROOT)/var/lib/erlyvideo/wwwroot/player/.git
+ 	mkdir -p $(DESTROOT)/var/log/erlyvideo
+-	mkdir -p $(DESTROOT)/etc/erlyvideo
+-	cp priv/erlyvideo.conf.debian $(DESTROOT)/etc/erlyvideo/erlyvideo.conf
+-	cp priv/log4erl.conf.debian $(DESTROOT)/etc/erlyvideo/log4erl.conf
+-	cp priv/production.config.debian $(DESTROOT)/etc/erlyvideo/production.config
++	install -p -D -m 0644 priv/erlyvideo.conf.debian $(DESTROOT)/etc/erlyvideo/erlyvideo.conf
++	install -p -D -m 0644 priv/log4erl.conf.debian $(DESTROOT)/etc/erlyvideo/log4erl.conf
++	install -p -D -m 0644 priv/production.config.debian $(DESTROOT)/etc/erlyvideo/production.config
+ 	cp -r snmp $(DESTROOT)/var/lib/erlyvideo/
+ 	mkdir -p $(DESTROOT)/var/cache/erlyvideo/licensed
+ 	for i in deps/amf deps/log4erl deps/erlydtl deps/erlmedia deps/mpegts deps/rtmp deps/rtp deps/rtsp ; do (cd $$i; make DESTROOT=$(DESTROOT) ERLANG_ROOT=$(ERLANG_ROOT) VERSION=$(VERSION) install) ; done
+-- 
+1.7.2.3
+

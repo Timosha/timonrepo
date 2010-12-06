@@ -1,0 +1,28 @@
+From 1f20cfd8d40edf4e4eac4117fcc3a37f31113520 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Sun, 31 Oct 2010 11:49:20 +0300
+Subject: [PATCH 2/4] Fix path to init script (Fedora/RHEL-specific)
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 91b5e79..33cde7c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -80,8 +80,8 @@ install: compile
+ 	cp -r ebin src include lib Emakefile $(DESTROOT)$(ERLDIR)/
+ 	install -p -D -m 0755 contrib/reverse_mpegts $(DESTROOT)/usr/bin/reverse_mpegts
+ 	install -p -D -m 0755 contrib/erlyctl.debian $(DESTROOT)/usr/bin/erlyctl
+-	mkdir -p $(DESTROOT)/etc/init.d/
+-	ln -s /usr/bin/erlyctl $(DESTROOT)/etc/init.d/erlyvideo
++	mkdir -p $(DESTROOT)/etc/rc.d/init.d/
++	ln -s /usr/bin/erlyctl $(DESTROOT)/etc/rc.d/init.d/erlyvideo
+ 	cp -r wwwroot $(DESTROOT)/var/lib/erlyvideo/
+ 	rm -rf $(DESTROOT)/var/lib/erlyvideo/wwwroot/player/.git
+ 	mkdir -p $(DESTROOT)/var/log/erlyvideo
+-- 
+1.7.2.3
+
