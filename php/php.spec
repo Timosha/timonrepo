@@ -14,10 +14,20 @@
 # Regression tests take a long time, you can skip 'em with this
 %{!?runselftest: %{expand: %%global runselftest 1}}
 
+# Use the arch-specific mysql_config binary to avoid mismatch with the
+# arch detection heuristic used by bindir/mysql_config.
+%define mysql_config %{_libdir}/mysql/mysql_config
+
+%ifarch %{ix86} x86_64
+%global with_fpm 1
+%else
+%global with_fpm 0
+%endif
+
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
-Version: 5.3.3
-Release: 5%{?dist}
+Version: 5.3.4
+Release: 1%{?dist}.1
 License: PHP
 Group: Development/Languages
 URL: http://www.php.net/
@@ -29,16 +39,17 @@ Source3: macros.php
 Source4: php-fpm.conf
 Source5: php-fpm-www.conf
 Source6: php-fpm.init
+Source7: php-fpm.logrotate
 
 # Build fixes
-Patch1: php-5.3.3-gnusrc.patch
+Patch1: php-5.3.4-gnusrc.patch
 Patch2: php-5.3.0-install.patch
 Patch3: php-5.2.4-norpath.patch
 Patch4: php-5.3.0-phpize64.patch
 Patch5: php-5.2.0-includedir.patch
 Patch6: php-5.2.4-embed.patch
 Patch7: php-5.3.0-recode.patch
-Patch8: php-5.3.3-aconf26x.patch
+Patch8: php-5.3.4-aconf26x.patch
 
 # Fixes for extension modules
 Patch20: php-4.3.11-shutdown.patch
@@ -48,6 +59,12 @@ Patch21: php-5.3.3-macropen.patch
 Patch40: php-5.0.4-dlopen.patch
 Patch41: php-5.3.0-easter.patch
 Patch42: php-5.3.1-systzdata-v7.patch
+# See http://bugs.php.net/53436
+Patch43: php-5.3.4-phpize.patch
+
+# Security patch from upstream SVN
+# http://svn.php.net/viewvc?view=revision&revision=306154
+Patch50: php-5.3.4-cve.patch
 
 # Fixes for tests
 Patch61: php-5.0.4-tests-wddx.patch
@@ -68,9 +85,17 @@ Requires: php-cli = %{version}-%{release}
 # To ensure correct /var/lib/php/session ownership:
 Requires(pre): httpd
 
+
+# Don't provides extensions, which are not shared library, as .so
+%{?filter_setup:
+%filter_provides_in %{_libdir}/php/modules/.*\.so$
+%filter_setup
+}
+
+
 %description
 PHP is an HTML-embedded scripting language. PHP attempts to make it
-easy for developers to write dynamically generated webpages. PHP also
+easy for developers to write dynamically generated web pages. PHP also
 offers built-in database integration for several commercial and
 non-commercial database management systems, so writing a
 database-enabled webpage with PHP is fairly simple. The most common
@@ -101,17 +126,18 @@ BuildRequires: libtool-ltdl-devel
 The php-zts package contains a module for use with the Apache HTTP
 Server which can operate under a threaded server processing model.
 
+%if %{with_fpm}
 %package fpm
 Group: Development/Languages
 Summary: PHP FastCGI Process Manager
 Requires: php-common = %{version}-%{release}
-Requires: libevent >= 1.4.11
 BuildRequires: libevent-devel >= 1.4.11
 
 %description fpm
 PHP-FPM (FastCGI Process Manager) is an alternative PHP FastCGI
 implementation with some additional features useful for sites of
 any size, especially busier sites.
+%endif
 
 %package common
 Group: Development/Languages
@@ -329,7 +355,8 @@ Summary: A module for PHP applications for using the gd graphics library
 Group: Development/Languages
 Requires: php-common = %{version}-%{release}
 # Required to build the bundled GD library
-BuildRequires: libXpm-devel, libjpeg-devel, libpng-devel, freetype-devel, t1lib-devel
+BuildRequires: libjpeg-devel, libpng-devel, freetype-devel
+BuildRequires: libXpm-devel, t1lib-devel
 
 %description gd
 The php-gd package contains a dynamic shared object that will add
@@ -455,6 +482,9 @@ support for using the enchant library to PHP.
 %patch40 -p1 -b .dlopen
 %patch41 -p1 -b .easter
 %patch42 -p1 -b .systzdata
+%patch43 -p0 -b .headers
+
+%patch50 -p4 -b .cve
 
 %patch61 -p1 -b .tests-wddx
 
@@ -465,7 +495,10 @@ cp ext/ereg/regex/COPYRIGHT regex_COPYRIGHT
 cp ext/gd/libgd/README gd_README
 
 # Multiple builds for multiple SAPIs
-mkdir build-cgi build-apache build-embedded build-zts build-fpm
+mkdir build-cgi build-apache build-embedded build-zts \
+%if %{with_fpm}
+    build-fpm
+%endif
 
 # Remove bogus test; position of read position after fopen(, "a+")
 # is not defined by C standard, so don't presume anything.
@@ -526,6 +559,9 @@ if test "$ver" != "%{jsonver}"; then
    exit 1
 fi
 
+# Fix some bogus permissions
+find . -name \*.[ch] -exec chmod 644 {} \;
+chmod 644 README.*
 
 %build
 # aclocal workaround - to be improved
@@ -616,7 +652,7 @@ build --enable-force-cgi-redirect \
       --with-xmlrpc=shared \
       --with-ldap=shared --with-ldap-sasl \
       --with-mysql=shared,%{_prefix} \
-      --with-mysqli=shared,%{_bindir}/mysql_config \
+      --with-mysqli=shared,%{mysql_config} \
       --with-interbase=shared,%{_libdir}/firebird \
       --with-pdo-firebird=shared,%{_libdir}/firebird \
       --enable-dom=shared \
@@ -630,7 +666,7 @@ build --enable-force-cgi-redirect \
       --enable-fastcgi \
       --enable-pdo=shared \
       --with-pdo-odbc=shared,unixODBC,%{_prefix} \
-      --with-pdo-mysql=shared,%{_prefix} \
+      --with-pdo-mysql=shared,%{mysql_config} \
       --with-pdo-pgsql=shared,%{_prefix} \
       --with-pdo-sqlite=shared,%{_prefix} \
       --with-pdo-dblib=shared,%{_prefix} \
@@ -667,10 +703,12 @@ pushd build-apache
 build --with-apxs2=%{_sbindir}/apxs ${without_shared}
 popd
 
+%if %{with_fpm}
 # Build php-fpm
 pushd build-fpm
 build --enable-fpm ${without_shared}
 popd
+%endif
 
 # Build for inclusion as embedded script language into applications,
 # /usr/lib[64]/libphp5.so
@@ -714,8 +752,10 @@ unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
 # Install the version for embedded script language in applications + php_embed.h
 make -C build-embedded install-sapi install-headers INSTALL_ROOT=$RPM_BUILD_ROOT
 
+%if %{with_fpm}
 # Install the php-fpm binary
 make -C build-fpm install-fpm INSTALL_ROOT=$RPM_BUILD_ROOT 
+%endif
 
 # Install everything from the CGI SAPI build
 make -C build-cgi install INSTALL_ROOT=$RPM_BUILD_ROOT 
@@ -746,11 +786,11 @@ install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/php.d
 install -m 755 -d $RPM_BUILD_ROOT%{_localstatedir}/lib/php
 install -m 700 -d $RPM_BUILD_ROOT%{_localstatedir}/lib/php/session
 
+%if %{with_fpm}
 # PHP-FPM stuff
-# PID
-install -m 755 -d $RPM_BUILD_ROOT%{_localstatedir}/run/php-fpm
 # Log
 install -m 755 -d $RPM_BUILD_ROOT%{_localstatedir}/log/php-fpm
+install -m 755 -d $RPM_BUILD_ROOT%{_localstatedir}/run/php-fpm
 # Config
 install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/php-fpm.d
 install -m 644 %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/php-fpm.conf
@@ -759,7 +799,10 @@ mv $RPM_BUILD_ROOT%{_sysconfdir}/php-fpm.conf.default .
 # Service
 install -m 755 -d $RPM_BUILD_ROOT%{_initrddir}
 install -m 755 %{SOURCE6} $RPM_BUILD_ROOT%{_initrddir}/php-fpm
-
+# LogRotate
+install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
+install -m 644 %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/php-fpm
+%endif
 
 # Fix the link
 (cd $RPM_BUILD_ROOT%{_bindir}; ln -sfn phar.phar phar)
@@ -825,6 +868,7 @@ rm -f README.{Zeus,QNX,CVS-RULES}
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 rm files.* macros.php
 
+%if %{with_fpm}
 %post fpm
 /sbin/chkconfig --add php-fpm
 
@@ -833,7 +877,7 @@ if [ "$1" = 0 ] ; then
     /sbin/service php-fpm stop >/dev/null 2>&1
     /sbin/chkconfig --del php-fpm
 fi
-
+%endif
 
 %post embedded -p /sbin/ldconfig
 %postun embedded -p /sbin/ldconfig
@@ -866,33 +910,38 @@ fi
 %{_bindir}/php-cgi
 %{_bindir}/phar.phar
 %{_bindir}/phar
+# provides phpize here (not in -devel) for pecl command
+%{_bindir}/phpize
 %{_mandir}/man1/php.1*
+%{_mandir}/man1/phpize.1*
 %doc sapi/cgi/README* sapi/cli/README
 
 %files zts
 %defattr(-,root,root)
 %{_libdir}/httpd/modules/libphp5-zts.so
 
+%if %{with_fpm}
 %files fpm
 %defattr(-,root,root)
 %doc php-fpm.conf.default
 %config(noreplace) %{_sysconfdir}/php-fpm.conf
 %config(noreplace) %{_sysconfdir}/php-fpm.d/www.conf
+%config(noreplace) %{_sysconfdir}/logrotate.d/php-fpm
 %{_sbindir}/php-fpm
 %{_initrddir}/php-fpm
 %dir %{_sysconfdir}/php-fpm.d
-%dir %{_localstatedir}/run/php-fpm
-%dir %{_localstatedir}/log/php-fpm
-%{_mandir}/man1/php-fpm.1*
+# log owned by apache for log
+%attr(770,apache,apache) %dir %{_localstatedir}/log/php-fpm
+%ghost %dir %{_localstatedir}/run/php-fpm
+%{_mandir}/man8/php-fpm.8*
+%endif
 
 %files devel
 %defattr(-,root,root)
 %{_bindir}/php-config
-%{_bindir}/phpize
 %{_includedir}/php
 %{_libdir}/php/build
 %{_mandir}/man1/php-config.1*
-%{_mandir}/man1/phpize.1*
 %config %{_sysconfdir}/rpm/macros.php
 
 %files embedded
@@ -927,12 +976,26 @@ fi
 %files enchant -f files.enchant
 
 %changelog
-* Mon Aug 02 2010 Timon <timosha@gmail.com> - 5.3.3-5
-- graceful reload in init script
+* Sun Dec 12 2010 Remi Collet <rpms@famillecollet.com> 5.3.4-1.1
+- security patch from upstream for #660517
 
-* Wed Jul 28 2010 Timon <timosha@gmail.com> - 5.3.3-4
-- add php-fpm
-- fix missed paths
+* Sat Dec 11 2010 Remi Collet <Fedora@famillecollet.com> 5.3.4-1
+- update to 5.3.4
+  http://www.php.net/ChangeLog-5.php#5.3.4
+- move phpize to php-cli (see #657812)
+
+* Wed Dec  1 2010 Remi Collet <Fedora@famillecollet.com> 5.3.3-5
+- ghost /var/run/php-fpm (see #656660)
+- add filter_setup to not provides extensions as .so
+
+* Mon Nov  1 2010 Joe Orton <jorton@redhat.com> - 5.3.3-4
+- use mysql_config in libdir directly to avoid biarch build failures
+
+* Fri Oct 29 2010 Joe Orton <jorton@redhat.com> - 5.3.3-3
+- rebuild for new net-snmp
+
+* Sun Oct 10 2010 Remi Collet <Fedora@famillecollet.com> 5.3.3-2
+- add php-fpm sub-package
 
 * Thu Jul 22 2010 Remi Collet <Fedora@famillecollet.com> 5.3.3-1
 - PHP 5.3.3 released
