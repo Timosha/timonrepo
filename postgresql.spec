@@ -52,7 +52,7 @@
 Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 8.4
-Version: 8.4.5
+Version: 8.4.6
 Release: 1%{?dist}
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
@@ -287,6 +287,9 @@ autoconf
 
 cp -p %{SOURCE1} .
 
+# remove .gitignore files to ensure none get into the RPMs (bug #642210)
+find . -type f -name .gitignore | xargs rm
+
 %build
 
 # fail quickly and obviously if user tries to build as root
@@ -357,8 +360,7 @@ CFLAGS="$CFLAGS -DLINUX_OOM_ADJ=0"
 %endif
 	--with-system-tzdata=/usr/share/zoneinfo \
 	--sysconfdir=/etc/sysconfig/pgsql \
-	--datadir=/usr/share/pgsql \
-	--with-docdir=%{_docdir}
+	--datadir=/usr/share/pgsql
 
 make %{?_smp_mflags} all
 make %{?_smp_mflags} -C contrib all
@@ -714,6 +716,12 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Dec 16 2010 Tom Lane <tgl@redhat.com> 8.4.6-1
+- Update to PostgreSQL 8.4.6, for various fixes described at
+  http://www.postgresql.org/docs/8.4/static/release-8-4-6.html
+- Ensure we don't package any .gitignore files from the source tarball
+Related: #642210
+
 * Tue Oct  5 2010 Tom Lane <tgl@redhat.com> 8.4.5-1
 - Update to PostgreSQL 8.4.5, for various fixes described at
   http://www.postgresql.org/docs/8.4/static/release-8-4-5.html
