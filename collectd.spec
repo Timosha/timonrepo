@@ -1,6 +1,6 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.10.1
+Version: 4.10.2
 Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
@@ -182,23 +182,107 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
 %build
 %configure \
-    --disable-ascent \
     --disable-static \
+    --disable-ascent \
+    --disable-apple_sensors \
+    --disable-curl_json  \
+    --disable-dbi  \
+    --disable-gmond \
     --disable-ipvs \
+    --disable-java \
+    --disable-memcachec \
+    --disable-modbus \
+    --disable-netapp \
+    --disable-netlink \
     --disable-notify_desktop \
+    --disable-notify_email \
+    --disable-onewire \
+    --disable-oracle \
+    --disable-pinba \
+    --disable-routeros \
+    --disable-rrdcached \
+    --disable-tape \
+    --disable-tokyotyrant \
+    --disable-xmms \
+    --disable-zfs_arc \
+    --enable-apache \
+    --enable-apcups \
+    --enable-battery \
+    --enable-bind \
+    --enable-conntrack \
+    --enable-contextswitch \
+    --enable-cpu \
+    --enable-cpufreq \
+    --enable-csv \
+    --enable-curl \
+    --enable-curl_xml \
+    --enable-df \
+    --enable-disk \
+    --enable-dns \
+    --enable-email \
+    --enable-entropy \
+    --enable-exec \
+    --enable-filecount \
+    --enable-fscache \
+    --enable-hddtemp \
+    --enable-interface \
+    --enable-ipmi \
+    --enable-iptables \
+    --enable-irq \
+    --enable-libvirt \
+    --enable-load \
+    --enable-logfile \
+    --enable-madwifi \
+    --enable-match_empty_counter \
+    --enable-match_hashed \
+    --enable-match_regex \
+    --enable-match_timediff \
+    --enable-match_value \
+    --enable-mbmon \
+    --enable-memcached \
+    --enable-memory \
+    --enable-multimeter \
     --enable-mysql \
+    --enable-network \
+    --enable-nfs \
+    --enable-nginx \
+    --enable-ntpd \
+    --enable-nut \
+    --enable-olsrd \
+    --enable-openvpn \
+    --enable-perl \
+    --enable-ping \
+    --enable-postgresql \
+    --enable-powerdns \
+    --enable-processes \
+    --enable-protocols \
+    --enable-python \
+    --enable-rrdtool \
 %ifnarch ppc ppc64 sparc sparc64
     --enable-sensors \
 %endif
-    --enable-email \
-    --enable-apache \
-    --enable-perl \
+    --enable-serial \
+    --enable-snmp \
+    --enable-swap \
+    --enable-syslog \
+    --enable-table \
+    --enable-tail \
+    --enable-target_notification \
+    --enable-target_replace \
+    --enable-target_scale \
+    --enable-target_set \
+    --enable-tcpconns \
+    --enable-teamspeak2 \
+    --enable-ted \
+    --enable-thermal \
     --enable-unixsock \
-    --enable-ipmi \
-    --enable-nut \
-    --enable-postgresql \
-    --enable-iptables \
-    --enable-ping \
+    --enable-uptime \
+    --enable-users \
+    --enable-uuid \
+    --enable-vmem \
+    --enable-vserver \
+    --enable-wireless \
+    --enable-write_http \
     --with-libiptc \
     --with-python \
     --with-perl-bindings=INSTALLDIRS=vendor
@@ -498,6 +582,11 @@ fi
 %endif
 
 %changelog
+* Thu Dec 16 2010 Alan Pevec <apevec@redhat.com> 4.10.2-1
+- New upstream version 4.10.2
+- http://collectd.org/news.shtml#news86
+- explicitly disable/enable all plugins, fixes FTBFS bz#660936
+
 * Thu Nov 04 2010 Alan Pevec <apevec@redhat.com> 4.10.1-1
 - New upstream version 4.10.1
   http://collectd.org/news.shtml#news85
