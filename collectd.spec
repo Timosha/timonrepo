@@ -10,6 +10,7 @@ Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
 Source1: collectd-httpd.conf
 Source2: collection.conf
 Patch1: %{name}-%{version}-include-collectd.d.patch
+Patch2: %{name}-%{version}-iptc-check.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -33,9 +34,10 @@ BuildRequires: mysql-devel
 BuildRequires: OpenIPMI-devel
 BuildRequires: postgresql-devel
 BuildRequires: nut-devel
-#BuildRequires: iptables-devel
+BuildRequires: iptables-devel
 BuildRequires: liboping-devel
 BuildRequires: python-devel
+BuildRequires: libgcrypt-devel
 
 %description
 collectd is a small daemon written in C for performance.  It reads various
@@ -176,6 +178,7 @@ This plugin collects information from virtualized guests.
 %prep
 %setup -q
 %patch1 -p1
+%patch2 -p1
 
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
