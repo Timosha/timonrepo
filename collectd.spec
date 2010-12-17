@@ -178,7 +178,7 @@ This plugin collects information from virtualized guests.
 %prep
 %setup -q
 %patch1 -p1
-%patch2 -p1
+%patch2 -p0
 
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
