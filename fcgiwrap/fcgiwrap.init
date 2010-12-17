@@ -1,0 +1,69 @@
+#!/bin/sh
+#
+# fcgiwrap - fcgiwrap swaping via spawn-fcgi
+#
+# chkconfig:   - 85 15
+# processname: fcgiwrap
+# config:      /etc/sysconfig/fcgiwrap (defaults RH style)
+# pidfile:     /var/run/fcgiwrap.pid
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ "$NETWORKING" = "no" ] && exit 0
+
+pidfile="/var/run/fcgiwrap.pid"
+spawner="/usr/bin/spawn-fcgi"
+cgi="/usr/bin/fcgiwrap"
+prog=$(basename $cgi)
+
+# do not edit, put changes in /etc/sysconfig/fcgiwrap
+[ -f /etc/sysconfig/fcgiwrap ] && . /etc/sysconfig/fcgiwrap
+
+start() {
+    [ -x $cgi ] || exit 1
+    [ -x $spawner ] || exit 2
+    echo -n $"Starting $prog: "
+    daemon $spawner -a $LISTEN -p $PORT -u $USER -g $GROUP -P $pidfile -f $cgi
+    retval=$?
+    echo
+    return $retval
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc -p $pidfile $prog -QUIT
+    retval=$?
+    echo
+    [ -f $pidfile ] && /bin/rm -f $pidfile
+    return $retval
+}
+
+restart(){
+        stop
+        sleep 2
+        start
+}
+
+rh_status(){
+        status -p $pidfile $prog
+}
+
+case "$1" in
+    start)
+        start;;
+    stop)
+        stop;;
+    restart)
+        restart;;
+    status)
+        rh_status;;
+    *) 
+        echo $"Usage: $0 {start|stop|restart|status}"
+        exit 3
+esac
+
+
