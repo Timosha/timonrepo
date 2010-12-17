@@ -1,13 +1,13 @@
 Summary:	Graphical client for PostgreSQL
 Name:		pgadmin3
-Version:	1.12.1
+Version:	1.12.2
 Release:	1%{?dist}
 License:	BSD
 Group:		Applications/Databases
-#Source:	ftp://ftp.postgresql.org/pub/pgadmin3/release/v%{version}/src/%{name}-%{version}.tar.gz
+Source:		http://developer.pgadmin.org/ftp/release/v%{version}/src/%{name}-%{version}.tar.gz
 #git clone git://git.postgresql.org/git/pgadmin3.git pgadmin3
 #GIT_DIR=pgadmin3/.git git archive --format=tar --prefix=pgadmin3-1.12.1/ REL-1_12_1 | bzip2 > pgadmin3-1.12.1.tar.bz2
-Source0:	%{name}-%{version}.tar.bz2
+#Source0:	%{name}-%{version}.tar.bz2
 URL:		http://www.pgadmin.org/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	wxGTK-devel postgresql-devel desktop-file-utils openssl-devel libxml2-devel libxslt-devel
@@ -84,6 +84,9 @@ chmod 644 pgadmin/include/images/{package,synonym}{,s}.xpm
 %{_datadir}/applications/*
 
 %changelog
+* Tue Dec 14 2010 Timon <timosha@gmail.com> - 1.12.2-1
+- 1.12.2 release
+
 * Tue Oct 5 2010 Timon <timosha@gmail.com> - 1.12.1-1
 - 1.12.1 release
 
