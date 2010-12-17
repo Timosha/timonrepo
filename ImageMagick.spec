@@ -3,7 +3,7 @@
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        17%{?dist}
+Release:        18%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -17,7 +17,7 @@ BuildRequires:  libtiff-devel, giflib-devel, zlib-devel, perl-devel >= 5.8.1
 BuildRequires:  ghostscript-devel, djvulibre-devel
 BuildRequires:  libwmf-devel, jasper-devel, libtool-ltdl-devel
 BuildRequires:  libX11-devel, libXext-devel, libXt-devel
-BuildRequires:  lcms-devel, libxml2-devel, librsvg2-devel
+BuildRequires:  lcms-devel, libxml2-devel, librsvg2-devel, OpenEXR-devel
 
 %description
 ImageMagick is an image display and manipulation tool for the X
@@ -305,6 +305,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Dec 17 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 6.6.5.10-18
+- Add BR OpenEXR-devel to support OpenEXR format (BZ#663705)
+
 * Thu Nov 25 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 6.6.5.10-17
 - New version 6.6.5-10.
 - Add --enable-hdri switch by request of Petr Vlašic.
