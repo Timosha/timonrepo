@@ -52,7 +52,7 @@
 Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 9.0
-Version: 9.0.1
+Version: 9.0.2
 Release: 1%{?dist}
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
@@ -720,6 +720,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Fri Dec 17 2010 Timon <timosha@gmail.com> 9.0.2-1
+- New release 9.0.2
+
 * Tue Oct 26 2010 Timon <timosha@gmail.com> 9.0.1-1
 - New release 9.0.1
 
