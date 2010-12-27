@@ -1,16 +1,16 @@
 # FIXME
 %global debug_package %{nil}
-%global git_tag a042859
+%global git_tag 25cf0c2
 
 
 Name:		erlyvideo
-Version:	2.4.13
+Version:	2.5.11
 Release:	1%{?dist}
 Summary:	Erlang RTMP server
 Group:		Applications/Multimedia
 License:	GPLv3
 URL:		http://erlyvideo.org/
-# wget http://github.com/erlyvideo/erlyvideo/tarball/v2.4.13
+# wget http://github.com/erlyvideo/erlyvideo/tarball/v2.5.11
 Source0:	erlyvideo-%{name}-v%{version}-0-g%{git_tag}.tar.gz
 # wget http://github.com/erlyvideo/erlyplayer/tarball/eed2837
 Source1:	erlyvideo-erlyplayer-eed2837.tar.gz
@@ -19,17 +19,25 @@ Patch2:		erlyvideo-0002-Fix-path-to-init-script-Fedora-RHEL-specific.patch
 Patch3:		erlyvideo-0003-Install-only-necessary-files.patch
 Patch4:		erlyvideo-0004-Fix-installing-of-contributed-rtmp-apps.patch
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
+
 BuildRequires:	erlang
 BuildRequires:	ruby
 Requires:	erlang
 
+BuildRequires:	fedora-usermgmt-devel
+%{?FE_USERADD_REQ}
+
+Requires(post):		/sbin/chkconfig
+Requires(preun):	/sbin/chkconfig
+Requires(preun):	/sbin/service
+Requires(postun):	/sbin/service
 
 %description
 Erlang RTMP server.
 
 
 %prep
-%setup -q -n erlyvideo-erlyvideo-b508e43
+%setup -q -n erlyvideo-erlyvideo-1cf9504
 mkdir -p wwwroot/player
 tar xf %{SOURCE1} --strip-components=1 -C wwwroot/player/
 %patch1 -p1 -b .install
@@ -53,13 +61,26 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/erlang/lib/log4erl-%{version}/src
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%pre
+%{__fe_groupadd} -r %{name} &>/dev/null || :
+%{__fe_useradd} -r -s /sbin/nologin -d %{_sharedstatedir}/%{name} -M \
+			-c '%{name}' -g %{name} %{name} &>/dev/null || :
+
+%preun
+if [ $1 = 0 ]; then
+    /sbin/service %{name} stop > /dev/null 2>&1
+    /sbin/chkconfig --del %{name}
+fi
+
+%post
+/sbin/chkconfig --add %{name}
 
 %files
 %defattr(-,root,root,-)
 %doc
-%{_sysconfdir}/%{name}/%{name}.conf
-%{_sysconfdir}/%{name}/log4erl.conf
-%{_sysconfdir}/%{name}/production.config
+%config(noreplace) %{_sysconfdir}/%{name}/%{name}.conf
+%config(noreplace) %{_sysconfdir}/%{name}/log4erl.conf
+%config(noreplace) %{_sysconfdir}/%{name}/production.config
 %{_initrddir}/%{name}
 %{_bindir}/erlyctl
 %{_bindir}/reverse_mpegts
@@ -90,6 +111,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/erlang/lib/erlmedia-%{version}/ebin/gen_listener.beam
 %{_libdir}/erlang/lib/erlmedia-%{version}/ebin/h264.beam
 %{_libdir}/erlang/lib/erlmedia-%{version}/ebin/http_uri2.beam
+%{_libdir}/erlang/lib/erlmedia-%{version}/ebin/http_stream.beam
+%{_libdir}/erlang/lib/erlmedia-%{version}/ebin/jpeg_reader.beam
 %{_libdir}/erlang/lib/erlmedia-%{version}/ebin/mjpeg_reader.beam
 %{_libdir}/erlang/lib/erlmedia-%{version}/ebin/mkv.beam
 %{_libdir}/erlang/lib/erlmedia-%{version}/ebin/mp3.beam
@@ -99,12 +122,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/erlang/lib/erlmedia-%{version}/ebin/mp4_writer.beam
 %{_libdir}/erlang/lib/erlmedia-%{version}/ebin/packet_codec.beam
 %{_libdir}/erlang/lib/erlmedia-%{version}/ebin/shoutcast_reader.beam
+%{_libdir}/erlang/lib/erlmedia-%{version}/ebin/srt_parser.beam
 %{_libdir}/erlang/lib/erlmedia-%{version}/ebin/wav.beam
 %{_libdir}/erlang/lib/erlmedia-%{version}/include/aac.hrl
 %{_libdir}/erlang/lib/erlmedia-%{version}/include/flv.hrl
 %{_libdir}/erlang/lib/erlmedia-%{version}/include/h264.hrl
 %{_libdir}/erlang/lib/erlmedia-%{version}/include/mp3.hrl
 %{_libdir}/erlang/lib/erlmedia-%{version}/include/mp4.hrl
+%{_libdir}/erlang/lib/erlmedia-%{version}/include/srt.hrl
 %{_libdir}/erlang/lib/erlmedia-%{version}/include/video_frame.hrl
 %{_libdir}/erlang/lib/erlmedia-%{version}/include/wav.hrl
 
@@ -176,7 +201,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/erlang/lib/rtmp-%{version}/ebin/rtmp_sup.beam
 %{_libdir}/erlang/lib/rtmp-%{version}/ebin/rtmpe.beam
 %{_libdir}/erlang/lib/rtmp-%{version}/ebin/rtmpt.beam
-%{_libdir}/erlang/lib/rtmp-%{version}/ebin/rtmpt_sessions.beam
 %{_libdir}/erlang/lib/rtmp-%{version}/ebin/sha2.beam
 %{_libdir}/erlang/lib/rtmp-%{version}/include/rtmp.hrl
 
@@ -208,5 +232,9 @@ rm -rf $RPM_BUILD_ROOT
 /var/lib/erlyvideo
 
 %changelog
+* Sat Oct 30 2010 Timon <timosha@gmail.com> - 2.4.13-2
+- add user and group
+- fix init.d script add
+
 * Sat Oct 30 2010 Peter Lemenkov <lemenkov@gmail.com> - 2.4.13-1
 - Initial build
