@@ -33,12 +33,12 @@
 %global gcj_support %{?_with_gcj_support:1}%{!?_with_gcj_support:%{?_without_gcj_support:0}%{!?_without_gcj_support:%{?_gcj_support:%{_gcj_support}}%{!?_gcj_support:0}}}
 
 %global section		devel
-%global upstreamver	8.4-701
+%global upstreamver	9.0-801
 
 Summary:	JDBC driver for PostgreSQL
 Name:		postgresql-jdbc
-Version:	8.4.701
-Release:	4%{?dist}
+Version:	9.0.801
+Release:	1%{?dist}
 # ASL 2.0 applies only to postgresql-jdbc.pom file, the rest is BSD
 License:	BSD and ASL 2.0
 Group:		Applications/Databases
@@ -47,7 +47,6 @@ URL:		http://jdbc.postgresql.org/
 Source0:	http://jdbc.postgresql.org/download/%{name}-%{upstreamver}.src.tar.gz
 # originally http://repo2.maven.org/maven2/postgresql/postgresql/8.4-701.jdbc4/postgresql-8.4-701.jdbc4.pom:
 Source1:	postgresql-jdbc.pom
-Patch1:		postgresql-jdbc-bogus-import.patch
 
 %if ! %{gcj_support}
 BuildArch:	noarch
@@ -83,8 +82,6 @@ rmdir %{name}-%{upstreamver}.src
 
 # remove any binary libs
 find -name "*.jar" -or -name "*.class" | xargs rm -f
-
-%patch1 -p1
 
 %build
 export OPT_JAR_LIST="ant/ant-junit junit"
@@ -157,6 +154,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/maven2/poms/JPP-%{name}.pom
 
 %changelog
+* Wed Dec 29 2010 Tom Lane <tgl@redhat.com> 9.0.801-1
+- Update to build 9.0-801
+
 * Mon May 31 2010 Tom Lane <tgl@redhat.com> 8.4.701-4
 - Update gcj_support sections to meet Packaging/GCJGuidelines;
   fixes FTBFS in F-14 rawhide
