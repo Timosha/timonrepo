@@ -1,10 +1,10 @@
-Select stderr-based logging with a week's worth of daily logfiles.
+Default to stderr-based logging with a week's worth of daily logfiles.
 
 
-diff -Naur postgresql-8.4.0.orig/src/backend/utils/misc/postgresql.conf.sample postgresql-8.4.0/src/backend/utils/misc/postgresql.conf.sample
---- postgresql-8.4.0.orig/src/backend/utils/misc/postgresql.conf.sample	2009-04-22 20:23:45.000000000 -0400
-+++ postgresql-8.4.0/src/backend/utils/misc/postgresql.conf.sample	2009-08-12 23:20:46.000000000 -0400
-@@ -236,17 +236,17 @@
+diff -Naur postgresql-9.0.1.orig/src/backend/utils/misc/postgresql.conf.sample postgresql-9.0.1/src/backend/utils/misc/postgresql.conf.sample
+--- postgresql-9.0.1.orig/src/backend/utils/misc/postgresql.conf.sample	2010-10-01 10:25:44.000000000 -0400
++++ postgresql-9.0.1/src/backend/utils/misc/postgresql.conf.sample	2010-10-11 11:53:34.650971490 -0400
+@@ -262,17 +262,17 @@
  					# requires logging_collector to be on.
  
  # This is used when logging to stderr:
@@ -26,7 +26,7 @@ diff -Naur postgresql-8.4.0.orig/src/backend/utils/misc/postgresql.conf.sample p
  					# same name as the new log file will be
  					# truncated rather than appended to.
  					# But such truncation only occurs on
-@@ -254,9 +254,9 @@
+@@ -280,9 +280,9 @@
  					# or size-driven rotation.  Default is
  					# off, meaning append to existing files
  					# in all cases.

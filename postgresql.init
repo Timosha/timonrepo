@@ -11,11 +11,20 @@
 # This script is slightly unusual in that the name of the daemon (postmaster)
 # is not the same as the name of the subsystem (postgresql)
 
-# PGVERSION is the full package version, e.g., 8.4.0
+# PGVERSION is the full package version, e.g., 9.0.2
 # Note: the specfile inserts the correct value during package build
 PGVERSION=xxxx
-# PGMAJORVERSION is major version, e.g., 8.4 (this should match PG_VERSION)
+# PGMAJORVERSION is major version, e.g., 9.0 (this should match PG_VERSION)
 PGMAJORVERSION=`echo "$PGVERSION" | sed 's/^\([0-9]*\.[0-9]*\).*$/\1/'`
+# PREVMAJORVERSION is the previous major version, e.g., 8.4, for upgrades
+# Note: the specfile inserts the correct value during package build
+PREVMAJORVERSION=xxxx
+# PREVPGENGINE is the directory containing the previous postmaster executable
+# Note: the specfile inserts the correct value during package build
+PREVPGENGINE=xxxx
+# PGDOCDIR is the directory containing the package's documentation
+# Note: the specfile inserts the correct value during package build
+PGDOCDIR=xxxx
 
 # Source function library.
 . /etc/rc.d/init.d/functions
@@ -76,35 +85,27 @@ start(){
 	if [ -f "$PGDATA/PG_VERSION" ] && [ -d "$PGDATA/base" ]
 	then
 		# Check version of existing PGDATA
-		if [ x`cat "$PGDATA/PG_VERSION"` != x"$PGMAJORVERSION" ]
+		if [ x`cat "$PGDATA/PG_VERSION"` = x"$PGMAJORVERSION" ]
 		then
-			SYSDOCDIR="(Your System's documentation directory)"
-			if [ -d "/usr/doc/postgresql-$PGVERSION" ]
-			then
-				SYSDOCDIR=/usr/doc
-			fi
-			if [ -d "/usr/share/doc/postgresql-$PGVERSION" ]
-			then
-				SYSDOCDIR=/usr/share/doc
-			fi
-			if [ -d "/usr/doc/packages/postgresql-$PGVERSION" ]
-			then
-				SYSDOCDIR=/usr/doc/packages
-			fi
-			if [ -d "/usr/share/doc/packages/postgresql-$PGVERSION" ]
-			then
-				SYSDOCDIR=/usr/share/doc/packages
-			fi
+			: A-OK
+		elif [ x`cat "$PGDATA/PG_VERSION"` = x"$PREVMAJORVERSION" ]
+		then
 			echo
 			echo $"An old version of the database format was found."
-			echo $"You need to upgrade the data format before using PostgreSQL."
-			echo $"See $SYSDOCDIR/postgresql-$PGVERSION/README.rpm-dist for more information."
+			echo $"Use \"service postgresql upgrade\" to upgrade to version $PGMAJORVERSION."
+			echo $"See $PGDOCDIR/README.rpm-dist for more information."
+			exit 1
+		else
+			echo
+			echo $"An old version of the database format was found."
+			echo $"You need to dump and reload before using PostgreSQL $PGMAJORVERSION."
+			echo $"See $PGDOCDIR/README.rpm-dist for more information."
 			exit 1
 		fi
 	else
 		# No existing PGDATA! Warn the user to initdb it.
 		echo
-                echo "$PGDATA is missing. Use \"service postgresql initdb\" to initialize the cluster first."
+                echo $"$PGDATA is missing. Use \"service postgresql initdb\" to initialize the cluster first."
 		echo_failure
 		echo
 		exit 1
@@ -163,18 +164,11 @@ reload(){
     $SU -l postgres -c "$PGENGINE/pg_ctl reload -D '$PGDATA' -s" > /dev/null 2>&1 < /dev/null
 }
 
-initdb(){
-    if [ -f "$PGDATA/PG_VERSION" ]
-    then
-	echo -n "Data directory is not empty!"
-	echo_failure
-	echo
-	script_result=1
-    else
-	echo -n $"Initializing database: "
+# code shared between initdb and upgrade actions
+perform_initdb(){
 	if [ ! -e "$PGDATA" -a ! -h "$PGDATA" ]
 	then
-		mkdir -p "$PGDATA" || exit 1
+		mkdir -p "$PGDATA" || return 1
 		chown postgres:postgres "$PGDATA"
 		chmod go-rwx "$PGDATA"
 	fi
@@ -184,7 +178,7 @@ initdb(){
 	# Make sure the startup-time log file is OK, too
 	if [ ! -e "$PGLOG" -a ! -h "$PGLOG" ]
 	then
-		touch "$PGLOG" || exit 1
+		touch "$PGLOG" || return 1
 		chown postgres:postgres "$PGLOG"
 		chmod go-rwx "$PGLOG"
 		[ -x /sbin/restorecon ] && /sbin/restorecon "$PGLOG"
@@ -200,6 +194,22 @@ initdb(){
 
 	if [ -f "$PGDATA/PG_VERSION" ]
 	then
+	    return 0
+	fi
+	return 1
+}
+
+initdb(){
+    if [ -f "$PGDATA/PG_VERSION" ]
+    then
+	echo -n $"Data directory is not empty!"
+	echo_failure
+	echo
+	script_result=1
+    else
+	echo -n $"Initializing database: "
+	if perform_initdb
+	then
 	    echo_success
 	else
 	    echo_failure
@@ -207,6 +217,79 @@ initdb(){
 	fi
 	echo
     fi
+}
+
+upgrade(){
+    # must see previous version in PG_VERSION
+    if [ ! -f "$PGDATA/PG_VERSION" -o \
+	 x`cat "$PGDATA/PG_VERSION"` != x"$PREVMAJORVERSION" ]
+    then
+	echo
+	echo $"Cannot upgrade because database is not of version $PREVMAJORVERSION."
+	echo_failure
+	echo
+	exit 1
+    fi
+    if [ ! -x "$PGENGINE/pg_upgrade" ]
+    then
+	echo
+	echo $"Please install the postgresql-upgrade RPM."
+	echo_failure
+	echo
+	exit 5
+    fi
+    # Make sure service is stopped
+    stop
+
+    echo -n $"Upgrading database: "
+
+    # Set up log file for pg_upgrade
+    PGUPLOG=/var/lib/pgsql/pgupgrade.log
+    rm -f "$PGUPLOG"
+    touch "$PGUPLOG" || exit 1
+    chown postgres:postgres "$PGUPLOG"
+    chmod go-rwx "$PGUPLOG"
+    [ -x /sbin/restorecon ] && /sbin/restorecon "$PGUPLOG"
+
+    # Move old DB to PGDATAOLD
+    PGDATAOLD="${PGDATA}-old"
+    rm -rf "$PGDATAOLD"
+    mv "$PGDATA" "$PGDATAOLD" || exit 1
+
+    # Create empty new-format database
+    if perform_initdb
+    then
+	# Do the upgrade
+	$SU -l postgres -c "$PGENGINE/pg_upgrade \
+		'--old-bindir=$PREVPGENGINE' \
+		'--new-bindir=$PGENGINE' \
+		'--old-datadir=$PGDATAOLD' \
+		'--new-datadir=$PGDATA' \
+		--link \
+		'--old-port=$PGPORT' '--new-port=$PGPORT' \
+		--user=postgres" >> "$PGUPLOG" 2>&1 < /dev/null
+	if [ $? -ne 0 ]
+	then
+	    # pg_upgrade failed
+	    script_result=1
+	fi
+    else
+	# initdb failed
+	script_result=1
+    fi
+
+    if [ $script_result -eq 0 ]
+    then
+	    echo_success
+    else
+	    # Clean up after failure
+	    rm -rf "$PGDATA"
+	    mv "$PGDATAOLD" "$PGDATA"
+
+	    echo_failure
+    fi
+    echo
+    echo $"See $PGUPLOG for details."
 }
 
 # See how we were called.
@@ -236,8 +319,11 @@ case "$1" in
   initdb)
 	initdb
 	;;
+  upgrade)
+	upgrade
+	;;
   *)
-	echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload|initdb}"
+	echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload|initdb|upgrade}"
 	exit 2
 esac
 
