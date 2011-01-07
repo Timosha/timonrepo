@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.10.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -33,7 +33,9 @@ BuildRequires: libpcap-devel
 BuildRequires: mysql-devel
 BuildRequires: OpenIPMI-devel
 BuildRequires: postgresql-devel
+%ifnarch 390 s390x
 BuildRequires: nut-devel
+%endif
 BuildRequires: iptables-devel
 BuildRequires: liboping-devel
 BuildRequires: python-devel
@@ -96,12 +98,14 @@ Requires:      collectd = %{version}-%{release}
 This plugin gets data provided by nginx.
 
 
+%ifnarch s390 s390x
 %package nut
 Summary:       Network UPS Tools module for collectd
 Group:         System Environment/Daemons
 Requires:      collectd = %{version}-%{release}
 %description nut
 This plugin for collectd provides Network UPS Tools support.
+%endif
 
 
 %package -n perl-Collectd
@@ -250,7 +254,9 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
     --enable-nfs \
     --enable-nginx \
     --enable-ntpd \
+%ifnarch s390 s390x
     --enable-nut \
+%endif
     --enable-olsrd \
     --enable-openvpn \
     --enable-perl \
@@ -521,10 +527,12 @@ fi
 %config(noreplace) %{_sysconfdir}/collectd.d/nginx.conf
 
 
+%ifnarch s390 s390x
 %files nut
 %defattr(-, root, root, -)
 %{_libdir}/collectd/nut.so
 %config(noreplace) %{_sysconfdir}/collectd.d/nut.conf
+%endif
 
 
 %files -n perl-Collectd
@@ -585,6 +593,9 @@ fi
 %endif
 
 %changelog
+* Fri Jan 07 2011 Dan Horák <dan[at]danny.cz> 4.10.2-2
+- no nut on s390(x)
+
 * Thu Dec 16 2010 Alan Pevec <apevec@redhat.com> 4.10.2-1
 - New upstream version 4.10.2
 - http://collectd.org/news.shtml#news86
