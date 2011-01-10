@@ -1,21 +1,19 @@
-%define version_upstream 3.9
-
 Name:		libev
-Version:	3.90
+Version:	4.01
 Release:	1%{?dist}
 Summary:	High-performance event loop/event model with lots of features
 
 Group:		System Environment/Libraries
 License:	BSD or GPLv2+
 URL:		http://software.schmorp.de/pkg/libev.html
-Source0:	http://dist.schmorp.de/libev/Attic/%{name}-%{version_upstream}.tar.gz
+Source0:	http://dist.schmorp.de/libev/Attic/%{name}-%{version}.tar.gz
 Source1:	%{name}.pc.in
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:	automake libtool
 
 %description
-Libev is modelled (very losely) after libevent and the Event perl
+Libev is modeled (very loosely) after libevent and the Event Perl
 module, but is faster, scales better and is more correct, and also more
 featureful. And also smaller.
 
@@ -26,13 +24,13 @@ Requires:	%{name} = %{version}-%{release}
 Requires:	pkgconfig
 
 %description 	devel
-Libev is modelled (very losely) after libevent and the Event perl
+Libev is modeled (very loosely) after libevent and the Event Perl
 module, but is faster, scales better and is more correct, and also more
 featureful. And also smaller. Development libraries.
 
 
 %prep
-%setup -q -n %{name}-%{version_upstream}
+%setup -q
 
 # Add pkgconfig support
 cp -p %{SOURCE1} .
@@ -72,8 +70,8 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %doc Changes LICENSE README
-%{_libdir}/%{name}.so.3
-%{_libdir}/%{name}.so.3.0.0
+%{_libdir}/%{name}.so.4
+%{_libdir}/%{name}.so.4.0.0
 %{_mandir}/man?/*
 
 
@@ -85,6 +83,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Jan 10 2011 Michal Nowak <mnowak@redhat.com> - 4.01-1
+- 4.01
+- fix grammar in %%description
+
 * Sat Jan  2 2010 Michal Nowak <mnowak@redhat.com> - 3.90-1
 - 3.9
 
