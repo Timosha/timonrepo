@@ -33,7 +33,7 @@ BuildRequires: libpcap-devel
 BuildRequires: mysql-devel
 BuildRequires: OpenIPMI-devel
 BuildRequires: postgresql-devel
-%ifnarch 390 s390x
+%ifnarch s390 s390x
 BuildRequires: nut-devel
 %endif
 BuildRequires: iptables-devel
