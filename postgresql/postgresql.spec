@@ -54,7 +54,7 @@ Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 9.0
 Version: 9.0.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
 License: PostgreSQL
@@ -544,7 +544,7 @@ mv $RPM_BUILD_ROOT%{_docdir}/pgsql/html doc
 rm -rf $RPM_BUILD_ROOT%{_docdir}/pgsql
 
 # remove files not to be packaged
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
+#rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 
 %find_lang ecpg-%{majorversion}
 cat ecpg-%{majorversion}.lang >devel.lst
@@ -780,8 +780,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/ecpg
 %{_libdir}/libpq.so
 %{_libdir}/libecpg.so
+%{_libdir}/libpq.a
+%{_libdir}/libecpg.a
 %{_libdir}/libecpg_compat.so
+%{_libdir}/libecpg_compat.a
+%{_libdir}/libpgport.a
 %{_libdir}/libpgtypes.so
+%{_libdir}/libpgtypes.a
 %{_libdir}/pgsql/pgxs/
 %{_mandir}/man1/ecpg.*
 %{_mandir}/man3/SPI_*
@@ -825,6 +830,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Tue Jan 25 2011 Timon <timosha@gmail.com> 9.0.2-3
+- add static libraries
+
 * Tue Dec 28 2010 Tom Lane <tgl@redhat.com> 9.0.2-2
 - Update to PostgreSQL 9.0.2 (major version bump)
 - Create infrastructure for in-place database upgrade using pg_upgrade
