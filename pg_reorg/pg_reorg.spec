@@ -12,7 +12,7 @@ Source0:	http://pgfoundry.org/frs/download.php/2845/%{sname}-%{version}.tar.gz
 URL:		http://pgfoundry.org/projects/%{sname}/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
 
-BuildRequires:	postgresql-devel, postgresql
+BuildRequires:	postgresql-devel glibc-devel readline-devel krb5-devel pam-devel zlib-devel openssl-devel
 Requires:	postgresql
 
 %description 	
