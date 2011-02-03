@@ -54,7 +54,7 @@ Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 9.0
 Version: 9.0.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
 License: PostgreSQL
@@ -80,7 +80,6 @@ Source7: ecpg_config.h
 Source8: README.rpm-dist
 Source14: postgresql.pam
 Source15: postgresql-bashprofile
-Source16: filter-requires-perl-Pg.sh
 
 # Comments for these patches are in the patch files.
 Patch1: rpm-pgsql.patch
@@ -297,8 +296,6 @@ system. The postgresql-test package includes the sources and pre-built
 binaries of various tests for the PostgreSQL database management
 system, including regression tests and benchmarks.
 %endif
-
-%global __perl_requires %{SOURCE16}
 
 %prep
 %setup -q 
@@ -823,6 +820,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Feb  3 2011 Tom Lane <tgl@redhat.com> 9.0.3-2
+- Remove filter-requires-perl-Pg.sh, which doesn't seem to be needed now that
+  PyGreSQL has been split out; and our use of it isn't compatible with rpm 4.9
+  anyway
+
 * Tue Feb  1 2011 Tom Lane <tgl@redhat.com> 9.0.3-1
 - Update to PostgreSQL 9.0.3, for various fixes described at
   http://www.postgresql.org/docs/9.0/static/release-9-0-3.html
