@@ -1,5 +1,8 @@
+%global source_dir  %{_datadir}/%{name}-source
+%global inst_srcdir %{buildroot}/%{source_dir}
+
 Name:		libev
-Version:	4.01
+Version:	4.03
 Release:	1%{?dist}
 Summary:	High-performance event loop/event model with lots of features
 
@@ -29,6 +32,18 @@ module, but is faster, scales better and is more correct, and also more
 featureful. And also smaller. Development libraries.
 
 
+%package	source
+Summary:	High-performance event loop/event model with lots of features
+Group:		System Environment/Libraries
+BuildArch:	noarch
+
+%description	source
+This package contains the source code for libev.
+
+Libev is modeled (very loosely) after libevent and the Event Perl
+module, but is faster, scales better and is more correct, and also more
+featureful. And also smaller. Development libraries.
+
 %prep
 %setup -q
 
@@ -56,6 +71,12 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
 
 rm -rf $RPM_BUILD_ROOT%{_libdir}/%{name}.la
 
+# Make the source package
+mkdir -p %{inst_srcdir}
+
+find . -type f | grep -E '.*\.(c|h|am|ac|inc|m4|h.in|pc.in|man.pre|pl|txt)$' | xargs tar cf - | (cd %{inst_srcdir} && tar xf -)
+install -p -m 0644 Changes ev.pod LICENSE README %{inst_srcdir}
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -82,7 +103,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/%{name}.pc
 
 
+%files source
+%defattr(-,root,root,-)
+%{source_dir}
+
+
 %changelog
+* Sat Feb  5 2011 Michal Nowak <mnowak@redhat.com> - 4.03-1
+- 4.03; RHBZ#674022
+- add a -source subpackage (Mathieu Bridon); RHBZ#672153
+
 * Mon Jan 10 2011 Michal Nowak <mnowak@redhat.com> - 4.01-1
 - 4.01
 - fix grammar in %%description
