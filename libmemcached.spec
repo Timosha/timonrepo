@@ -1,7 +1,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
 Version:   0.44
-Release:   4%{?dist}
+Release:   5%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -123,6 +123,9 @@ config/autorun.sh
 
 
 %changelog
+* Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.44-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
 * Wed Nov 24 2010 Joe Orton <jorton@redhat.com> - 0.44-4
 - repackage source tarball to remove non-free Hsieh hash code
 
