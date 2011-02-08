@@ -4,7 +4,7 @@
 %global         daemon mongod
 Name:           mongodb
 Version:        1.6.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -189,6 +189,9 @@ fi
 %{_includedir}/mongo
 
 %changelog
+* Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.6.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
 * Mon Dec 06 2010 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.6.4-3
 - Add post/postun ldconfig... oops!
 
