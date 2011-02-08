@@ -3,7 +3,7 @@
 
 Name:		libev
 Version:	4.03
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	High-performance event loop/event model with lots of features
 
 Group:		System Environment/Libraries
@@ -109,6 +109,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.03-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
 * Sat Feb  5 2011 Michal Nowak <mnowak@redhat.com> - 4.03-1
 - 4.03; RHBZ#674022
 - add a -source subpackage (Mathieu Bridon); RHBZ#672153
