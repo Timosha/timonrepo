@@ -2,7 +2,7 @@
 
 Name:		pgbouncer
 Version:	1.3.3
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Lightweight connection pooler for PostgreSQL
 Group:		Applications/Databases
 License:	MIT and BSD
@@ -82,6 +82,9 @@ rm -rf %{buildroot}
 %{_mandir}/man5/%{name}.*
 
 %changelog
+* Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
 * Mon May 10 2010 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.3.3-1
 - Update to 1.3.3, per changes described in:
 - http://pgfoundry.org/frs/shownotes.php?release_id=1645
