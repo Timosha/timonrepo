@@ -7,7 +7,7 @@
 Summary:    Performance monitoring tool for PostgreSQL
 Name:       pg_statsinfo
 Version:    2.0.1
-Release:    2%{?dist}
+Release:    3%{?dist}
 License:    BSD
 Group:      Applications/Databases
 Source0:    http://pgfoundry.org/frs/download.php/2791/%{name}-%{version}.tar.gz
@@ -47,8 +47,7 @@ install -m 755 bin/pg_statsinfo %{buildroot}%{_bindir}/pg_statsinfo
 install -m 644 bin/pg_statsrepo.sql %{buildroot}%{_datadir}/pgsql/contrib/pg_statsrepo.sql
 install -m 644 bin/uninstall_pg_statsrepo.sql %{buildroot}%{_datadir}/pgsql/contrib/uninstall_pg_statsrepo.sql
 
-mkdir -p %{buildroot}%{_libdir}/pgsql/plugins
-install -m 755 lib/pg_statsinfo.so %{buildroot}%{_libdir}/pgsql/plugins/pg_statsinfo.so
+install -m 755 lib/pg_statsinfo.so %{buildroot}%{_libdir}/pgsql/pg_statsinfo.so
 install -m 644 lib/pg_statsinfo.sql %{buildroot}%{_datadir}/pgsql/contrib/pg_statsinfo.sql
 install -m 644 lib/uninstall_pg_statsinfo.sql %{buildroot}%{_datadir}/pgsql/contrib/uninstall_pg_statsinfo.sql
 
@@ -58,7 +57,7 @@ rm -rf %{buildroot}
 ## Set files for this packages
 %files
 %defattr(-,root,root)
-%{_libdir}/pgsql/plugins/pg_statsinfo.so
+%{_libdir}/pgsql/pg_statsinfo.so
 %{_bindir}/pg_statsinfo
 %{_datadir}/pgsql/contrib/pg_statsrepo.sql
 %{_datadir}/pgsql/contrib/uninstall_pg_statsrepo.sql
@@ -68,8 +67,8 @@ rm -rf %{buildroot}
 # History of pg_statsinfo-v2 RPM.
 # Bellow messages are still dummy.
 %changelog
-* Thu Feb 10 2011 - Timon <timosh@gmail.com> 2.0.1-2
-- move to $libdir/pgsql/plugins
+* Thu Feb 10 2011 - Timon <timosh@gmail.com> 2.0.1-3
+- rebuild
 
 * Wed Feb 9 2011 - Timon <timosh@gmail.com> 2.0.1-1
 - Build for Fedora
