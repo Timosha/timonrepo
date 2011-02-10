@@ -139,7 +139,7 @@ BuildRequires: systemtap-sdt-devel
 %endif
 
 # main package requires -libs subpackage
-Requires: %{name}-libs = %{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -175,8 +175,8 @@ PostgreSQL server.
 %package server
 Summary: The programs needed to create and run a PostgreSQL server
 Group: Applications/Databases
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires(pre): /usr/sbin/useradd
 Requires(post): chkconfig
 Requires(preun): chkconfig
@@ -199,7 +199,7 @@ to install the postgresql package.
 %package docs
 Summary: Extra documentation for PostgreSQL
 Group: Applications/Databases
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description docs
 The postgresql-docs package includes some additional documentation for
@@ -210,8 +210,8 @@ and source files for the PostgreSQL tutorial.
 %package contrib
 Summary: Contributed modules distributed with PostgreSQL
 Group: Applications/Databases
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description contrib
 The postgresql-contrib package contains contributed packages that are
@@ -221,8 +221,8 @@ included in the PostgreSQL distribution.
 %package devel
 Summary: PostgreSQL development header files and libraries
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description devel
 The postgresql-devel package contains the header files and libraries
@@ -236,8 +236,8 @@ develop applications which will interact with a PostgreSQL server.
 %package upgrade
 Summary: Support for upgrading from the previous major release of PostgreSQL
 Group: Applications/Databases
-Requires: %{name}-server = %{version}-%{release}
-Requires: %{name}-libs = %{version}-%{release}
+Requires: %{name}-server%{?_isa} = %{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description upgrade
 PostgreSQL is an advanced Object-Relational database management
@@ -251,7 +251,7 @@ major version of PostgreSQL.
 %package plperl
 Summary: The Perl procedural language for PostgreSQL
 Group: Applications/Databases
-Requires: %{name}-server = %{version}-%{release}
+Requires: %{name}-server%{?_isa} = %{version}-%{release}
 Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description plperl
@@ -264,7 +264,7 @@ procedural language for the backend.
 %package plpython
 Summary: The Python procedural language for PostgreSQL
 Group: Applications/Databases
-Requires: %{name}-server = %{version}-%{release}
+Requires: %{name}-server%{?_isa} = %{version}-%{release}
 
 %description plpython
 PostgreSQL is an advanced Object-Relational database management
@@ -276,7 +276,7 @@ procedural language for the backend.
 %package pltcl
 Summary: The Tcl procedural language for PostgreSQL
 Group: Applications/Databases
-Requires: %{name}-server = %{version}-%{release}
+Requires: %{name}-server%{?_isa} = %{version}-%{release}
 
 %description pltcl
 PostgreSQL is an advanced Object-Relational database management
@@ -288,7 +288,7 @@ procedural language for the backend.
 %package test
 Summary: The test suite distributed with PostgreSQL
 Group: Applications/Databases
-Requires: %{name}-server = %{version}-%{release}
+Requires: %{name}-server%{?_isa} = %{version}-%{release}
 
 %description test
 PostgreSQL is an advanced Object-Relational database management
