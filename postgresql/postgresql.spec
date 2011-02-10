@@ -539,7 +539,7 @@ mv $RPM_BUILD_ROOT%{_docdir}/pgsql/html doc
 rm -rf $RPM_BUILD_ROOT%{_docdir}/pgsql
 
 # remove files not to be packaged
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
+#rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 
 %find_lang ecpg-%{majorversion}
 cat ecpg-%{majorversion}.lang >devel.lst
@@ -775,8 +775,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/ecpg
 %{_libdir}/libpq.so
 %{_libdir}/libecpg.so
+%{_libdir}/libpq.a
+%{_libdir}/libecpg.a
 %{_libdir}/libecpg_compat.so
+%{_libdir}/libecpg_compat.a
+%{_libdir}/libpgport.a
 %{_libdir}/libpgtypes.so
+%{_libdir}/libpgtypes.a
 %{_libdir}/pgsql/pgxs/
 %{_mandir}/man1/ecpg.*
 %{_mandir}/man3/SPI_*
@@ -820,6 +825,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Thu Feb 10 2011 Timon <rel-eng@lists.fedoraproject.org> - 9.0.3-3
+- Add static libs
+
 * Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 9.0.3-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
