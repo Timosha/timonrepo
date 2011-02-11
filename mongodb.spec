@@ -3,8 +3,8 @@
 
 %global         daemon mongod
 Name:           mongodb
-Version:        1.6.4
-Release:        4%{?dist}
+Version:        1.7.5
+Release:        1%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -17,7 +17,6 @@ Source0:        http://fastdl.mongodb.org/src/%{name}-src-r%{version}.tar.gz
 Source1:        %{name}.init
 Source2:        %{name}.logrotate
 Source3:        %{name}.conf
-Patch0:         %{name}-cppflags.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  python-devel
@@ -37,6 +36,8 @@ Requires(pre):  shadow-utils
 
 # This is for /sbin/service
 Requires(postun): initscripts
+
+Requires:       lib%{name} = %{version}-%{release}
 
 # Mongodb must run on a little-endian CPU (see bug #630898)
 ExcludeArch:    ppc ppc64 %{sparc} s390 s390x
@@ -59,11 +60,17 @@ A key goal of MongoDB is to bridge the gap between key/value stores (which are
 fast and highly scalable) and traditional RDBMS systems (which are deep in
 functionality).
 
+%package -n lib%{name}
+Summary:        MongoDB shared libraries
+Group:          Development/Libraries
+
+%description -n lib%{name}
+This package provides the shared library for the MongoDB client.
+
 %package devel
 Summary:        MongoDB header files
 Group:          Development/Libraries
-Requires:       %{name} = %{version}-%{release}
-Provides:       %{name}-static = %{version}-%{release}
+Requires:       lib%{name} = %{version}-%{release}
 
 %description devel
 This package provides the header files and C++ driver for MongoDB. MongoDB is
@@ -82,9 +89,6 @@ software, default configuration files, and init scripts.
 %prep
 %setup -q -n mongodb-src-r%{version}
 
-# allow cppflags overriding
-%patch0 -p1 -b .cppflags
-
 # spurious permissions
 chmod -x README
 chmod -x db/repl/rs_exception.h
@@ -96,12 +100,12 @@ sed -i 's/\r//' db/resource.h
 sed -i 's/\r//' README
 
 %build
-scons %{?_smp_mflags} --cppflags="%{optflags} -fno-strict-aliasing -fPIC" --sharedclient .
+scons %{?_smp_mflags} --sharedclient .
 
 
 %install
 rm -rf %{buildroot}
-scons install . --cppflags="%{optflags} -fno-strict-aliasing -fPIC" --sharedclient --prefix=%{buildroot}%{_prefix} --nostrip --full
+scons install . --sharedclient --prefix=%{buildroot}%{_prefix} --nostrip --full
 rm -f %{buildroot}%{_libdir}/libmongoclient.a
 
 mkdir -p %{buildroot}%{_sharedstatedir}/%{name}
@@ -149,7 +153,6 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%doc README GNU-AGPL-3.0.txt APACHE-2.0.txt
 %{_bindir}/mongo
 %{_bindir}/mongodump
 %{_bindir}/mongoexport
@@ -159,7 +162,6 @@ fi
 %{_bindir}/mongostat
 %{_bindir}/mongosniff
 %{_bindir}/bsondump
-%{_libdir}/libmongoclient.so
 
 %{_mandir}/man1/mongo.1*
 %{_mandir}/man1/mongod.1*
@@ -170,6 +172,11 @@ fi
 %{_mandir}/man1/mongosniff.1*
 %{_mandir}/man1/mongostat.1*
 %{_mandir}/man1/mongorestore.1*
+
+%files -n lib%{name}
+%defattr(-,root,root,-)
+%doc README GNU-AGPL-3.0.txt APACHE-2.0.txt
+%{_libdir}/libmongoclient.so
 
 %files server
 %defattr(-,root,root,-)
@@ -189,6 +196,11 @@ fi
 %{_includedir}/mongo
 
 %changelog
+* Fri Feb 11 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-1
+- Update to 1.7.5
+- Remove CPPFLAGS override
+- Added libmongodb package
+
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.6.4-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
