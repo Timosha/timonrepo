@@ -4,7 +4,7 @@
 %global         daemon mongod
 Name:           mongodb
 Version:        1.7.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -100,6 +100,10 @@ sed -i 's/\r//' db/resource.h
 sed -i 's/\r//' README
 
 %build
+# Disable error on warning
+mv SConstruct SConstruct.orig
+grep -v 'Werror' SConstruct.orig > SConstruct
+
 scons %{?_smp_mflags} --sharedclient .
 
 
@@ -196,6 +200,9 @@ fi
 %{_includedir}/mongo
 
 %changelog
+* Fri Feb 11 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-2
+- Disable compilation errors on warnings
+
 * Fri Feb 11 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-1
 - Update to 1.7.5
 - Remove CPPFLAGS override
