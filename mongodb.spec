@@ -103,6 +103,7 @@ sed -i 's/\r//' README
 # Disable error on warning
 mv SConstruct SConstruct.orig
 grep -v 'Werror' SConstruct.orig > SConstruct
+sed -i 's/-Wall //' SConstruct
 
 scons %{?_smp_mflags} --sharedclient .
 
