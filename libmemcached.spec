@@ -1,7 +1,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
 Version:   0.44
-Release:   5%{?dist}
+Release:   6%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -44,9 +44,9 @@ memerror - Creates human readable messages from libmemcached error codes.
 %package devel
 Summary: Header files and development libraries for %{name}
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
-Requires: pkgconfig
-Requires: cyrus-sasl-devel
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: pkgconfig%{?_isa}
+Requires: cyrus-sasl-devel%{?_isa}
 
 %description devel
 This package contains the header files and development libraries
@@ -117,12 +117,15 @@ config/autorun.sh
 %{_libdir}/libmemcachedprotocol.so
 %{_libdir}/libmemcachedutil.so
 %{_libdir}/pkgconfig/libmemcached.pc
-%{_mandir}/man3/libmemcached*.3.gz
-%{_mandir}/man3/memcached_*.3.gz
+%{_mandir}/man3/libmemcached*
+%{_mandir}/man3/memcached_*
 %{_mandir}/man3/hashkit*
 
 
 %changelog
+* Sat Feb 12 2011 Remi Collet <Fedora@famillecollet.com> - 0.44-6
+- arch specific requires
+
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.44-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
