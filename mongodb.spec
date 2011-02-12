@@ -4,7 +4,7 @@
 %global         daemon mongod
 Name:           mongodb
 Version:        1.7.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -201,6 +201,9 @@ fi
 %{_includedir}/mongo
 
 %changelog
+* Sat Feb 12 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-3
+- Disable extra warnings
+
 * Fri Feb 11 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-2
 - Disable compilation errors on warnings
 
