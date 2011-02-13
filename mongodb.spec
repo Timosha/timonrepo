@@ -4,7 +4,7 @@
 %global         daemon mongod
 Name:           mongodb
 Version:        1.7.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -100,10 +100,10 @@ sed -i 's/\r//' db/resource.h
 sed -i 's/\r//' README
 
 %build
-# Disable error on warning
+# Disable error on warning, use boost-fs 2
 mv SConstruct SConstruct.orig
 grep -v 'Werror' SConstruct.orig > SConstruct
-sed -i 's/-Wall //' SConstruct
+sed -i 's/-Wall/-DBOOST_FILESYSTEM_VERSION=2/' SConstruct
 
 scons %{?_smp_mflags} --sharedclient .
 
@@ -201,6 +201,9 @@ fi
 %{_includedir}/mongo
 
 %changelog
+* Sun Feb 13 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-4
+- Manually define to use boost-fs v2
+
 * Sat Feb 12 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-3
 - Disable extra warnings
 
