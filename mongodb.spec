@@ -4,7 +4,7 @@
 %global         daemon mongod
 Name:           mongodb
 Version:        1.7.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -17,6 +17,7 @@ Source0:        http://fastdl.mongodb.org/src/%{name}-src-r%{version}.tar.gz
 Source1:        %{name}.init
 Source2:        %{name}.logrotate
 Source3:        %{name}.conf
+Patch0:         nonce_fix.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  python-devel
@@ -88,6 +89,8 @@ software, default configuration files, and init scripts.
 
 %prep
 %setup -q -n mongodb-src-r%{version}
+
+%patch0 -b .nonce
 
 # spurious permissions
 chmod -x README
@@ -201,6 +204,9 @@ fi
 %{_includedir}/mongo
 
 %changelog
+* Wed Feb 16 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-5
+- Add nonce patch
+
 * Sun Feb 13 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-4
 - Manually define to use boost-fs v2
 
