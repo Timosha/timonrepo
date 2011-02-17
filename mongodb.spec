@@ -4,7 +4,7 @@
 %global         daemon mongod
 Name:           mongodb
 Version:        1.7.5
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -29,6 +29,11 @@ BuildRequires:  readline-devel
 BuildRequires:  libpcap-devel
 # to run tests
 BuildRequires:  unittest
+
+%if "%{dist}" == "el5"
+BuildRequires:  libtermcap-devel
+%endif
+
 
 Requires(post): chkconfig
 Requires(preun): chkconfig
@@ -204,6 +209,9 @@ fi
 %{_includedir}/mongo
 
 %changelog
+* Wed Feb 16 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-6
+- Add libtermcap-devel BR on el5
+
 * Wed Feb 16 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-5
 - Add nonce patch
 
