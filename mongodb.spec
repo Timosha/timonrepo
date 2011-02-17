@@ -4,7 +4,7 @@
 %global         daemon mongod
 Name:           mongodb
 Version:        1.7.5
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -29,11 +29,6 @@ BuildRequires:  readline-devel
 BuildRequires:  libpcap-devel
 # to run tests
 BuildRequires:  unittest
-
-%if "%{dist}" == "el5"
-BuildRequires:  libtermcap-devel
-%endif
-
 
 Requires(post): chkconfig
 Requires(preun): chkconfig
@@ -113,12 +108,22 @@ mv SConstruct SConstruct.orig
 grep -v 'Werror' SConstruct.orig > SConstruct
 sed -i 's/-Wall/-DBOOST_FILESYSTEM_VERSION=2/' SConstruct
 
-scons %{?_smp_mflags} --sharedclient .
-
+scons %{?_smp_mflags} . \
+%if "%{dist}" == "el5"
+	--extralib termcap \
+%endif
+	--sharedclient
 
 %install
 rm -rf %{buildroot}
-scons install . --sharedclient --prefix=%{buildroot}%{_prefix} --nostrip --full
+scons install . \
+%if "%{dist}" == "el5"
+	--extralib termcap \
+%endif
+	--sharedclient \
+	--prefix=%{buildroot}%{_prefix} \
+	--nostrip \
+	--full
 rm -f %{buildroot}%{_libdir}/libmongoclient.a
 
 mkdir -p %{buildroot}%{_sharedstatedir}/%{name}
@@ -209,6 +214,10 @@ fi
 %{_includedir}/mongo
 
 %changelog
+* Wed Feb 16 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-7
+- Remove libtermcap-devel BR
+- Add termcap to --extralib on el5
+
 * Wed Feb 16 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-6
 - Add libtermcap-devel BR on el5
 
