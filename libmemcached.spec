@@ -1,7 +1,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   0.44
-Release:   6%{?dist}
+Version:   0.46
+Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -19,8 +19,10 @@ Patch0:    libmemcached-sasl.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: cyrus-sasl-devel
+BuildRequires: systemtap-sdt-devel
+BuildRequires: libevent-devel
 # checked during configure (for test suite)
-BuildRequires: memcached
+#BuildRequires: memcached
 # We patch .m4 files
 BuildRequires: libtool autoconf automake
 
@@ -65,7 +67,8 @@ you will need to install %{name}-devel.
 
 %build
 config/autorun.sh
-%configure
+# option --with-memcached=false to disable server binary check (as we don't run test)
+%configure --with-memcached=false
 %{__make} %{_smp_mflags}
 
 
@@ -123,6 +126,9 @@ config/autorun.sh
 
 
 %changelog
+* Fri Feb 18 2011 Remi Collet <Fedora@famillecollet.com> - 0.46-1
+- update to 0.46
+
 * Sat Feb 12 2011 Remi Collet <Fedora@famillecollet.com> - 0.44-6
 - arch specific requires
 
