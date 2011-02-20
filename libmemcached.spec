@@ -1,7 +1,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
 Version:   0.46
-Release:   1%{?dist}
+Release:   2%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -21,10 +21,6 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: cyrus-sasl-devel
 BuildRequires: systemtap-sdt-devel
 BuildRequires: libevent-devel
-# checked during configure (for test suite)
-#BuildRequires: memcached
-# We patch .m4 files
-BuildRequires: libtool autoconf automake
 
 
 %description
@@ -47,7 +43,7 @@ memerror - Creates human readable messages from libmemcached error codes.
 Summary: Header files and development libraries for %{name}
 Group: Development/Libraries
 Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: pkgconfig%{?_isa}
+Requires: pkgconfig
 Requires: cyrus-sasl-devel%{?_isa}
 
 %description devel
@@ -66,7 +62,6 @@ you will need to install %{name}-devel.
 
 
 %build
-config/autorun.sh
 # option --with-memcached=false to disable server binary check (as we don't run test)
 %configure --with-memcached=false
 %{__make} %{_smp_mflags}
@@ -126,6 +121,10 @@ config/autorun.sh
 
 
 %changelog
+* Sun Feb 20 2011 Remi Collet <Fedora@famillecollet.com> - 0.46-2
+- patch Makefile.in instead of include.am (to avoid autoconf)
+- donc requires pkgconfig with arch
+
 * Fri Feb 18 2011 Remi Collet <Fedora@famillecollet.com> - 0.46-1
 - update to 0.46
 
