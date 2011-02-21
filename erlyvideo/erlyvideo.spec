@@ -1,16 +1,16 @@
 # FIXME
 %global debug_package %{nil}
-%global git_tag 25cf0c2
-
+%global git_tag 7ca993a
+%global git_path d422f84
 
 Name:		erlyvideo
-Version:	2.5.11
+Version:	2.6.3
 Release:	1%{?dist}
 Summary:	Erlang RTMP server
 Group:		Applications/Multimedia
 License:	GPLv3
 URL:		http://erlyvideo.org/
-# wget http://github.com/erlyvideo/erlyvideo/tarball/v2.5.11
+# wget https://github.com/erlyvideo/erlyvideo/tarball/v2.6.3
 Source0:	erlyvideo-%{name}-v%{version}-0-g%{git_tag}.tar.gz
 # wget http://github.com/erlyvideo/erlyplayer/tarball/eed2837
 Source1:	erlyvideo-erlyplayer-eed2837.tar.gz
@@ -37,11 +37,11 @@ Erlang RTMP server.
 
 
 %prep
-%setup -q -n erlyvideo-erlyvideo-1cf9504
+%setup -q -n erlyvideo-erlyvideo-%{git_path}
 mkdir -p wwwroot/player
 tar xf %{SOURCE1} --strip-components=1 -C wwwroot/player/
-%patch1 -p1 -b .install
-%patch2 -p1 -b .init-path
+%patch1 -p0 -b .install
+%patch2 -p0 -b .init-path
 %patch3 -p1 -b .only_required
 %patch4 -p1 -b .install_rtmp_contribs
 
@@ -174,13 +174,13 @@ fi
 %{_libdir}/erlang/lib/mpegts-%{version}/ebin/ems_http_mpegts.beam
 %{_libdir}/erlang/lib/mpegts-%{version}/ebin/iphone_streams.beam
 %{_libdir}/erlang/lib/mpegts-%{version}/ebin/mpeg2_crc32.beam
-%{_libdir}/erlang/lib/mpegts-%{version}/ebin/mpeg2_crc32.so
+#%{_libdir}/erlang/lib/mpegts-%{version}/ebin/mpeg2_crc32.so
 %{_libdir}/erlang/lib/mpegts-%{version}/ebin/mpegts.app
 %{_libdir}/erlang/lib/mpegts-%{version}/ebin/mpegts.beam
 %{_libdir}/erlang/lib/mpegts-%{version}/ebin/mpegts_file_reader.beam
 %{_libdir}/erlang/lib/mpegts-%{version}/ebin/mpegts_play.beam
 %{_libdir}/erlang/lib/mpegts-%{version}/ebin/mpegts_reader.beam
-%{_libdir}/erlang/lib/mpegts-%{version}/ebin/mpegts_reader.so
+#%{_libdir}/erlang/lib/mpegts-%{version}/ebin/mpegts_reader.so
 %{_libdir}/erlang/lib/mpegts-%{version}/ebin/mpegts_sup.beam
 
 # rtmp
@@ -211,10 +211,11 @@ fi
 %{_libdir}/erlang/lib/rtp-%{version}/ebin/ertp.app
 %{_libdir}/erlang/lib/rtp-%{version}/ebin/ertp.beam
 %{_libdir}/erlang/lib/rtp-%{version}/ebin/ertp_sup.beam
-%{_libdir}/erlang/lib/rtp-%{version}/ebin/rtp_server.beam
+%{_libdir}/erlang/lib/rtp-%{version}/ebin/rtp_rtsp.beam
 %{_libdir}/erlang/lib/rtp-%{version}/ebin/sdp.beam
 %{_libdir}/erlang/lib/rtp-%{version}/ebin/sdp_tests.beam
 %{_libdir}/erlang/lib/rtp-%{version}/include/sdp.hrl
+%{_libdir}/erlang/lib/rtp-%{version}/include/rtp.hrl
 
 # rtsp
 %dir %{_libdir}/erlang/lib/rtsp-%{version}
@@ -227,11 +228,24 @@ fi
 %{_libdir}/erlang/lib/rtsp-%{version}/ebin/rtsp_socket.beam
 %{_libdir}/erlang/lib/rtsp-%{version}/ebin/rtsp_sup.beam
 %{_libdir}/erlang/lib/rtsp-%{version}/include/rtsp.hrl
-%{_libdir}/erlang/lib/rtsp-%{version}/include/sdp.hrl
+
+#ibrowse
+%dir %{_libdir}/erlang/lib/ibrowse-2.1.3
+%dir %{_libdir}/erlang/lib/ibrowse-2.1.3/ebin
+%{_libdir}/erlang/lib/ibrowse-2.1.3/ebin/ibrowse.beam
+%{_libdir}/erlang/lib/ibrowse-2.1.3/ebin/ibrowse_app.beam
+%{_libdir}/erlang/lib/ibrowse-2.1.3/ebin/ibrowse_http_client.beam
+%{_libdir}/erlang/lib/ibrowse-2.1.3/ebin/ibrowse_lb.beam
+%{_libdir}/erlang/lib/ibrowse-2.1.3/ebin/ibrowse_lib.beam
+%{_libdir}/erlang/lib/ibrowse-2.1.3/ebin/ibrowse_sup.beam
+%{_libdir}/erlang/lib/ibrowse-2.1.3/ebin/ibrowse_test.beam
 
 /var/lib/erlyvideo
 
 %changelog
+* Wed Feb 16 2011 Timon <timosha@gmail.com> - 2.6.3-1
+- v2.6.3
+
 * Sat Oct 30 2010 Timon <timosha@gmail.com> - 2.4.13-2
 - add user and group
 - fix init.d script add
