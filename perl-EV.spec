@@ -1,6 +1,6 @@
 Name:           perl-EV
 Version:        4.03
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Wrapper for the libev high-performance event loop library
 
 Group:          Development/Libraries
@@ -8,7 +8,6 @@ License:        (GPL+ or Artistic) and (BSD or GPLv2+)
 URL:            http://search.cpan.org/dist/EV/
 Source0:        http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/EV-%{version}.tar.gz
 Patch0:         perl-EV-4.03-Don-t-ask-questions-at-build-time.patch
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(common::sense)
@@ -16,6 +15,9 @@ BuildRequires:  gdbm-devel
 BuildRequires:  libev-source == %{version}
 BuildRequires:  perl(AnyEvent) => 2.6
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+
+
+%{?perl_default_filter}
 
 
 %description
@@ -26,6 +28,15 @@ is comprehensive, one might also consult the documentation of libev itself
 semantics or some discussion on the available backends, or how to force a
 specific backend with "LIBEV_FLAGS", or just about in any case because it has
 much more detailed information.
+
+
+%package devel
+Summary:        Wrapper for the libev high-performance event loop library
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+
+%description devel
+This package provides the development headers for the Perl EV module.
 
 
 %prep
@@ -69,11 +80,24 @@ rm -rf $RPM_BUILD_ROOT
 %doc Changes COPYING README
 %{perl_vendorarch}/auto/*
 %{perl_vendorarch}/EV.pm
-%{perl_vendorarch}/EV/
+%{perl_vendorarch}/EV
+%exclude %{perl_vendorarch}/EV/*.h
 %{_mandir}/man3/*.3*
 
 
+%files devel
+%defattr(-,root,root,-)
+%{perl_vendorarch}/EV/*.h
+
+
 %changelog
+* Wed Feb 23 2011 Mathieu Bridon <bochecha@fedoraproject.org> - 4.03-2
+- Fixes asked during the review process:
+  - Filter the private shared EV.so out of the automatic Provides
+  - Put the header files in a -devel package
+- Removed the Buildroot line since it's useless for newer versions of Fedora
+  and this package can only go in Fedora >= 15 due to its libev dependency)
+
 * Mon Jan 24 2011 Mathieu Bridon <bochecha@fedoraproject.org> - 4.03-1
 - Update to 4.03.
 - Use the system libev instead of the bundled one.
