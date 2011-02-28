@@ -1,7 +1,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   0.46
-Release:   2%{?dist}
+Version:   0.47
+Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -12,10 +12,6 @@ URL:       http://libmemcached.org/
 # source tarball, and run "./strip-hsieh.sh <version>" to produce the
 # "-exhsieh" tarball.
 Source0:   libmemcached-%{version}-exhsieh.tar.gz
-
-# Add -lsasl2 to libmemcached.pc
-# See http://lists.libmemcached.org/pipermail/libmemcached-discuss/2010-October/002207.html
-Patch0:    libmemcached-sasl.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: cyrus-sasl-devel
@@ -54,8 +50,6 @@ you will need to install %{name}-devel.
 
 %prep
 %setup -q
-
-%patch0 -p1 -b .sasl
 
 %{__mkdir} examples
 %{__cp} -p tests/*.{c,cpp,h} examples/
@@ -121,6 +115,10 @@ you will need to install %{name}-devel.
 
 
 %changelog
+* Mon Feb 28 2011 Remi Collet <Fedora@famillecollet.com> - 0.47-1
+- update to 0.47
+- remove patch merged upstream
+
 * Sun Feb 20 2011 Remi Collet <Fedora@famillecollet.com> - 0.46-2
 - patch Makefile.in instead of include.am (to avoid autoconf)
 - donc requires pkgconfig with arch
