@@ -15,8 +15,12 @@ Source0:   libmemcached-%{version}-exhsieh.tar.gz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: cyrus-sasl-devel
+%if 0%{?fedora} >= 12
 BuildRequires: systemtap-sdt-devel
+%endif
+%if 0%{?fedora} >= 11 || 0%{?rhel} >= 6
 BuildRequires: libevent-devel
+%endif
 
 
 %description
