@@ -1,10 +1,13 @@
 Name:           perl-EV
 Version:        4.03
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Wrapper for the libev high-performance event loop library
 
 Group:          Development/Libraries
-License:        (GPL+ or Artistic) and (BSD or GPLv2+)
+# Note: The source archive includes a libev/ folder which contents are licensed
+#       as "BSD or GPLv2+". However, those are removed at build-time and
+#       perl-EV is instead built against the system-provided libev.
+License:        GPL+ or Artistic
 URL:            http://search.cpan.org/dist/EV/
 Source0:        http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/EV-%{version}.tar.gz
 Patch0:         perl-EV-4.03-Don-t-ask-questions-at-build-time.patch
@@ -59,7 +62,6 @@ make %{?_smp_mflags}
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
 make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
 find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
 find $RPM_BUILD_ROOT -type f -name '*.bs' -a -size 0 -exec rm -f {} ';'
@@ -91,6 +93,13 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Mar 08 2011 Mathieu Bridon <bochecha@fedoraproject.org> - 4.03-3
+- Some more fixes as part of the review process:
+  - Fix the license tag to be only the license of perl-EV, and add a note about
+    the included libev sources.
+- Removed manual cleaning of the buildroot since it has been useless since
+  Fedora 10 and even EPEL (>=6) doesn't need it now.
+
 * Wed Feb 23 2011 Mathieu Bridon <bochecha@fedoraproject.org> - 4.03-2
 - Fixes asked during the review process:
   - Filter the private shared EV.so out of the automatic Provides
