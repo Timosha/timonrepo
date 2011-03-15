@@ -1,9 +1,9 @@
-%global VER 6.6.5
-%global Patchlevel 10
+%global VER 6.6.8
+%global Patchlevel 4
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        19%{?dist}
+Release:        1%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -305,6 +305,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Mar 15 2011 Pavel Alexeev <Pahan@Hubbitus.info> - 6.6.8.4-1
+- Add BR liblqr-1-devel (BZ#683159)
+- Update to new version (BZ#579458) 6.6.8-4
+
 * Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 6.6.5.10-19
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
