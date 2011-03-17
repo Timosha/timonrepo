@@ -127,6 +127,9 @@ cd %{pecl_name}-%{version}
 - rebuilt with igbinary support
 - add arch specific provides/requires
 
+* Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
 * Sat Oct 23 2010  Remi Collet <Fedora@FamilleCollet.com> - 1.0.2-3
 - add filter_provides to avoid private-shared-object-provides memcached.so
 
