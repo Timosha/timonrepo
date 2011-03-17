@@ -5,7 +5,7 @@
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
 Version:      1.0.2
-Release:      3%{?dist}
+Release:      4%{?dist}
 License:      PHP
 Group:        Development/Languages
 URL:          http://pecl.php.net/package/%{pecl_name}
@@ -15,17 +15,22 @@ Source:       http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 BuildRoot:    %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # 5.2.10 required to HAVE_JSON enabled
-BuildRequires: php-devel >= 5.2.10, php-pear
-BuildRequires: libmemcached-devel, zlib-devel
+BuildRequires: php-devel >= 5.2.10
+BuildRequires: php-pear
+BuildRequires: php-igbinary-devel
+BuildRequires: libmemcached-devel
+BuildRequires: zlib-devel
 
 Requires(post): %{__pecl}
 Requires(postun): %{__pecl}
 
-Requires:     php-common >= 5.2.10
+Requires:     php-common%{?_isa} >= 5.2.10
+Requires:     php-pecl-igbinary%{?_isa}
 Requires:     php(zend-abi) = %{php_zend_api}
 Requires:     php(api) = %{php_core_api}
 
 Provides:     php-pecl(%{pecl_name}) = %{version}-%{release}
+Provides:     php-pecl(%{pecl_name})%{?_isa} = %{version}-%{release}
 
 
 %{?filter_setup:
@@ -53,7 +58,7 @@ cd %{pecl_name}-%{version}
 %build
 cd %{pecl_name}-%{version}
 phpize
-%configure
+%configure --enable-memcached-igbinary
 %{__make} %{?_smp_mflags}
 
 
@@ -100,9 +105,11 @@ fi
 cd %{pecl_name}-%{version}
 # only check if build extension can be loaded
 %{__ln_s} %{php_extdir}/json.so modules/
+%{__ln_s} %{php_extdir}/igbinary.so modules/
 %{_bindir}/php \
     -n -q -d extension_dir=modules \
     -d extension=json.so \
+    -d extension=igbinary.so \
     -d extension=%{pecl_name}.so \
     --modules | grep %{pecl_name}
 
@@ -116,6 +123,10 @@ cd %{pecl_name}-%{version}
 
 
 %changelog
+* Thu Mar 17 2011  Remi Collet <Fedora@FamilleCollet.com> - 1.0.2-4
+- rebuilt with igbinary support
+- add arch specific provides/requires
+
 * Sat Oct 23 2010  Remi Collet <Fedora@FamilleCollet.com> - 1.0.2-3
 - add filter_provides to avoid private-shared-object-provides memcached.so
 
