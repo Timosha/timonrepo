@@ -31,8 +31,8 @@
 %endif
 
 # Flip these to 1 and zip respectively to enable zip support again
-%global with_zip 0
-%global zipmod %nil
+%global with_zip 1
+%global zipmod   zip
 
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
@@ -1047,9 +1047,6 @@ fi
 - update to 5.3.6
   http://www.php.net/ChangeLog-5.php#5.3.6
 - fix php-pdo arch specific requires
-
-* Tue Mar 15 2011 Joe Orton <jorton@redhat.com> - 5.3.5-6
-- disable zip extension per "No Bundled Libraries" policy (#551513)
 
 * Mon Mar 07 2011 Caolán McNamara <caolanm@redhat.com> 5.3.5-5
 - rebuild for icu 4.6
