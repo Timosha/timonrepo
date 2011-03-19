@@ -3,8 +3,8 @@
 
 %global         daemon mongod
 Name:           mongodb
-Version:        1.7.5
-Release:        7%{?dist}
+Version:        1.8.0
+Release:        2%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -17,7 +17,6 @@ Source0:        http://fastdl.mongodb.org/src/%{name}-src-r%{version}.tar.gz
 Source1:        %{name}.init
 Source2:        %{name}.logrotate
 Source3:        %{name}.conf
-Patch0:         nonce_fix.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  python-devel
@@ -90,8 +89,6 @@ software, default configuration files, and init scripts.
 %prep
 %setup -q -n mongodb-src-r%{version}
 
-%patch0 -b .nonce
-
 # spurious permissions
 chmod -x README
 chmod -x db/repl/rs_exception.h
@@ -108,11 +105,7 @@ mv SConstruct SConstruct.orig
 grep -v 'Werror' SConstruct.orig > SConstruct
 sed -i 's/-Wall/-DBOOST_FILESYSTEM_VERSION=2/' SConstruct
 
-scons %{?_smp_mflags} . \
-%if "%{dist}" == "el5"
-	--extralib termcap \
-%endif
-	--sharedclient
+scons %{?_smp_mflags} --sharedclient .
 
 %install
 rm -rf %{buildroot}
@@ -214,12 +207,12 @@ fi
 %{_includedir}/mongo
 
 %changelog
-* Wed Feb 16 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-7
-- Remove libtermcap-devel BR
-- Add termcap to --extralib on el5
+* Sat Mar 19 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.8.0-2
+- Make mongod bind only to 127.0.0.1 by default
 
-* Wed Feb 16 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-6
-- Add libtermcap-devel BR on el5
+* Sat Mar 19 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.8.0-1
+- Update to 1.8.0
+- Remove upstreamed nonce patch
 
 * Wed Feb 16 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.7.5-5
 - Add nonce patch
