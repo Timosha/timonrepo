@@ -4,7 +4,7 @@
 %global         daemon mongod
 Name:           mongodb
 Version:        1.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -200,6 +200,9 @@ fi
 %{_includedir}/mongo
 
 %changelog
+* Sat Mar 19 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.8.0-2
+- Make mongod bind only to 127.0.0.1 by default
+
 * Sat Mar 19 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.8.0-1
 - Update to 1.8.0
 - Remove upstreamed nonce patch
