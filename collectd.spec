@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.10.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -593,6 +593,9 @@ fi
 %endif
 
 %changelog
+* Wed Mar 23 2011 Dan Horák <dan@danny.cz> - 4.10.2-4
+- rebuilt for mysql 5.5.10 (soname bump in libmysqlclient)
+
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.10.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
