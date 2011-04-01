@@ -6,4 +6,5 @@ noarch
 *.bz2
 *.gz
 *.zip
+*.tgz
 common/sync.sh
