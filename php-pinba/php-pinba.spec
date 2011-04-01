@@ -1,15 +1,15 @@
-%global gitdate 20100505
+#%global gitdate 20100505
 
 Name:           php-pinba
 Version:        0.0.6
-Release:        0.2.%{gitdate}git%{?dist}
-Summary:        PHP extension to measure particular parts of the code 
+Release:        1%{?dist}
+Summary:        PHP extension to measure particular parts of the code
 
 Group:          Development/Languages
 License:        GPLv2
-URL:            http://pinba.org
-Source0:        pinba-%{gitdate}.tar.bz2
-#Source:         http://pinba.org/files/pinba_extension-%{version}.tgz
+URL:            http://pinba.org/
+#Source0:        pinba-%{gitdate}.tar.bz2
+Source:         http://pinba.org/files/pinba_extension-%{version}.tgz
 Source1:        pinba.ini
 # http://pinba.org/files/pinba_engine-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -28,7 +28,7 @@ at the request shutdown it computes the difference. After that the extension
 creates a protobuf packet and sends it to the server by UDP. 
 
 %prep
-%setup -q -n pinba-%{gitdate}
+%setup -q -n pinba_extension-%{version}
 
 %build
 phpize
@@ -50,6 +50,8 @@ phpize
 %{php_extdir}/pinba.so
 
 %changelog
+* Fri Apr 1 2011 Timon <timosha@gmail.com> - 0.0.6-1
+- new release
 
 * Thu Jul 22 2010 Timon <timosha@gmail.com> - 0.0.6-0.2220100505git
 - git branch
