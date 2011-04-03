@@ -7,12 +7,13 @@
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.5.1
-Release:	2%{?dist}
+Release:	3%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
 Source2:	http://www.postgis.org/download/%{name}-%{version}.pdf
 Source4:	filter-requires-perl-Pg.sh
+Patch0:		postgis-1.5.1-pgsql9.patch
 URL:		http://postgis.refractions.net/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -67,6 +68,7 @@ The postgis-utils package provides the utilities for PostGIS.
 
 %prep
 %setup -q -n %{name}-%{version}
+%patch0 -p1 -b .pgsql9
 # Copy .pdf file to top directory before installing.
 cp -p %{SOURCE2} .
 
@@ -170,6 +172,9 @@ rm -rf %{buildroot}
 %doc postgis*.pdf
 
 %changelog
+* Sun Apr 03 2011 Nils Philippsen <nils@redhat.com> - 1.5.1-3
+- cope with PostgreSQL 9.0 build environment
+
 * Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.5.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
