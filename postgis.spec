@@ -4,6 +4,9 @@
 
 %global majorversion 1.5
 
+%global pg_version_minimum 8.2
+%global pg_version_built  %(if [ -x %{_bindir}/pg_config ]; then %{_bindir}/pg_config --version | /bin/sed 's,^PostgreSQL *,,gi'; else echo %{pg_version_minimum}; fi)
+
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.5.1
@@ -17,9 +20,9 @@ Patch0:		postgis-1.5.1-pgsql9.patch
 URL:		http://postgis.refractions.net/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:	postgresql-devel >= 8.2, proj-devel, geos-devel >= 3.1.1, byacc, proj-devel, flex, sinjdoc, java, java-devel, ant
+BuildRequires:	postgresql-devel >= %{pg_version_minimum}, proj-devel, geos-devel >= 3.1.1, byacc, proj-devel, flex, sinjdoc, java, java-devel, ant
 BuildRequires:	gtk2-devel, libxml2-devel
-Requires:	postgresql >= 8.2, geos >= 3.1.1, proj
+Requires:	postgresql >= %{pg_version_built}, geos >= 3.1.1, proj
 
 %description
 PostGIS adds support for geographic objects to the PostgreSQL object-relational
@@ -174,6 +177,7 @@ rm -rf %{buildroot}
 %changelog
 * Sun Apr 03 2011 Nils Philippsen <nils@redhat.com> - 1.5.1-3
 - cope with PostgreSQL 9.0 build environment
+- require pgsql version used for building
 
 * Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.5.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
