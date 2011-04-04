@@ -4,7 +4,7 @@ RPMDEFINES := --define "_sourcedir $(SRCDIR)" \
               --define "_rpmdir $(SRCDIR)"
 
 REPODIR := /home/timon/development/repo
-RELEASE := 14
+RELEASE := 15
 ARCH := x86_64
 
 build: prep
@@ -36,15 +36,37 @@ bl:
 mock: clean srpm
 	mock -r fedora-$(RELEASE)-$(ARCH) rebuild $(NAME)*.src.rpm 
 
-repo: clean f14 f13
+repo: clean f15 f14 f13
+
+f14: f15-x86_64 f15-i386
 
 f14: f14-x86_64 f14-i386
 
 f13: f13-x86_64 f13-i386
 
-f12: f12-x86_64 f12-i386
-
 arch: clean f$(RELEASE)-$(ARCH)
+
+f15-x86_64: srpm
+	mock -r fedora-15-x86_64 rebuild $(NAME)*.src.rpm && \
+	mkdir -p $(REPODIR)/15/{SRPMS,x86_64} && \
+	mkdir -p $(REPODIR)/15/x86_64/{os,debug} && \
+	( mv /var/lib/mock/fedora-15-x86_64/result/*-debuginfo-*.rpm  $(REPODIR)/15/x86_64/debug || echo noarch ) && \
+	mv /var/lib/mock/fedora-15-x86_64/result/$(NAME)-*.src.rpm  $(REPODIR)/15/SRPMS && \
+	mv /var/lib/mock/fedora-15-x86_64/result/*-*.rpm  $(REPODIR)/15/x86_64/os && \
+	cd $(REPODIR)/15/x86_64/os && createrepo --update . && \
+	cd $(REPODIR)/15/x86_64/debug && createrepo --update . && \
+	cd $(REPODIR)/15/SRPMS && createrepo --update .
+
+f15-i386: srpm
+	mock -r fedora-15-i386 rebuild $(NAME)*.src.rpm && \
+	mkdir -p $(REPODIR)/15/{SRPMS,i386} && \
+	mkdir -p $(REPODIR)/15/i386/{os,debug} && \
+	( mv /var/lib/mock/fedora-15-i386/result/*-debuginfo-*.rpm  $(REPODIR)/15/i386/debug || echo noarch) && \
+	mv /var/lib/mock/fedora-15-i386/result/$(NAME)-*.src.rpm  $(REPODIR)/15/SRPMS && \
+	mv /var/lib/mock/fedora-15-i386/result/*-*.rpm  $(REPODIR)/15/i386/os && \
+	cd $(REPODIR)/15/i386/os && createrepo --update . && \
+	cd $(REPODIR)/15/i386/debug && createrepo --update . && \
+	cd $(REPODIR)/15/SRPMS && createrepo --update .
 
 f14-x86_64: srpm
 	mock -r fedora-14-x86_64 rebuild $(NAME)*.src.rpm && \
