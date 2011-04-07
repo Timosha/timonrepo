@@ -1,6 +1,6 @@
 Name:           perl-EV
 Version:        4.03
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Wrapper for the libev high-performance event loop library
 
 Group:          Development/Libraries
@@ -31,15 +31,6 @@ is comprehensive, one might also consult the documentation of libev itself
 semantics or some discussion on the available backends, or how to force a
 specific backend with "LIBEV_FLAGS", or just about in any case because it has
 much more detailed information.
-
-
-%package devel
-Summary:        Wrapper for the libev high-performance event loop library
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
-
-%description devel
-This package provides the development headers for the Perl EV module.
 
 
 %prep
@@ -83,16 +74,15 @@ rm -rf $RPM_BUILD_ROOT
 %{perl_vendorarch}/auto/*
 %{perl_vendorarch}/EV.pm
 %{perl_vendorarch}/EV
-%exclude %{perl_vendorarch}/EV/*.h
+%{perl_vendorarch}/EV/*.h
 %{_mandir}/man3/*.3*
 
 
-%files devel
-%defattr(-,root,root,-)
-%{perl_vendorarch}/EV/*.h
-
-
 %changelog
+* Thu Apr 07 2011 Mathieu Bridon <bochecha@fedoraproject.org> - 4.03-4
+- Readded the header file to the main package, as per guidelines:
+      -> http://fedoraproject.org/wiki/Packaging/Perl#.h_files_in_module_packages
+
 * Tue Mar 08 2011 Mathieu Bridon <bochecha@fedoraproject.org> - 4.03-3
 - Some more fixes as part of the review process:
   - Fix the license tag to be only the license of perl-EV, and add a note about
