@@ -38,7 +38,7 @@ mock: clean srpm
 
 repo: clean f15 f14 f13
 
-f14: f15-x86_64 f15-i386
+f15: f15-x86_64 f15-i386
 
 f14: f14-x86_64 f14-i386
 
