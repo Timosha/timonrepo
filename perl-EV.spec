@@ -1,6 +1,6 @@
 Name:           perl-EV
 Version:        4.03
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Wrapper for the libev high-performance event loop library
 
 Group:          Development/Libraries
@@ -19,6 +19,11 @@ BuildRequires:  libev-source == %{version}
 BuildRequires:  perl(AnyEvent) => 2.6
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
+# As per review, a perl-EV-devel subpackage had at first been pushed to the
+# repositories. It now has broken deps if it's not properly obsoleted/provided.
+# TODO: Remove those two lines during the Fedora 17 development cycle.
+Provides:       %{name}-devel = %{version}-%{release}
+Obsoletes:      %{name}-devel < 4.03-5
 
 %{?perl_default_filter}
 
@@ -79,6 +84,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Apr 12 2011 Mathieu Bridon <bochecha@fedoraproject.org> - 4.03-5
+- Add the correct Obsoletes/Provides to avoid broken deps from the -devel
+  subpackage removal.
+
 * Thu Apr 07 2011 Mathieu Bridon <bochecha@fedoraproject.org> - 4.03-4
 - Readded the header file to the main package, as per guidelines:
       -> http://fedoraproject.org/wiki/Packaging/Perl#.h_files_in_module_packages
