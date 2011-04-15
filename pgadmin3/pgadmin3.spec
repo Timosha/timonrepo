@@ -1,6 +1,6 @@
 Summary:	Graphical client for PostgreSQL
 Name:		pgadmin3
-Version:	1.12.2
+Version:	1.12.3
 Release:	1%{?dist}
 License:	BSD
 Group:		Applications/Databases
@@ -84,6 +84,9 @@ chmod 644 pgadmin/include/images/{package,synonym}{,s}.xpm
 %{_datadir}/applications/*
 
 %changelog
+* Fri Apr 15 2011 Timon <timosha@gmail.com> - 1.12.3-1
+- 1.12.3 release
+
 * Tue Dec 14 2010 Timon <timosha@gmail.com> - 1.12.2-1
 - 1.12.2 release
 
