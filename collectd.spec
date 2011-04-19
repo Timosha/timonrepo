@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.10.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -33,11 +33,7 @@ BuildRequires: libpcap-devel
 BuildRequires: mysql-devel
 BuildRequires: OpenIPMI-devel
 BuildRequires: postgresql-devel
-# fc14 and later have nut 2.6 which fails collectd check:
-#  libupsclient  . . . . no (symbol upscli_connect not found)
-# Also, no nut on 390* was: %ifnarch s390 s390x
-# assuming there will be no 390* builds on fc14 or older
-%if 0%{?fedora} < 14
+%ifnarch s390 s390x
 BuildRequires: nut-devel
 %endif
 BuildRequires: iptables-devel
@@ -102,7 +98,7 @@ Requires:      collectd = %{version}-%{release}
 This plugin gets data provided by nginx.
 
 
-%if 0%{?fedora} < 14
+%ifnarch s390 s390x
 %package nut
 Summary:       Network UPS Tools module for collectd
 Group:         System Environment/Daemons
@@ -258,10 +254,10 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
     --enable-nfs \
     --enable-nginx \
     --enable-ntpd \
-%if 0%{?fedora} >= 14
-    --disable-nut \
-%else
+%ifnarch s390 s390x
     --enable-nut \
+%else
+    --disable-nut \
 %endif
     --enable-olsrd \
     --enable-openvpn \
@@ -353,10 +349,10 @@ cp contrib/redhat/sensors.conf %{buildroot}/etc/collectd.d/sensors.conf
 cp contrib/redhat/snmp.conf %{buildroot}/etc/collectd.d/snmp.conf
 
 # configs for subpackaged plugins
-%if 0%{?fedora} >= 14
-for p in dns ipmi libvirt perl ping postgresql rrdtool
-%else
+%ifnarch s390 s390x
 for p in dns ipmi libvirt nut perl ping postgresql rrdtool
+%else
+for p in dns ipmi libvirt perl ping postgresql rrdtool
 %endif
 do
 %{__cat} > %{buildroot}/etc/collectd.d/$p.conf <<EOF
@@ -400,7 +396,7 @@ fi
 %exclude %{_sysconfdir}/collectd.d/libvirt.conf
 %exclude %{_sysconfdir}/collectd.d/mysql.conf
 %exclude %{_sysconfdir}/collectd.d/nginx.conf
-%if 0%{?fedora} < 14
+%ifarch s390 s390x
 %exclude %{_sysconfdir}/collectd.d/nut.conf
 %endif
 %exclude %{_sysconfdir}/collectd.d/perl.conf
@@ -539,7 +535,7 @@ fi
 %config(noreplace) %{_sysconfdir}/collectd.d/nginx.conf
 
 
-%if 0%{?fedora} < 14
+%ifnarch s390 s390x
 %files nut
 %defattr(-, root, root, -)
 %{_libdir}/collectd/nut.so
@@ -605,6 +601,9 @@ fi
 %endif
 
 %changelog
+* Tue Apr 19 2011 Alan Pevec <apevec@redhat.com> 4.10.3-2
+- re-enable nut plugin rhbz#465729 rhbz#691380
+
 * Tue Mar 29 2011 Alan Pevec <apevec@redhat.com> 4.10.3-1
 - new upstream version 4.10.3
   http://collectd.org/news.shtml#news87
