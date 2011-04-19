@@ -53,8 +53,8 @@
 Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 9.0
-Version: 9.0.3
-Release: 3%{?dist}
+Version: 9.0.4
+Release: 1%{?dist}
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
 License: PostgreSQL
@@ -825,6 +825,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Apr 18 2011 Tom Lane <tgl@redhat.com> 9.0.4-1
+- Update to PostgreSQL 9.0.4, for various fixes described at
+  http://www.postgresql.org/docs/9.0/static/release-9-0-4.html
+- Add %%{?_isa} to cross-subpackage Requires, per latest packaging guidelines
+
 * Thu Feb 10 2011 Timon <rel-eng@lists.fedoraproject.org> - 9.0.3-3
 - Add static libs
 
