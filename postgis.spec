@@ -9,8 +9,8 @@
 
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
-Version:	1.5.1
-Release:	3%{?dist}
+Version:	1.5.2
+Release:	1%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
@@ -175,6 +175,9 @@ rm -rf %{buildroot}
 %doc postgis*.pdf
 
 %changelog
+* Tue Apr 19 2011 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5.2-1
+- Update to 1.5.2
+
 * Sun Apr 03 2011 Nils Philippsen <nils@redhat.com> - 1.5.1-3
 - cope with PostgreSQL 9.0 build environment
 - require pgsql version used for building
