@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.10.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -396,7 +396,7 @@ fi
 %exclude %{_sysconfdir}/collectd.d/libvirt.conf
 %exclude %{_sysconfdir}/collectd.d/mysql.conf
 %exclude %{_sysconfdir}/collectd.d/nginx.conf
-%ifarch s390 s390x
+%ifnarch s390 s390x
 %exclude %{_sysconfdir}/collectd.d/nut.conf
 %endif
 %exclude %{_sysconfdir}/collectd.d/perl.conf
@@ -601,6 +601,9 @@ fi
 %endif
 
 %changelog
+* Tue May 03 2011 Dan Horák <dan@danny.cz> - 4.10.3-3
+- fix build on s390(x)
+
 * Tue Apr 19 2011 Alan Pevec <apevec@redhat.com> 4.10.3-2
 - re-enable nut plugin rhbz#465729 rhbz#691380
 
