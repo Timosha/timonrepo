@@ -3,8 +3,8 @@
 
 %global         daemon mongod
 Name:           mongodb
-Version:        1.8.0
-Release:        2%{?dist}
+Version:        1.8.1
+Release:        1%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
 License:        AGPLv3 and zlib and ASL 2.0
@@ -26,6 +26,7 @@ BuildRequires:  pcre-devel
 BuildRequires:  js-devel
 BuildRequires:  readline-devel
 BuildRequires:  libpcap-devel
+
 # to run tests
 BuildRequires:  unittest
 
@@ -207,6 +208,9 @@ fi
 %{_includedir}/mongo
 
 %changelog
+* Thu May 26 2011 Timon <timosha@gmail.com> - 1.8.1-1
+- Update to 1.8.1
+
 * Sat Mar 19 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.8.0-2
 - Make mongod bind only to 127.0.0.1 by default
 
