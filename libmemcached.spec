@@ -1,6 +1,8 @@
+%global with_tests       %{?_with_tests:1}%{!?_with_tests:0}
+
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   0.47
+Version:   0.49
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -15,6 +17,9 @@ Source0:   libmemcached-%{version}-exhsieh.tar.gz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: cyrus-sasl-devel
+%if %{with_tests}
+BuildRequires: memcached
+%endif
 %if 0%{?fedora} >= 12
 BuildRequires: systemtap-sdt-devel
 %endif
@@ -61,7 +66,11 @@ you will need to install %{name}-devel.
 
 %build
 # option --with-memcached=false to disable server binary check (as we don't run test)
-%configure --with-memcached=false
+%configure \
+%if ! %{with_tests}
+   --with-memcached=false
+%endif
+
 %{__make} %{_smp_mflags}
 
 
@@ -71,11 +80,14 @@ you will need to install %{name}-devel.
 
 
 %check
-# For documentation only:
+%if %{with_tests}
 # test suite cannot run in mock (same port use for memcache servers on all arch)
 # All tests completed successfully
 # diff output.res output.cmp fails but result depend on server version
-#%{__make} test
+%{__make} test
+%else
+echo 'Test suite disabled (missing "--with tests" option)'
+%endif
 
 
 %clean
@@ -96,10 +108,10 @@ you will need to install %{name}-devel.
 %exclude %{_libdir}/libmemcachedprotocol.la
 %exclude %{_libdir}/libmemcachedutil.la
 %exclude %{_libdir}/libhashkit.la
-%{_libdir}/libhashkit.so.0*
-%{_libdir}/libmemcached.so.6*
+%{_libdir}/libhashkit.so.1*
+%{_libdir}/libmemcached.so.7*
 %{_libdir}/libmemcachedprotocol.so.0*
-%{_libdir}/libmemcachedutil.so.1*
+%{_libdir}/libmemcachedutil.so.2*
 %{_mandir}/man1/mem*
 
 
@@ -114,11 +126,16 @@ you will need to install %{name}-devel.
 %{_libdir}/libmemcachedutil.so
 %{_libdir}/pkgconfig/libmemcached.pc
 %{_mandir}/man3/libmemcached*
-%{_mandir}/man3/memcached_*
+%{_mandir}/man3/libhashkit*
+%{_mandir}/man3/memcached*
 %{_mandir}/man3/hashkit*
 
 
 %changelog
+* Thu Jun 02 2011 Remi Collet <Fedora@famillecollet.com> - 0.49-1
+- update to 0.49
+- add build option : --with tests
+
 * Mon Feb 28 2011 Remi Collet <Fedora@famillecollet.com> - 0.47-1
 - update to 0.47
 - remove patch merged upstream
