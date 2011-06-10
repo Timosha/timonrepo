@@ -3,7 +3,7 @@
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -305,6 +305,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Jun 10 2011 Marcela Mašláňová <mmaslano@redhat.com> - 6.6.8.4-2
+- Perl 5.14 mass rebuild
+
 * Tue Mar 15 2011 Pavel Alexeev <Pahan@Hubbitus.info> - 6.6.8.4-1
 - Add BR liblqr-1-devel (BZ#683159)
 - Update to new version (BZ#579458) 6.6.8-4
