@@ -86,6 +86,7 @@ Patch1: rpm-pgsql.patch
 Patch2: postgresql-logging.patch
 Patch3: postgresql-perl-rpath.patch
 Patch4: postgresql-gcc-workaround.patch
+Patch5: postgresql-perl-5.14.patch
 
 BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex gawk
 BuildRequires: perl(ExtUtils::Embed), perl-devel
@@ -304,6 +305,7 @@ system, including regression tests and benchmarks.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 # We used to run autoconf here, but there's no longer any real need to,
 # since Postgres ships with a reasonably modern configure script.
@@ -822,8 +824,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
-* Fri Jun 17 2011 Marcela Mašláňová <mmaslano@redhat.com> - 9.0.4-4
+* Fri Jun 17 2011 Marcela Mašláňová <mmaslano@redhat.com> 9.0.4-4
 - Perl mass rebuild
+- incorporate upstream patch to make it build with Perl 5.14
 
 * Fri Jun 10 2011 Tom Lane <tgl@redhat.com> 9.0.4-3
 - Work around gcc 4.6.0 bug (temporary backport from next upstream release)
