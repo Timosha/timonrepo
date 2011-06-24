@@ -1,4 +1,4 @@
-%{!?javabuild:%define	javabuild 1}
+%{!?javabuild:%define	javabuild 0}
 %{!?utils:%define	utils 1}
 %{!?gcj_support:%define	gcj_support 1}
 
@@ -6,8 +6,8 @@
 
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
-Version:	1.5.1
-Release:	2%{?dist}
+Version:	1.5.2
+Release:	1%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
@@ -170,6 +170,10 @@ rm -rf %{buildroot}
 %doc postgis*.pdf
 
 %changelog
+* Mon Feb 28 2011 Timon <timosha@gmail.com> - 1.5.2-1
+- update to 1.5.2
+- disbale javabuild
+
 * Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.5.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
