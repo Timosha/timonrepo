@@ -1,0 +1,12 @@
+diff -urp mongodb-src-r1.8.0.orig/SConstruct mongodb-src-r1.8.0/SConstruct
+--- mongodb-src-r1.8.0.orig/SConstruct	2011-03-16 11:33:30.000000000 -0400
++++ mongodb-src-r1.8.0/SConstruct	2011-07-01 11:29:41.966707723 -0400
+@@ -679,7 +679,7 @@ if nix:
+ 
+     #make scons colorgcc friendly
+     env['ENV']['HOME'] = os.environ['HOME']
+-    env['ENV']['TERM'] = os.environ['TERM']
++    #env['ENV']['TERM'] = os.environ['TERM']
+ 
+     if linux and has_option( "sharedclient" ):
+         env.Append( LINKFLAGS=" -Wl,--as-needed -Wl,-zdefs " )

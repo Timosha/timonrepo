@@ -3,7 +3,7 @@
 
 %global         daemon mongod
 Name:           mongodb
-Version:        1.8.1
+Version:        1.8.2
 Release:        1%{?dist}
 Summary:        High-performance, schema-free document-oriented database
 Group:          Applications/Databases
@@ -17,6 +17,8 @@ Source0:        http://fastdl.mongodb.org/src/%{name}-src-r%{version}.tar.gz
 Source1:        %{name}.init
 Source2:        %{name}.logrotate
 Source3:        %{name}.conf
+Patch1:         mongodb-no-term.patch
+Patch2:         mongodb-src-r1.8.2-js.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  python-devel
@@ -89,6 +91,8 @@ software, default configuration files, and init scripts.
 
 %prep
 %setup -q -n mongodb-src-r%{version}
+%patch1 -p1
+%patch2 -p1
 
 # spurious permissions
 chmod -x README
@@ -208,8 +212,12 @@ fi
 %{_includedir}/mongo
 
 %changelog
-* Thu May 26 2011 Timon <timosha@gmail.com> - 1.8.1-1
-- Update to 1.8.1
+* Fri Jul 01 2011 Chris Lalancette <clalance@redhat.com> - 1.8.2-1
+- Update to upstream 1.8.2
+- Add patch to ignore TERM
+
+* Fri Jul 01 2011 Chris Lalancette <clalance@redhat.com> - 1.8.0-3
+- Bump release to build against new boost package
 
 * Sat Mar 19 2011 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.8.0-2
 - Make mongod bind only to 127.0.0.1 by default

@@ -1,10 +1,5 @@
-x86_64
-i386
-noarch
-*.src.rpm
-*.rpm
-*.bz2
-*.gz
-*.zip
-*.tgz
-common/sync.sh
+/mongodb-src-r1.6.2.tar.gz
+/mongodb-src-r1.6.3.tar.gz
+/mongodb-src-r1.6.4.tar.gz
+/mongodb-src-r1.7.5.tar.gz
+/mongodb-src-r1.8.0.tar.gz
