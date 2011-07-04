@@ -1,9 +1,9 @@
-%global VER 6.6.8
-%global Patchlevel 4
+%global VER 6.7.0
+%global Patchlevel 10
 
 Name:           ImageMagick
 Version:        %{VER}.%{Patchlevel}
-Release:        3%{?dist}
+Release:        1%{?dist}
 Summary:        An X application for displaying and manipulating images
 Group:          Applications/Multimedia
 License:        ImageMagick
@@ -193,9 +193,6 @@ if [ -z perl-pkg-files ] ; then
     exit -1
 fi
 
-# These don't belong here, we include them in %%doc
-rm $RPM_BUILD_ROOT%{_datadir}/%{name}-%{VER}/{ChangeLog,LICENSE,NEWS.txt}
-
 # fix multilib issues
 %ifarch x86_64 s390x ia64 ppc64 alpha sparc64
 %define wordsize 64
@@ -251,6 +248,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man[145]/[a-z]*
 %{_mandir}/man1/%{name}.*
 %exclude %{_libdir}/%{name}-%{VER}/modules-Q16/coders/djvu.*
+%{_sysconfdir}/%{name}
 
 %files devel
 %defattr(-,root,root,-)
@@ -305,6 +303,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Jun 22 2011 Pavel Alexeev <Pahan@Hubbitus.info> - 6.7.0.10-1
+- Update to 6.7.0-10.
+
 * Fri Jun 17 2011 Marcela Mašláňová <mmaslano@redhat.com> - 6.6.8.4-3
 - Perl mass rebuild
 
