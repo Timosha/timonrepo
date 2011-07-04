@@ -54,7 +54,7 @@ Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 9.0
 Version: 9.0.4
-Release: 4%{?dist}
+Release: 5%{?dist}
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
 License: PostgreSQL
@@ -829,6 +829,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Fri Jul 4 2011 Timon <timosha@gmail.com> 9.0.4-5
+- Rebuild
+
 * Fri Jun 17 2011 Marcela Mašláňová <mmaslano@redhat.com> 9.0.4-4
 - Perl mass rebuild
 - incorporate upstream patch to make it build with Perl 5.14
