@@ -824,7 +824,7 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
-* Wed Jul  6 Tom Lane <tgl@redhat.com> 9.0.4-5
+* Wed Jul  6 2011 Tom Lane <tgl@redhat.com> 9.0.4-5
 - Remove erroneously-included Default-Start line from LSB init block
 Related: #717024
 
