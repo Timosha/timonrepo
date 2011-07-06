@@ -54,7 +54,7 @@ Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 9.0
 Version: 9.0.4
-Release: 3%{?dist}
+Release: 5%{?dist}
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
 License: PostgreSQL
@@ -822,6 +822,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Jul  6 2011 Tom Lane <tgl@redhat.com> 9.0.4-5
+- Remove erroneously-included Default-Start line from LSB init block
+Related: #717024
+
 * Fri Jun 10 2011 Tom Lane <tgl@redhat.com> 9.0.4-3
 - Work around gcc 4.6.0 bug (temporary backport from next upstream release)
 
