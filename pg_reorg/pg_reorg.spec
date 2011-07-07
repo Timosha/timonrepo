@@ -4,11 +4,12 @@
 
 Summary:	Reorganize tables in PostgreSQL databases without any locks. 
 Name:		%{sname}
-Version:	1.1.5
-Release:	1%{?dist}
+Version:	1.1.6
+Release:	0.cvs.1%{?dist}
 License:	BSD
 Group:		Applications/Databases
-Source0:	http://pgfoundry.org/frs/download.php/2845/%{sname}-%{version}.tar.gz
+#Source0:	http://pgfoundry.org/frs/download.php/2845/%{sname}-%{version}.tar.gz
+Source:		%{sname}.tar.gz
 URL:		http://pgfoundry.org/projects/%{sname}/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
 
@@ -21,7 +22,7 @@ you can retrieve or update rows in tables being reorganized.
 The module is developed to be a better alternative of CLUSTER and VACUUM FULL.
 
 %prep
-%setup -q -n %{sname}-%{version}
+%setup -q -n %{sname}
 
 %build
 USE_PGXS=1 make %{?_smp_mflags}
@@ -39,8 +40,6 @@ install -m 755 lib/pg_reorg.so			%{buildroot}%{_libdir}/pgsql/pg_reorg.so
 install -m 644 lib/pg_reorg.sql			%{buildroot}%{_datadir}/pgsql/contrib/pg_reorg.sql
 install -m 644 lib/uninstall_pg_reorg.sql	%{buildroot}%{_datadir}/pgsql/contrib/uninstall_pg_reorg.sql
 
-%define pg_sharedir 
-
 %files
 %defattr(755,root,root,755)
 %{_bindir}/pg_reorg
@@ -53,6 +52,7 @@ install -m 644 lib/uninstall_pg_reorg.sql	%{buildroot}%{_datadir}/pgsql/contrib/
 %{__rm} -rf %{buildroot}
 
 %changelog
+* Thu Jul 7 2011 - Timon <timosha@gmail.com> 1.1.6-0.cvs.1
 * Thu Oct 21 2010 - NTT OSS Center <sakamoto.masahiko@oss.ntt.co.jp> 1.1.5-1
 * Wed Sep 22 2010 - NTT OSS Center <sakamoto.masahiko@oss.ntt.co.jp> 1.1.4-1
 * Thu Apr 22 2010 - NTT OSS Center <itagaki.takahiro@oss.ntt.co.jp> 1.1.2-1
