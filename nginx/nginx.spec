@@ -8,7 +8,7 @@
 %define nginx_webroot   %{nginx_datadir}/html
 
 Name:           nginx
-Version:        1.0.4
+Version:        1.0.5
 Release:        1%{?dist}
 Summary:        Robust, small and high performance HTTP and reverse proxy server
 Group:          System Environment/Daemons   
@@ -195,8 +195,12 @@ fi
 
 
 %changelog
+* Wed Jul 20 2011 Timon <timosha@gmail.com> - 1.0.5-1
+- Update to 1.0.5
+
 * Tue Jul 19 2011 Timon <timosha@gmail.com> - 1.0.4-1
 - Update to 1.0.4
+- fix build with kernel >= 3.0
 
 * Fri Jun 17 2011 Marcela Mašláňová <mmaslano@redhat.com> - 1.0.0-3
 - Perl mass rebuild
