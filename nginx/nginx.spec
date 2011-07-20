@@ -8,8 +8,8 @@
 %define nginx_webroot   %{nginx_datadir}/html
 
 Name:           nginx
-Version:        1.0.0
-Release:        3%{?dist}
+Version:        1.0.4
+Release:        1%{?dist}
 Summary:        Robust, small and high performance HTTP and reverse proxy server
 Group:          System Environment/Daemons   
 
@@ -49,6 +49,9 @@ Source104:  404.html
 # -D_FORTIFY_SOURCE=2 causing warnings to turn into errors.
 Patch0:     nginx-auto-cc-gcc.patch
 
+# fix build with kernel >=3.0
+Patch1:     nginx-fix-build-with-kernel-3-0.patch
+
 %description
 Nginx [engine x] is an HTTP(S) server, HTTP(S) reverse proxy and IMAP/POP3
 proxy server written by Igor Sysoev.
@@ -57,6 +60,7 @@ proxy server written by Igor Sysoev.
 %setup -q
 
 %patch0 -p0
+%patch1 -p0
 
 %build
 # nginx does not utilize a standard configure script.  It has its own
@@ -191,6 +195,9 @@ fi
 
 
 %changelog
+* Tue Jul 19 2011 Timon <timosha@gmail.com> - 1.0.4-1
+- Update to 1.0.4
+
 * Fri Jun 17 2011 Marcela Mašláňová <mmaslano@redhat.com> - 1.0.0-3
 - Perl mass rebuild
 
