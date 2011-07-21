@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.10.3
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -601,6 +601,9 @@ fi
 %endif
 
 %changelog
+* Thu Jul 21 2011 Petr Sabata <contyk@redhat.com> - 4.10.3-7
+- Perl mass rebuild
+
 * Wed Jul 20 2011 Petr Sabata <contyk@redhat.com> - 4.10.3-6
 - Perl mass rebuild
 
