@@ -54,7 +54,10 @@ Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 9.0
 Version: 9.0.4
-Release: 7%{?dist}
+Release: 8%{?dist}
+# Update this whenever F15 gets rebased; it must be NVR-greater than F15 pkg:
+%global first_systemd_version 9.0.4-8
+
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
 License: PostgreSQL
@@ -73,11 +76,12 @@ Source1: postgresql-%{version}-US.pdf
 # generate-pdf.sh is not used during RPM build, but include for documentation
 Source2: generate-pdf.sh
 Source3: ftp://ftp.postgresql.org/pub/source/v%{prevversion}/postgresql-%{prevversion}.tar.bz2
-Source4: postgresql.init
 Source5: Makefile.regress
 Source6: pg_config.h
 Source7: ecpg_config.h
 Source8: README.rpm-dist
+Source9: postgresql-setup
+Source10: postgresql.service
 Source14: postgresql.pam
 Source15: postgresql-bashprofile
 
@@ -87,12 +91,12 @@ Patch2: postgresql-logging.patch
 Patch3: postgresql-perl-rpath.patch
 Patch4: postgresql-gcc-workaround.patch
 Patch5: postgresql-perl-5.14.patch
+Patch6: postgresql-pgctl-timeout.patch
 
 BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex gawk
 BuildRequires: perl(ExtUtils::Embed), perl-devel
-# for /sbin/ldconfig
-Requires(post): glibc initscripts
-Requires(postun): glibc initscripts
+BuildRequires: readline-devel zlib-devel
+BuildRequires: systemd-units
 
 %if %plpython
 BuildRequires: python-devel
@@ -104,9 +108,6 @@ BuildRequires: tcl
 BuildRequires: tcl-devel
 %endif
 %endif
-
-BuildRequires: readline-devel
-BuildRequires: zlib-devel >= 1.0.4
 
 %if %ssl
 BuildRequires: openssl-devel
@@ -167,6 +168,9 @@ if you're installing the postgresql-server package.
 Summary: The shared libraries required for any PostgreSQL clients
 Group: Applications/Databases
 Provides: libpq.so = %{version}-%{release}
+# for /sbin/ldconfig
+Requires(post): glibc
+Requires(postun): glibc
 
 %description libs
 The postgresql-libs package provides the essential shared libraries for any 
@@ -180,11 +184,18 @@ Group: Applications/Databases
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires(pre): /usr/sbin/useradd
+# for /sbin/ldconfig
+Requires(post): glibc
+Requires(postun): glibc
+# pre/post stuff needs systemd too
+Requires(post): systemd-units
+Requires(preun): systemd-units
+Requires(postun): systemd-units
+# This is actually needed for the %%triggerun script but Requires(triggerun)
+# is not valid.  We can use post because this particular %%triggerun script
+# should fire just after this package is installed.
+Requires(post): systemd-sysv
 Requires(post): chkconfig
-Requires(preun): chkconfig
-# This is for /sbin/service
-Requires(preun): initscripts
-Requires(postun): initscripts
 
 %description server
 The postgresql-server package includes the programs needed to create
@@ -306,6 +317,7 @@ system, including regression tests and benchmarks.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 # We used to run autoconf here, but there's no longer any real need to,
 # since Postgres ships with a reasonably modern configure script.
@@ -388,7 +400,6 @@ CFLAGS="$CFLAGS -DLINUX_OOM_ADJ=0"
 	--enable-thread-safety \
 %endif
 	--with-system-tzdata=/usr/share/zoneinfo \
-	--sysconfdir=/etc/sysconfig/pgsql \
 	--datadir=/usr/share/pgsql
 
 make %{?_smp_mflags} world
@@ -452,14 +463,16 @@ esac
 install -d -m 755 $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
 cp src/tutorial/* $RPM_BUILD_ROOT%{_libdir}/pgsql/tutorial
 
-# prep the initscript, including insertion of some values it needs
-install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
+# prep the setup script, including insertion of some values it needs
 sed -e 's|^PGVERSION=.*$|PGVERSION=%{version}|' \
+	-e 's|^PGENGINE=.*$|PGENGINE=%{_bindir}|' \
 	-e 's|^PREVMAJORVERSION=.*$|PREVMAJORVERSION=%{prevmajorversion}|' \
 	-e 's|^PREVPGENGINE=.*$|PREVPGENGINE=%{_libdir}/pgsql/postgresql-%{prevmajorversion}/bin|' \
-	-e 's|^PGDOCDIR=.*$|PGDOCDIR=%{_docdir}/%{name}-%{version}|' \
-	<%{SOURCE4} >postgresql.init
-install -m 755 postgresql.init $RPM_BUILD_ROOT/etc/rc.d/init.d/postgresql
+	<%{SOURCE9} >postgresql-setup
+install -m 755 postgresql-setup $RPM_BUILD_ROOT%{_bindir}/postgresql-setup
+
+install -d $RPM_BUILD_ROOT%{_unitdir}
+install -m 644 %{SOURCE10} $RPM_BUILD_ROOT%{_unitdir}/postgresql.service
 
 %if %pam
 install -d $RPM_BUILD_ROOT/etc/pam.d
@@ -474,9 +487,6 @@ install -d -m 700 $RPM_BUILD_ROOT/var/lib/pgsql/backups
 
 # postgres' .bash_profile
 install -m 644 %{SOURCE15} $RPM_BUILD_ROOT/var/lib/pgsql/.bash_profile
-
-# Create the multiple postmaster startup directory
-install -d -m 700 $RPM_BUILD_ROOT/etc/sysconfig/pgsql
 
 
 %if %upgrade
@@ -593,19 +603,36 @@ cat psql-%{majorversion}.lang >>main.lst
 	-c "PostgreSQL Server" -u 26 postgres >/dev/null 2>&1 || :
 
 %post server
-/sbin/chkconfig --add postgresql
 /sbin/ldconfig
+if [ $1 -eq 1 ] ; then
+    # Initial installation
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+fi
+
+# Run this when upgrading from SysV initscript to native systemd unit
+%triggerun server -- postgresql-server < %{first_systemd_version}
+# Save the current service runlevel info
+# User must manually run systemd-sysv-convert --apply postgresql
+# to migrate them to systemd targets
+/usr/bin/systemd-sysv-convert --save postgresql >/dev/null 2>&1 || :
+
+# Run these because the SysV package being removed won't do them
+/sbin/chkconfig --del postgresql >/dev/null 2>&1 || :
+/bin/systemctl try-restart postgresql.service >/dev/null 2>&1 || :
 
 %preun server
-if [ $1 = 0 ] ; then
-	/sbin/service postgresql stop >/dev/null 2>&1
-	/sbin/chkconfig --del postgresql
+if [ $1 -eq 0 ] ; then
+    # Package removal, not upgrade
+    /bin/systemctl --no-reload disable postgresql.service >/dev/null 2>&1 || :
+    /bin/systemctl stop postgresql.service >/dev/null 2>&1 || :
 fi
 
 %postun server
 /sbin/ldconfig 
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
 if [ $1 -ge 1 ] ; then
-	/sbin/service postgresql condrestart >/dev/null 2>&1 || :
+    # Package upgrade, not uninstall
+    /bin/systemctl try-restart postgresql.service >/dev/null 2>&1 || :
 fi
 
 %if %plperl
@@ -734,17 +761,17 @@ rm -rf $RPM_BUILD_ROOT
 
 %files server -f server.lst
 %defattr(-,root,root)
-/etc/rc.d/init.d/postgresql
+%{_unitdir}/postgresql.service
 %if %pam
 %config(noreplace) /etc/pam.d/postgresql
 %endif
-%attr (755,root,root) %dir /etc/sysconfig/pgsql
 %{_bindir}/initdb
 %{_bindir}/pg_controldata
 %{_bindir}/pg_ctl
 %{_bindir}/pg_resetxlog
 %{_bindir}/postgres
 %{_bindir}/postmaster
+%{_bindir}/postgresql-setup
 %{_mandir}/man1/initdb.*
 %{_mandir}/man1/pg_controldata.*
 %{_mandir}/man1/pg_ctl.*
@@ -824,6 +851,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Wed Jul 27 2011 Tom Lane <tgl@redhat.com> 9.0.4-8
+- Convert to systemd startup support
+Resolves: #696427
+
 * Thu Jul 21 2011 Petr Sabata <contyk@redhat.com> - 9.0.4-7
 - Perl mass rebuild
 
