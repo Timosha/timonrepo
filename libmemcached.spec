@@ -2,7 +2,7 @@
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   0.49
+Version:   0.51
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -61,7 +61,7 @@ you will need to install %{name}-devel.
 %setup -q
 
 %{__mkdir} examples
-%{__cp} -p tests/*.{c,cpp,h} examples/
+%{__cp} -p tests/*.{cc,cpp,h} examples/
 
 
 %build
@@ -109,7 +109,7 @@ echo 'Test suite disabled (missing "--with tests" option)'
 %exclude %{_libdir}/libmemcachedutil.la
 %exclude %{_libdir}/libhashkit.la
 %{_libdir}/libhashkit.so.1*
-%{_libdir}/libmemcached.so.7*
+%{_libdir}/libmemcached.so.8*
 %{_libdir}/libmemcachedprotocol.so.0*
 %{_libdir}/libmemcachedutil.so.2*
 %{_mandir}/man1/mem*
@@ -132,6 +132,9 @@ echo 'Test suite disabled (missing "--with tests" option)'
 
 
 %changelog
+* Sun Jul 31 2011 Remi Collet <remi@fedoraproject.org> - 0.51-1
+- update to 0.51 (soname bump libmemcached.so.8)
+
 * Thu Jun 02 2011 Remi Collet <Fedora@famillecollet.com> - 0.49-1
 - update to 0.49
 - add build option : --with tests
