@@ -24,7 +24,7 @@
 %global with_fpm 0
 %endif
 
-%if %{?__isa:1}
+%if 0%{?__isa:1}
 %global isasuffix -%{__isa}
 %else
 %global isasuffix %nil
@@ -36,8 +36,8 @@
 
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
-Version: 5.3.6
-Release: 2%{?dist}
+Version: 5.3.7
+Release: 1%{?dist}
 License: PHP
 Group: Development/Languages
 URL: http://www.php.net/
@@ -52,14 +52,16 @@ Source6: php-fpm.init
 Source7: php-fpm.logrotate
 
 # Build fixes
-Patch1: php-5.3.6-gnusrc.patch
+Patch1: php-5.3.7-gnusrc.patch
 Patch2: php-5.3.0-install.patch
 Patch3: php-5.2.4-norpath.patch
 Patch4: php-5.3.0-phpize64.patch
 Patch5: php-5.2.0-includedir.patch
 Patch6: php-5.2.4-embed.patch
 Patch7: php-5.3.0-recode.patch
-Patch8: php-5.3.6-aconf26x.patch
+# from http://svn.php.net/viewvc?view=revision&revision=311042
+# and  http://svn.php.net/viewvc?view=revision&revision=311908
+Patch8: php-5.3.7-aconf259.patch
 
 # Fixes for extension modules
 Patch20: php-4.3.11-shutdown.patch
@@ -93,10 +95,11 @@ Requires(pre): httpd
 
 
 # Don't provides extensions, which are not shared library, as .so
-%{?filter_setup:
-%filter_provides_in %{_libdir}/php/modules/.*\.so$
-%filter_setup
-}
+# RPM 4.8
+%{?filter_provides_in: %filter_provides_in %{_libdir}/php/modules/.*\.so$}
+%{?filter_setup}
+# RPM 4.9
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}%{_libdir}/php/modules/.*\\.so$
 
 
 %description
@@ -170,6 +173,7 @@ Provides: php-ftp, php-ftp%{?_isa}
 Provides: php-gettext, php-gettext%{?_isa}
 Provides: php-gmp, php-gmp%{?_isa}
 Provides: php-hash, php-hash%{?_isa}
+Provides: php-mhash = %{version}, php-mhash%{?_isa} = %{version}
 Provides: php-iconv, php-iconv%{?_isa}
 Provides: php-json, php-json%{?_isa}
 Provides: php-pecl-json = %{jsonver}, php-pecl-json%{?_isa} = %{jsonver}
@@ -194,6 +198,7 @@ Obsoletes: php-pecl-zip
 %endif
 Provides: php-zlib, php-zlib%{?_isa}
 Obsoletes: php-openssl, php-pecl-json, php-json, php-pecl-phar, php-pecl-Fileinfo
+Obsoletes: php-mhash < 5.3.0
 
 %description common
 The php-common package contains files used by both the php
@@ -685,6 +690,7 @@ ln -sf ../configure
         --with-libxml-dir=%{_prefix} \
 	--enable-xml \
         --with-system-tzdata \
+        --with-mhash \
 	$* 
 if test $? != 0; then 
   tail -500 config.log
@@ -1043,6 +1049,11 @@ fi
 %files enchant -f files.enchant
 
 %changelog
+* Thu Aug 18 2011 Remi Collet <remi@fedoraproject.org> 5.3.7-1
+- update to 5.3.7
+  http://www.php.net/ChangeLog-5.php#5.3.7
+- enable mhash extension (emulated by hash extension)
+
 * Wed Mar 23 2011 Remi Collet <Fedora@famillecollet.com> 5.3.6-2
 - rebuild for new MySQL client library
 
