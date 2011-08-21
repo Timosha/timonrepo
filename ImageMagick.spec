@@ -1,23 +1,23 @@
-%global VER 6.7.0
-%global Patchlevel 10
+%global VER 6.7.1
+%global Patchlevel 9
 
-Name:           ImageMagick
-Version:        %{VER}.%{Patchlevel}
-Release:        3%{?dist}
-Summary:        An X application for displaying and manipulating images
-Group:          Applications/Multimedia
-License:        ImageMagick
-Url:            http://www.imagemagick.org/
-Source0:        ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.xz
-Patch1:         ImageMagick-6.4.0-multilib.patch
+Name:		ImageMagick
+Version:		%{VER}.%{Patchlevel}
+Release:		1%{?dist}
+Summary:		An X application for displaying and manipulating images
+Group:		Applications/Multimedia
+License:		ImageMagick
+Url:			http://www.imagemagick.org/
+Source0:		ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.xz
+Patch1:		ImageMagick-6.4.0-multilib.patch
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:  bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
-BuildRequires:  libtiff-devel, giflib-devel, zlib-devel, perl-devel >= 5.8.1
-BuildRequires:  ghostscript-devel, djvulibre-devel
-BuildRequires:  libwmf-devel, jasper-devel, libtool-ltdl-devel
-BuildRequires:  libX11-devel, libXext-devel, libXt-devel
-BuildRequires:  lcms-devel, libxml2-devel, librsvg2-devel, OpenEXR-devel
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRequires:	bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
+BuildRequires:	libtiff-devel, giflib-devel, zlib-devel, perl-devel >= 5.8.1
+BuildRequires:	ghostscript-devel, djvulibre-devel
+BuildRequires:	libwmf-devel, jasper-devel, libtool-ltdl-devel
+BuildRequires:	libX11-devel, libXext-devel, libXt-devel
+BuildRequires:	lcms-devel, libxml2-devel, librsvg2-devel, OpenEXR-devel
 
 %description
 ImageMagick is an image display and manipulation tool for the X
@@ -303,6 +303,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Aug 22 2011 Pavel Alexeev <Pahan@Hubbitus.info> - 6.7.1.9-1
+- New version 6.7.1-9.
+
 * Thu Jul 21 2011 Petr Sabata <contyk@redhat.com> - 6.7.0.10-3
 - Perl mass rebuild
 
