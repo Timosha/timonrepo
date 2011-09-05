@@ -4,12 +4,12 @@
 
 Summary:	Reorganize tables in PostgreSQL databases without any locks. 
 Name:		%{sname}
-Version:	1.1.6
-Release:	0.cvs.1%{?dist}
+Version:	1.1.7
+Release:	1%{?dist}
 License:	BSD
 Group:		Applications/Databases
-#Source0:	http://pgfoundry.org/frs/download.php/2845/%{sname}-%{version}.tar.gz
-Source:		%{sname}.tar.gz
+Source0:	%{sname}-%{version}.tar.gz
+#Source:		%{sname}.tar.gz
 URL:		http://pgfoundry.org/projects/%{sname}/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
 
@@ -52,6 +52,7 @@ install -m 644 lib/uninstall_pg_reorg.sql	%{buildroot}%{_datadir}/pgsql/contrib/
 %{__rm} -rf %{buildroot}
 
 %changelog
+* Mon Sep 5 2011 - Timon <timosha@gmail.com> 1.1.7-1
 * Thu Jul 7 2011 - Timon <timosha@gmail.com> 1.1.6-0.cvs.1
 * Thu Oct 21 2010 - NTT OSS Center <sakamoto.masahiko@oss.ntt.co.jp> 1.1.5-1
 * Wed Sep 22 2010 - NTT OSS Center <sakamoto.masahiko@oss.ntt.co.jp> 1.1.4-1
