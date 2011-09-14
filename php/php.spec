@@ -121,7 +121,6 @@ Provides: php-readline, php-readline%{?_isa}
 %description cli
 The php-cli package contains the command-line interface 
 executing PHP scripts, /usr/bin/php, and the CGI interface.
-
 %package zts
 Group: Development/Languages
 Summary: Thread-safe PHP interpreter for use with the Apache HTTP Server
@@ -138,7 +137,6 @@ Server which can operate under a threaded server processing model.
 Group: Development/Languages
 Summary: PHP FastCGI Process Manager
 Requires: php-common%{?_isa} = %{version}-%{release}
-Requires: systemd-units
 BuildRequires: libevent-devel >= 1.4.11
 
 %description fpm
