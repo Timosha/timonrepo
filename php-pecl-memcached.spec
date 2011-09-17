@@ -113,7 +113,7 @@ ln -s %{php_extdir}/igbinary.so modules/
 
 
 %changelog
-* Sat Sep 17 2011  Remi Collet <Fedora@FamilleCollet.com> - 1.0.2-7
+* Sat Sep 17 2011  Remi Collet <remi@fedoraproject.org> - 1.0.2-7
 - rebuild against libmemcached 0.52
 - adapted filter
 - clean spec
