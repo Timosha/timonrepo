@@ -1,18 +1,15 @@
 %{!?__pecl:     %{expand: %%global __pecl     %{_bindir}/pecl}}
-
 %global pecl_name memcached
 
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
 Version:      1.0.2
-Release:      6%{?dist}
+Release:      7%{?dist}
 License:      PHP
 Group:        Development/Languages
 URL:          http://pecl.php.net/package/%{pecl_name}
 
 Source:       http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
-
-BuildRoot:    %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # 5.2.10 required to HAVE_JSON enabled
 BuildRequires: php-devel >= 5.2.10
@@ -33,10 +30,11 @@ Provides:     php-pecl(%{pecl_name}) = %{version}-%{release}
 Provides:     php-pecl(%{pecl_name})%{?_isa} = %{version}-%{release}
 
 
-%{?filter_setup:
-%filter_provides_in %{php_extdir}/.*\.so$
-%filter_setup
-}
+# RPM 4.8
+%{?filter_provides_in: %filter_provides_in %{php_extdir}/.*\.so$}
+%{?filter_setup}
+# RPM 4.9
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}%{php_extdir}/.*\\.so$
 
 
 %description
@@ -52,27 +50,10 @@ It also provides a session handler (memcached).
 
 %prep 
 %setup -c -q
-cd %{pecl_name}-%{version}
 
-
-%build
-cd %{pecl_name}-%{version}
-phpize
-%configure --enable-memcached-igbinary
-%{__make} %{?_smp_mflags}
-
-
-%install
-cd %{pecl_name}-%{version}
-%{__rm} -rf %{buildroot}
-%{__make} install INSTALL_ROOT=%{buildroot}
-
-# Drop in the bit of configuration
-%{__mkdir_p} %{buildroot}%{_sysconfdir}/php.d
-%{__cat} > %{buildroot}%{_sysconfdir}/php.d/%{pecl_name}.ini << 'EOF'
+cat > %{pecl_name}.ini << 'EOF'
 ; Enable %{pecl_name} extension module
 extension=%{pecl_name}.so
-
 
 ; ----- Options to use the memcached session handler
 
@@ -82,13 +63,23 @@ extension=%{pecl_name}.so
 ;session.save_path="localhost:11211"
 EOF
 
+
+%build
+cd %{pecl_name}-%{version}
+phpize
+%configure --enable-memcached-igbinary
+make %{?_smp_mflags}
+
+
+%install
+rm -rf %{buildroot}
+make install -C %{pecl_name}-%{version} INSTALL_ROOT=%{buildroot}
+
+# Drop in the bit of configuration
+install -D -m 644 %{pecl_name}.ini %{buildroot}%{_sysconfdir}/php.d/%{pecl_name}.ini
+
 # Install XML package description
-%{__mkdir_p} %{buildroot}%{pecl_xmldir}
-%{__install} -m 644 ../package.xml %{buildroot}%{pecl_xmldir}/%{name}.xml
-
-
-%clean
-%{__rm} -rf %{buildroot}
+install -D -m 644 package.xml %{buildroot}%{pecl_xmldir}/%{name}.xml
 
 
 %post
@@ -104,10 +95,10 @@ fi
 %check
 cd %{pecl_name}-%{version}
 # only check if build extension can be loaded
-%{__ln_s} %{php_extdir}/json.so modules/
-%{__ln_s} %{php_extdir}/igbinary.so modules/
-%{_bindir}/php \
-    -n -q -d extension_dir=modules \
+ln -s %{php_extdir}/json.so modules/
+ln -s %{php_extdir}/igbinary.so modules/
+%{_bindir}/php -n -q \
+    -d extension_dir=modules \
     -d extension=json.so \
     -d extension=igbinary.so \
     -d extension=%{pecl_name}.so \
@@ -115,7 +106,6 @@ cd %{pecl_name}-%{version}
 
 
 %files
-%defattr(-, root, root, -)
 %doc %{pecl_name}-%{version}/{CREDITS,LICENSE,README.markdown,ChangeLog}
 %config(noreplace) %{_sysconfdir}/php.d/%{pecl_name}.ini
 %{php_extdir}/%{pecl_name}.so
@@ -123,6 +113,11 @@ cd %{pecl_name}-%{version}
 
 
 %changelog
+* Sat Sep 17 2011  Remi Collet <Fedora@FamilleCollet.com> - 1.0.2-7
+- rebuild against libmemcached 0.52
+- adapted filter
+- clean spec
+
 * Thu Jun 02 2011  Remi Collet <Fedora@FamilleCollet.com> - 1.0.2-6
 - rebuild against libmemcached 0.49
 
