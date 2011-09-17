@@ -2,7 +2,7 @@
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   0.51
+Version:   0.52
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -66,7 +66,7 @@ you will need to install %{name}-devel.
 
 %build
 # option --with-memcached=false to disable server binary check (as we don't run test)
-%configure \
+%configure --disable-static \
 %if ! %{with_tests}
    --with-memcached=false
 %endif
@@ -104,10 +104,7 @@ echo 'Test suite disabled (missing "--with tests" option)'
 %defattr (-,root,root,-) 
 %doc AUTHORS COPYING README THANKS TODO ChangeLog
 %{_bindir}/mem*
-%exclude %{_libdir}/libmemcached.la
-%exclude %{_libdir}/libmemcachedprotocol.la
-%exclude %{_libdir}/libmemcachedutil.la
-%exclude %{_libdir}/libhashkit.la
+%exclude %{_libdir}/lib*.la
 %{_libdir}/libhashkit.so.1*
 %{_libdir}/libmemcached.so.8*
 %{_libdir}/libmemcachedprotocol.so.0*
@@ -132,6 +129,9 @@ echo 'Test suite disabled (missing "--with tests" option)'
 
 
 %changelog
+* Sat Sep 17 2011 Remi Collet <remi@fedoraproject.org> - 0.52-1
+- update to 0.52
+
 * Sun Jul 31 2011 Remi Collet <remi@fedoraproject.org> - 0.51-1
 - update to 0.51 (soname bump libmemcached.so.8)
 
