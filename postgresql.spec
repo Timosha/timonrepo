@@ -53,8 +53,8 @@
 Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 9.0
-Version: 9.0.4
-Release: 5%{?dist}
+Version: 9.0.5
+Release: 1%{?dist}
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
 License: PostgreSQL
@@ -85,7 +85,6 @@ Source15: postgresql-bashprofile
 Patch1: rpm-pgsql.patch
 Patch2: postgresql-logging.patch
 Patch3: postgresql-perl-rpath.patch
-Patch4: postgresql-gcc-workaround.patch
 
 BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex gawk
 BuildRequires: perl(ExtUtils::Embed), perl-devel
@@ -303,7 +302,6 @@ system, including regression tests and benchmarks.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
 
 # We used to run autoconf here, but there's no longer any real need to,
 # since Postgres ships with a reasonably modern configure script.
@@ -822,6 +820,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Sep 26 2011 Tom Lane <tgl@redhat.com> 9.0.5-1
+- Update to PostgreSQL 9.0.5, for various fixes described at
+  http://www.postgresql.org/docs/9.0/static/release-9-0-5.html
+
 * Wed Jul  6 2011 Tom Lane <tgl@redhat.com> 9.0.4-5
 - Remove erroneously-included Default-Start line from LSB init block
 Related: #717024
