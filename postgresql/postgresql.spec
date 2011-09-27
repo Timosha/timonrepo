@@ -314,8 +314,8 @@ system, including regression tests and benchmarks.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
-%patch5 -p1
+#%patch4 -p1
+#%patch5 -p1
 %patch6 -p1
 
 # We used to run autoconf here, but there's no longer any real need to,
