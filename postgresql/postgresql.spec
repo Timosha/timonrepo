@@ -53,10 +53,9 @@
 Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 9.0
-Version: 9.0.4
-Release: 8%{?dist}
-# Update this whenever F15 gets rebased; it must be NVR-greater than F15 pkg:
-%global first_systemd_version 9.0.4-8
+
+Version: 9.0.5
+Release: 1%{?dist}
 
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
@@ -856,23 +855,13 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
-* Wed Jul 27 2011 Tom Lane <tgl@redhat.com> 9.0.4-8
-- Convert to systemd startup support
-Resolves: #696427
-
-* Thu Jul 21 2011 Petr Sabata <contyk@redhat.com> - 9.0.4-7
-- Perl mass rebuild
-
-* Wed Jul 20 2011 Petr Sabata <contyk@redhat.com> - 9.0.4-6
-- Perl mass rebuild
+* Mon Sep 26 2011 Tom Lane <tgl@redhat.com> 9.0.5-1
+- Update to PostgreSQL 9.0.5, for various fixes described at
+  http://www.postgresql.org/docs/9.0/static/release-9-0-5.html
 
 * Wed Jul  6 2011 Tom Lane <tgl@redhat.com> 9.0.4-5
 - Remove erroneously-included Default-Start line from LSB init block
 Related: #717024
-
-* Fri Jun 17 2011 Marcela Mašláňová <mmaslano@redhat.com> 9.0.4-4
-- Perl mass rebuild
-- incorporate upstream patch to make it build with Perl 5.14
 
 * Fri Jun 10 2011 Tom Lane <tgl@redhat.com> 9.0.4-3
 - Work around gcc 4.6.0 bug (temporary backport from next upstream release)
@@ -885,9 +874,6 @@ Resolves: #703215
 - Update to PostgreSQL 9.0.4, for various fixes described at
   http://www.postgresql.org/docs/9.0/static/release-9-0-4.html
 - Add %%{?_isa} to cross-subpackage Requires, per latest packaging guidelines
-
-* Thu Feb 10 2011 Timon <rel-eng@lists.fedoraproject.org> - 9.0.3-3
-- Add static libs
 
 * Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 9.0.3-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
