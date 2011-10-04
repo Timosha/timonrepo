@@ -9,7 +9,7 @@
 
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
-Version:	1.5.2
+Version:	1.5.3
 Release:	1%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
@@ -175,6 +175,9 @@ rm -rf %{buildroot}
 %doc postgis*.pdf
 
 %changelog
+* Tue Oct 4 2011 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5.3-1
+- Update to 1.5.3
+
 * Tue Apr 19 2011 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5.2-1
 - Update to 1.5.2
 
