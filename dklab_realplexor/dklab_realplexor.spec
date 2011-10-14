@@ -1,7 +1,7 @@
 Summary:	Comet server which handles 1000000+ parallel browser connections
 Name:		dklab_realplexor
-Version:	1.32
-Release:	2%{?dist}
+Version:	1.40
+Release:	1%{?dist}
 Group:		Development/Libraries
 License:	GPLv2
 URL:		http://dklab.ru/lib/dklab_realplexor/
@@ -92,6 +92,9 @@ fi
 %{_datadir}/php/Dklab/Realplexor.php
 
 %changelog
+* Thu Oct 10 2011 Timon <timosha@gmail.com> - 1.40-1
+- new version
+
 * Thu Oct 28 2010 Timon <timosha@gmail.com> - 1.32-2
 - config noreplace
 
