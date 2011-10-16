@@ -2,7 +2,7 @@
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   0.52
+Version:   0.53
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -14,6 +14,9 @@ URL:       http://libmemcached.org/
 # source tarball, and run "./strip-hsieh.sh <version>" to produce the
 # "-exhsieh" tarball.
 Source0:   libmemcached-%{version}-exhsieh.tar.gz
+
+# http://lists.libmemcached.org/pipermail/libmemcached-discuss/2011-October/002292.html
+Source1:   nohsieh.cc
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: cyrus-sasl-devel
@@ -60,8 +63,11 @@ you will need to install %{name}-devel.
 %prep
 %setup -q
 
-%{__mkdir} examples
-%{__cp} -p tests/*.{cc,cpp,h} examples/
+mkdir examples
+cp -p tests/*.{cc,cpp,h} examples/
+
+# Temporary workaround for mandatory file
+cp %{SOURCE1} libhashkit/hsieh.cc
 
 
 %build
@@ -71,12 +77,12 @@ you will need to install %{name}-devel.
    --with-memcached=false
 %endif
 
-%{__make} %{_smp_mflags}
+make %{_smp_mflags}
 
 
 %install
-%{__rm} -rf %{buildroot}
-%{__make} install  DESTDIR="%{buildroot}" AM_INSTALL_PROGRAM_FLAGS=""
+rm -rf %{buildroot}
+make install  DESTDIR="%{buildroot}" AM_INSTALL_PROGRAM_FLAGS=""
 
 
 %check
@@ -84,14 +90,14 @@ you will need to install %{name}-devel.
 # test suite cannot run in mock (same port use for memcache servers on all arch)
 # All tests completed successfully
 # diff output.res output.cmp fails but result depend on server version
-%{__make} test
+make test
 %else
 echo 'Test suite disabled (missing "--with tests" option)'
 %endif
 
 
 %clean
-%{__rm} -rf %{buildroot}
+rm -rf %{buildroot}
 
 
 %post -p /sbin/ldconfig
@@ -129,6 +135,9 @@ echo 'Test suite disabled (missing "--with tests" option)'
 
 
 %changelog
+* Sun Oct 16 2011 Remi Collet <remi@fedoraproject.org> - 0.53-1
+- update to 0.53
+
 * Sat Sep 17 2011 Remi Collet <remi@fedoraproject.org> - 0.52-1
 - update to 0.52
 
