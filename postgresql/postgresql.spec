@@ -53,8 +53,8 @@
 Summary: PostgreSQL client programs
 Name: postgresql
 %global majorversion 9.0
-Version: 9.0.4
-Release: 3%{?dist}
+Version: 9.0.5
+Release: 1%{?dist}
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
 License: PostgreSQL
@@ -64,7 +64,7 @@ Url: http://www.postgresql.org/
 # This SRPM includes a copy of the previous major release, which is needed for
 # in-place upgrade of an old database.  In most cases it will not be critical
 # that this be kept up with the latest minor release of the previous series.
-%global prevversion 8.4.6
+%global prevversion 8.4.9
 %global prevmajorversion 8.4
 
 Source0: ftp://ftp.postgresql.org/pub/source/v%{version}/postgresql-%{version}.tar.bz2
@@ -85,7 +85,7 @@ Source15: postgresql-bashprofile
 Patch1: rpm-pgsql.patch
 Patch2: postgresql-logging.patch
 Patch3: postgresql-perl-rpath.patch
-Patch4: postgresql-gcc-workaround.patch
+#Patch4: postgresql-gcc-workaround.patch
 
 BuildRequires: perl(ExtUtils::MakeMaker) glibc-devel bison flex gawk
 BuildRequires: perl(ExtUtils::Embed), perl-devel
@@ -303,7 +303,7 @@ system, including regression tests and benchmarks.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
+#%patch4 -p1
 
 # We used to run autoconf here, but there's no longer any real need to,
 # since Postgres ships with a reasonably modern configure script.
@@ -541,7 +541,7 @@ mv $RPM_BUILD_ROOT%{_docdir}/pgsql/html doc
 rm -rf $RPM_BUILD_ROOT%{_docdir}/pgsql
 
 # remove files not to be packaged
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
+#rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 
 %find_lang ecpg-%{majorversion}
 cat ecpg-%{majorversion}.lang >devel.lst
@@ -729,6 +729,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libecpg.so.*
 %{_libdir}/libpgtypes.so.*
 %{_libdir}/libecpg_compat.so.*
+%{_libdir}/lib*.a
 
 %files server -f server.lst
 %defattr(-,root,root)
@@ -822,6 +823,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Mon Oct 17 2011 Timon <timosha@gmail.com> 9.0.5-1
+- add *.a files
+- 9.0.5
+- remove workaround patch
+
 * Fri Jun 10 2011 Tom Lane <tgl@redhat.com> 9.0.4-3
 - Work around gcc 4.6.0 bug (temporary backport from next upstream release)
 
