@@ -2,7 +2,7 @@
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   0.53
+Version:   1.0.2
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -14,9 +14,6 @@ URL:       http://libmemcached.org/
 # source tarball, and run "./strip-hsieh.sh <version>" to produce the
 # "-exhsieh" tarball.
 Source0:   libmemcached-%{version}-exhsieh.tar.gz
-
-# http://lists.libmemcached.org/pipermail/libmemcached-discuss/2011-October/002292.html
-Source1:   nohsieh.cc
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: cyrus-sasl-devel
@@ -65,9 +62,6 @@ you will need to install %{name}-devel.
 
 mkdir examples
 cp -p tests/*.{cc,cpp,h} examples/
-
-# Temporary workaround for mandatory file
-cp %{SOURCE1} libhashkit/hsieh.cc
 
 
 %build
@@ -122,7 +116,11 @@ rm -rf %{buildroot}
 %defattr (-,root,root,-) 
 %doc examples
 %{_includedir}/libmemcached
+%{_includedir}/libmemcached-1.0
 %{_includedir}/libhashkit
+%{_includedir}/libhashkit-1.0
+%{_includedir}/libmemcachedprotocol-0.0
+%{_includedir}/libmemcachedutil-1.0
 %{_libdir}/libhashkit.so
 %{_libdir}/libmemcached.so
 %{_libdir}/libmemcachedprotocol.so
@@ -135,6 +133,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Oct 27 2011 Remi Collet <remi@fedoraproject.org> - 1.0.2-1
+- update to 1.0.2
+
 * Sun Oct 16 2011 Remi Collet <remi@fedoraproject.org> - 0.53-1
 - update to 0.53
 
