@@ -306,7 +306,7 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 %{__install} -Dp -m0644 src/collectd.conf %{buildroot}%{_sysconfdir}/collectd.conf
 %{__install} -Dp -m0755 contrib/fedora/init.d-collectd %{buildroot}%{_initrddir}/collectd
 
-%{__install} -d -m0755 %{buildroot}%{_localstatedir}/lib/collectd/
+%{__install} -d -m0755 %{buildroot}%{_localstatedir}/lib/collectd/rrd
 %{__install} -d -m0755 %{buildroot}/%{_datadir}/collectd/collection3/
 %{__install} -d -m0755 %{buildroot}/%{_sysconfdir}/httpd/conf.d/
 
@@ -357,6 +357,13 @@ do
 LoadPlugin $p
 EOF
 done
+%{__cat} >> %{buildroot}/etc/collectd.d/rrdtool.conf <<EOF
+<Plugin rrdtool>
+       DataDir "/var/lib/collectd/rrd"
+       CacheTimeout 120
+       CacheFlush   900
+</Plugin>
+EOF
 
 
 # *.la files shouldn't be distributed.
@@ -602,6 +609,7 @@ fi
 * Mon Nov 28 2011 Alan Pevec <apevec@redhat.com> 4.10.4-1
 - new upstream version 4.10.4
   http://mailman.verplant.org/pipermail/collectd/2011-October/004777.html
+- collectd-web config file DataDir value wrong rhbz#719809
 
 * Fri Jul 29 2011 Kevin Fenzi <kevin@scrye.com> - 4.10.3-8
 - Rebuild for new snmp again.
