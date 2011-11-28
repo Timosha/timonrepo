@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.10.3
-Release: 8%{?dist}
+Version: 4.10.4
+Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -10,7 +10,6 @@ Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
 Source1: collectd-httpd.conf
 Source2: collection.conf
 Patch1: %{name}-4.10.2-include-collectd.d.patch
-Patch2: %{name}-%{version}-iptc-check.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -182,7 +181,6 @@ This plugin collects information from virtualized guests.
 %prep
 %setup -q
 %patch1 -p1
-%patch2 -p0
 
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
@@ -601,8 +599,12 @@ fi
 %endif
 
 %changelog
+* Mon Nov 28 2011 Alan Pevec <apevec@redhat.com> 4.10.4-1
+- new upstream version 4.10.4
+  http://mailman.verplant.org/pipermail/collectd/2011-October/004777.html
+
 * Fri Jul 29 2011 Kevin Fenzi <kevin@scrye.com> - 4.10.3-8
-- Rebuild for new snmp again. 
+- Rebuild for new snmp again.
 
 * Thu Jul 21 2011 Petr Sabata <contyk@redhat.com> - 4.10.3-7
 - Perl mass rebuild
