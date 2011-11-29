@@ -186,7 +186,7 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
 
 %build
-%configure \
+%configure CFLAGS="%{optflags} -DLT_LAZY_OR_NOW='RTLD_LAZY|RTLD_GLOBAL'" \
     --disable-static \
     --disable-ascent \
     --disable-apple_sensors \
@@ -610,6 +610,7 @@ fi
 - new upstream version 4.10.4
   http://mailman.verplant.org/pipermail/collectd/2011-October/004777.html
 - collectd-web config file DataDir value wrong rhbz#719809
+- Python plugin doesn't work rhbz#739593
 
 * Fri Jul 29 2011 Kevin Fenzi <kevin@scrye.com> - 4.10.3-8
 - Rebuild for new snmp again.
