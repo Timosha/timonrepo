@@ -9,6 +9,7 @@ URL: http://collectd.org/
 Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
 Source1: collectd-httpd.conf
 Source2: collection.conf
+Source3: collectd.service
 Patch1: %{name}-4.10.2-include-collectd.d.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -39,6 +40,12 @@ BuildRequires: iptables-devel
 BuildRequires: liboping-devel
 BuildRequires: python-devel
 BuildRequires: libgcrypt-devel
+%if 0%{?fedora} >= 15
+Requires(post):   systemd-units
+Requires(preun):  systemd-units
+Requires(postun): systemd-units
+%endif
+
 
 %description
 collectd is a small daemon written in C for performance.  It reads various
@@ -304,7 +311,11 @@ sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 %{__make} install DESTDIR="%{buildroot}"
 
 %{__install} -Dp -m0644 src/collectd.conf %{buildroot}%{_sysconfdir}/collectd.conf
+%if 0%{?fedora} >= 15
+%{__install} -Dp -m0644 %{SOURCE3} %{buildroot}%{_unitdir}/collectd.service
+%else
 %{__install} -Dp -m0755 contrib/fedora/init.d-collectd %{buildroot}%{_initrddir}/collectd
+%endif
 
 %{__install} -d -m0755 %{buildroot}%{_localstatedir}/lib/collectd/rrd
 %{__install} -d -m0755 %{buildroot}/%{_datadir}/collectd/collection3/
@@ -371,18 +382,41 @@ rm -f %{buildroot}/%{_libdir}/{collectd/,}*.la
 
 
 %post
-/sbin/chkconfig --add collectd
+if [ $1 -eq 1 ] ; then
+    # Initial installation
+%if 0%{?fedora} >= 15
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+%else
+    /sbin/chkconfig --add collectd
+%endif
+fi
 
 
 %preun
 if [ $1 -eq 0 ]; then
+    # Package removal, not upgrade
+%if 0%{?fedora} >= 15
+    /bin/systemctl --no-reload disable collectd.service > /dev/null 2>&1 || :
+    /bin/systemctl stop collectd.service > /dev/null 2>&1 || :
+%else
     /sbin/service collectd stop &>/dev/null || :
     /sbin/chkconfig --del collectd
+%endif
 fi
 
 
 %postun
-/sbin/service collectd condrestart &>/dev/null || :
+%if 0%{?fedora} >= 15
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+%endif
+if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+%if 0%{?fedora} >= 15
+    /bin/systemctl try-restart collectd.service >/dev/null 2>&1 || :
+%else
+    /sbin/service collectd condrestart &>/dev/null || :
+%endif
+fi
 
 
 %clean
@@ -411,7 +445,11 @@ fi
 %exclude %{_sysconfdir}/collectd.d/sensors.conf
 %exclude %{_sysconfdir}/collectd.d/snmp.conf
 
+%if 0%{?fedora} >= 15
+%{_unitdir}/collectd.service
+%else
 %{_initrddir}/collectd
+%endif
 %{_bindir}/collectd-nagios
 %{_sbindir}/collectd
 %{_sbindir}/collectdmon
@@ -611,6 +649,7 @@ fi
   http://mailman.verplant.org/pipermail/collectd/2011-October/004777.html
 - collectd-web config file DataDir value wrong rhbz#719809
 - Python plugin doesn't work rhbz#739593
+- Add systemd service file. (thanks Paul P. Komkoff Jr) rhbz#754460
 
 * Fri Jul 29 2011 Kevin Fenzi <kevin@scrye.com> - 4.10.3-8
 - Rebuild for new snmp again.
