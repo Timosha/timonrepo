@@ -1,7 +1,7 @@
---- collectd-4.10.0/src/collectd.conf.in	2010-05-01 11:15:45.000000000 +0200
-+++ collectd-4.10.0/src/collectd.conf.in	2010-09-19 15:00:15.893887909 +0200
-@@ -116,7 +116,7 @@
- #@BUILD_PLUGIN_PYTHON_TRUE@LoadPlugin python
+--- collectd-4.10.4/src/collectd.conf.in	2011-10-14 22:46:13.000000000 +0200
++++ collectd-4.10.4/src/collectd.conf.in	2011-11-29 02:53:03.975913077 +0100
+@@ -120,7 +120,7 @@
+ #@BUILD_PLUGIN_PYTHON_TRUE@</LoadPlugin>
  #@BUILD_PLUGIN_ROUTEROS_TRUE@LoadPlugin routeros
  #@BUILD_PLUGIN_RRDCACHED_TRUE@LoadPlugin rrdcached
 -@LOAD_PLUGIN_RRDTOOL@LoadPlugin rrdtool
@@ -9,7 +9,7 @@
  #@BUILD_PLUGIN_SENSORS_TRUE@LoadPlugin sensors
  #@BUILD_PLUGIN_SERIAL_TRUE@LoadPlugin serial
  #@BUILD_PLUGIN_SNMP_TRUE@LoadPlugin snmp
-@@ -758,6 +758,7 @@
+@@ -762,6 +762,7 @@
  #	CreateFiles true
  #	CollectStatistics true
  #</Plugin>

@@ -10,7 +10,7 @@ Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
 Source1: collectd-httpd.conf
 Source2: collection.conf
 Source3: collectd.service
-Patch1: %{name}-4.10.2-include-collectd.d.patch
+Patch1: %{name}-%{version}-include-collectd.d.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
