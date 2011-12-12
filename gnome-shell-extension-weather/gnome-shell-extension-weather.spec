@@ -1,11 +1,11 @@
-%global git 9b55721
+%global git 2a8a9eb
 #%global uuid weather@simon04
 %global uuid weather@gnome-shell-extensions.gnome.org
 %global github simon04-gnome-shell-extension-weather
 
 Name:           gnome-shell-extension-weather
 Version:        0
-Release:        0.1.git%{git}%{?dist}
+Release:        0.2.git%{git}%{?dist}
 Summary:        A gnome-shell extension to show current weather and forecast
 
 Group:          User Interface/Desktops
@@ -56,7 +56,10 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 
 
 %changelog
+* Thu Dec 12 2011 Timon <timosha@gmail.com> 0-0.2.git2a8a9eb
+- Some updates from git
+
 * Thu Nov 03 2011 Timon <timosha@gmail.com> 0-0.1.git9b55721
 - Initial package for Fedora
-- Using spec of Fabian Affolter as a template
+- Using spec from Fabian Affolter as a template
 
