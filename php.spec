@@ -36,8 +36,8 @@
 
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
-Version: 5.3.8
-Release: 3%{?dist}
+Version: 5.3.9
+Release: 1%{?dist}
 License: PHP
 Group: Development/Languages
 URL: http://www.php.net/
@@ -52,7 +52,7 @@ Source6: php-fpm.init
 Source7: php-fpm.logrotate
 
 # Build fixes
-Patch1: php-5.3.7-gnusrc.patch
+Patch1: php-5.3.9-gnusrc.patch
 Patch2: php-5.3.0-install.patch
 Patch3: php-5.2.4-norpath.patch
 Patch5: php-5.2.0-includedir.patch
@@ -60,10 +60,9 @@ Patch6: php-5.2.4-embed.patch
 Patch7: php-5.3.0-recode.patch
 # from http://svn.php.net/viewvc?view=revision&revision=311042
 # and  http://svn.php.net/viewvc?view=revision&revision=311908
-Patch8: php-5.3.8-aconf259.patch
-# from http://svn.php.net/viewvc?view=revision&revision=316281
-# + fix harcoded mysql.sock path
-Patch9: php-5.3.8-mysqlnd.patch
+Patch8: php-5.3.9-aconf259.patch
+# fix harcoded mysql.sock path
+Patch9: php-5.3.9-mysqlnd.patch
 
 # Fixes for extension modules
 Patch20: php-4.3.11-shutdown.patch
@@ -75,8 +74,6 @@ Patch41: php-5.3.0-easter.patch
 Patch42: php-5.3.1-systzdata-v7.patch
 # See http://bugs.php.net/53436
 Patch43: php-5.3.4-phpize.patch
-# http://svn.php.net/viewvc?view=revision&revision=317183
-Patch44: php-5.3.8-isa.patch
 
 # Fixes for tests
 Patch61: php-5.0.4-tests-wddx.patch
@@ -563,7 +560,6 @@ support for using the enchant library to PHP.
 %patch41 -p1 -b .easter
 %patch42 -p1 -b .systzdata
 %patch43 -p0 -b .headers
-%patch44 -p4 -b .isa
 
 %patch61 -p1 -b .tests-wddx
 
@@ -1058,9 +1054,10 @@ fi
 %{_initrddir}/php-fpm
 %dir %{_sysconfdir}/php-fpm.d
 # log owned by apache for log
-%attr(770,apache,apache) %dir %{_localstatedir}/log/php-fpm
+%attr(770,apache,root) %dir %{_localstatedir}/log/php-fpm
 %dir %{_localstatedir}/run/php-fpm
 %{_mandir}/man8/php-fpm.8*
+%{_datadir}/fpm/status.html
 %endif
 
 %files devel
@@ -1105,6 +1102,12 @@ fi
 
 
 %changelog
+* Wed Jan 11 2012 Remi Collet <remi@fedoraproject.org> 5.3.9-1
+- update to 5.3.9
+  http://www.php.net/ChangeLog-5.php#5.3.9
+- fix owner of /var/log/php-fpm (bug #773077)
+- add max_input_vars, max_file_uploads, zend.enable_gc to php.ini
+
 * Wed Sep 28 2011 Remi Collet <remi@fedoraproject.org> 5.3.8-3
 - revert is_a() to php <= 5.3.6 behavior (from upstream)
   with new option (allow_string) for new behavior
