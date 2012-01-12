@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.10.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -644,6 +644,9 @@ fi
 %endif
 
 %changelog
+* Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.10.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
 * Mon Nov 28 2011 Alan Pevec <apevec@redhat.com> 4.10.4-1
 - new upstream version 4.10.4
   http://mailman.verplant.org/pipermail/collectd/2011-October/004777.html
