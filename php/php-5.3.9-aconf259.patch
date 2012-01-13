@@ -44,7 +44,7 @@ diff -up php-5.3.8/configure.in.aconf259 php-5.3.8/configure.in
 --- php-5.3.8/configure.in.aconf259	2011-09-12 17:42:17.008672708 +0200
 +++ php-5.3.8/configure.in	2011-09-12 17:42:17.017672713 +0200
 @@ -1,28 +1,6 @@
- ## $Id: configure.in 315343 2011-08-23 08:56:29Z johannes $ -*- autoconf -*-
+ ## $Id: configure.in 322014 2012-01-10 11:21:57Z johannes $ -*- autoconf -*-
  dnl ## Process this file with autoconf to produce a configure script.
  
 -divert(1)

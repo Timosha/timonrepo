@@ -36,8 +36,8 @@
 
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
-Version: 5.3.8
-Release: 3%{?dist}.1
+Version: 5.3.9
+Release: 1%{?dist}
 License: PHP
 Group: Development/Languages
 URL: http://www.php.net/
@@ -52,7 +52,6 @@ Source6: php-fpm.init
 Source7: php-fpm.logrotate
 
 # Build fixes
-Patch1: php-5.3.7-gnusrc.patch
 Patch2: php-5.3.0-install.patch
 Patch3: php-5.2.4-norpath.patch
 Patch5: php-5.2.0-includedir.patch
@@ -60,10 +59,7 @@ Patch6: php-5.2.4-embed.patch
 Patch7: php-5.3.0-recode.patch
 # from http://svn.php.net/viewvc?view=revision&revision=311042
 # and  http://svn.php.net/viewvc?view=revision&revision=311908
-Patch8: php-5.3.8-aconf259.patch
-# from http://svn.php.net/viewvc?view=revision&revision=316281
-# + fix harcoded mysql.sock path
-Patch9: php-5.3.8-mysqlnd.patch
+Patch8: php-5.3.9-aconf259.patch
 
 # Fixes for extension modules
 Patch20: php-4.3.11-shutdown.patch
@@ -75,11 +71,12 @@ Patch41: php-5.3.0-easter.patch
 Patch42: php-5.3.1-systzdata-v7.patch
 # See http://bugs.php.net/53436
 Patch43: php-5.3.4-phpize.patch
-# http://svn.php.net/viewvc?view=revision&revision=317183
-Patch44: php-5.3.8-isa.patch
 
 # Fixes for tests
 Patch61: php-5.0.4-tests-wddx.patch
+
+# Fix fpm status.html install dir
+Patch62: php-5.3.9-fpm-status.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -557,14 +554,12 @@ support for using the enchant library to PHP.
 
 %prep
 %setup -q
-%patch1 -p1 -b .gnusrc
 %patch2 -p1 -b .install
 %patch3 -p1 -b .norpath
 %patch5 -p1 -b .includedir
 %patch6 -p1 -b .embed
 %patch7 -p1 -b .recode
 %patch8 -p1 -b .aconf26x
-%patch9 -p1 -b .mysqlnd
 
 %patch20 -p1 -b .shutdown
 %patch21 -p1 -b .macropen
@@ -573,9 +568,9 @@ support for using the enchant library to PHP.
 %patch41 -p1 -b .easter
 %patch42 -p1 -b .systzdata
 %patch43 -p0 -b .headers
-%patch44 -p4 -b .isa
 
 %patch61 -p1 -b .tests-wddx
+%patch62 -p0 -b .fpm-status
 
 # Prevent %%doc confusion over LICENSE files
 cp Zend/LICENSE Zend/ZEND_LICENSE
@@ -1070,6 +1065,8 @@ fi
 # log owned by apache for log
 %attr(770,apache,apache) %dir %{_localstatedir}/log/php-fpm
 %dir %{_localstatedir}/run/php-fpm
+%dir %{_datadir}/php-fpm
+%{_datadir}/php-fpm/status.html
 %{_mandir}/man8/php-fpm.8*
 %endif
 
@@ -1115,6 +1112,10 @@ fi
 
 
 %changelog
+* Wed Jan 11 2012 Timon <timosha@gmail.com> 5.3.9-1
+- backport pg_notify patch from trunk
+- 5.3.9
+
 * Wed Oct 12 2011 Peter Schiffer <pschiffe@redhat.com> - 5.3.8-3.1
 - rebuild with new gmp
 
