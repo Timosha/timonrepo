@@ -1,6 +1,6 @@
 Name:           lsyncd
 Version:        2.0.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        File change monitoring and synchronization daemon
 
 Group:          Applications/Internet
@@ -52,5 +52,8 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
 * Fri Apr 29 2011 Lubomir Rintel (GoodData) <lubo.rintel@gooddata.com> - 2.0.4-1
 - Initial packaging
