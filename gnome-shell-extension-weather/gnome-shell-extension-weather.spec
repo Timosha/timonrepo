@@ -1,11 +1,11 @@
-%global git 2a8a9eb
+%global git 7b9d2ed
 #%global uuid weather@simon04
 %global uuid weather@gnome-shell-extensions.gnome.org
 %global github simon04-gnome-shell-extension-weather
 
 Name:           gnome-shell-extension-weather
 Version:        0
-Release:        0.2.git%{git}%{?dist}
+Release:        0.3.git%{git}%{?dist}
 Summary:        A gnome-shell extension to show current weather and forecast
 
 Group:          User Interface/Desktops
@@ -34,6 +34,7 @@ current weather and forecast.
 %{__rm} -rf %{buildroot}
 #%{__make} install
 make DESTDIR=%{buildroot} install
+%{__install} -Dp -m 0755 weather-extension-configurator.py %{buildroot}%{_bindir}/weather-extension-configurator
 %find_lang %{name}
 
 #mkdir -p %{buildroot}%{_datadir}/gnome-shell/extensions/%{uuid}
@@ -53,9 +54,13 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %doc README.md
 %{_datadir}/gnome-shell/extensions/%{uuid}/
 %{_datadir}/glib-2.0/schemas/org.gnome.shell.extensions.weather.gschema.xml
-
+%{_bindir}/weather-extension-configurator
 
 %changelog
+* Thu Dec 12 2011 Timon <timosha@gmail.com> 0-0.3.git7b9d2ed
+- configurator
+- Some updates from git
+
 * Thu Dec 12 2011 Timon <timosha@gmail.com> 0-0.2.git2a8a9eb
 - Some updates from git
 
