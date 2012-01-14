@@ -10,7 +10,7 @@
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
 Version:	1.5.3
-Release:	2%{?dist}
+Release:	3%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
@@ -176,6 +176,9 @@ rm -rf %{buildroot}
 %doc postgis*.pdf
 
 %changelog
+* Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.5.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
 * Tue Oct 4 2011 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5.3-2
 - Provide postgis.jar instead of provide postgis-1.5.2.jar,
   per #714856
