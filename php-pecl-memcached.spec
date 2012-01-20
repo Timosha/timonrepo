@@ -1,15 +1,21 @@
 %{!?__pecl:     %{expand: %%global __pecl     %{_bindir}/pecl}}
+
 %global pecl_name memcached
+%global gitver    1736623
 
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
-Version:      1.0.2
-Release:      8%{?dist}
+Version:      2.0.0
+%if 0%{?gitver:1}
+Release:      0.1.git%{gitver}%{?dist}
+Source:       php-memcached-dev-php-memcached-v2.0.0b2-14-g%{gitver}.tar.gz
+%else
+Release:      11%{?dist}
+Source:       http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
+%endif
 License:      PHP
 Group:        Development/Languages
 URL:          http://pecl.php.net/package/%{pecl_name}
-
-Source:       http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 
 # 5.2.10 required to HAVE_JSON enabled
 BuildRequires: php-devel >= 5.2.10
@@ -51,6 +57,11 @@ It also provides a session handler (memcached).
 %prep 
 %setup -c -q
 
+%if 0%{?gitver:1}
+mv php-memcached-dev-php-memcached-%{gitver}/package.xml .
+mv php-memcached-dev-php-memcached-%{gitver} %{pecl_name}-%{version}
+%endif
+
 cat > %{pecl_name}.ini << 'EOF'
 ; Enable %{pecl_name} extension module
 extension=%{pecl_name}.so
@@ -67,7 +78,8 @@ EOF
 %build
 cd %{pecl_name}-%{version}
 phpize
-%configure --enable-memcached-igbinary
+%configure --enable-memcached-igbinary \
+           --enable-memcached-json
 make %{?_smp_mflags}
 
 
@@ -113,6 +125,9 @@ ln -s %{php_extdir}/igbinary.so modules/
 
 
 %changelog
+* Thu Jan 19 2012 Remi Collet <remi@fedoraproject.org> - 2.0.0-0.1.1736623
+- update to git snapshot (post 2.0.0b2) for php 5.4 build
+
 * Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.2-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
