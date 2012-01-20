@@ -2,15 +2,16 @@
 %{!?__pecl:		%{expand:	%%global __pecl	%{_bindir}/pecl}}
 %{!?php_extdir:	%{expand:	%%global php_extdir	%(php-config --extension-dir)}}
 
-%define	peclName	imagick
+%global peclName  imagick
+%global prever    RC1
 
 Summary:		Provides a wrapper to the ImageMagick library
 Name:		php-pecl-%peclName
-Version:		3.0.0
-Release:		11%{?dist}
+Version:		3.1.0
+Release:		0.1.%{prever}%{?dist}
 License:		PHP
 Group:		Development/Libraries
-Source0:		http://pecl.php.net/get/%peclName-%{version}.tgz
+Source0:		http://pecl.php.net/get/%peclName-%{version}%{?prever}.tgz
 Source1:		%peclName.ini
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root-%(%{__id_u} -n)
 URL:			http://pecl.php.net/package/%peclName
@@ -28,6 +29,13 @@ Provides:		php-pecl(%peclName) = %{version}
 
 Conflicts:	php-pecl-gmagick
 
+# RPM 4.8
+%{?filter_provides_in: %filter_provides_in %{php_extdir}/.*\.so$}
+%{?filter_setup}
+# RPM 4.9
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}%{php_extdir}/.*\\.so$
+
+
 %description
 %peclName is a native php extension to create and modify images using the
 ImageMagick API.
@@ -39,7 +47,7 @@ IMPORTANT: Version 2.x API is not compatible with earlier versions.
 %setup -qc
 
 %build
-cd %peclName-%{version}
+cd %peclName-%{version}%{?prever}
 phpize
 %{configure} --with-%peclName
 %{__make}
@@ -47,7 +55,7 @@ phpize
 %install
 rm -rf %{buildroot}
 
-cd %peclName-%{version}
+cd %peclName-%{version}%{?prever}
 
 %{__make} install \
 	INSTALL_ROOT=%{buildroot}
@@ -59,6 +67,14 @@ install -d %{buildroot}%{_sysconfdir}/php.d/
 install -m 0664 %{SOURCE1} %{buildroot}%{_sysconfdir}/php.d/%peclName.ini
 
 rm -rf %{buildroot}/%{_includedir}/php/ext/%peclName/
+
+%check
+# simple module load test
+pushd %peclName-%{version}%{?prever}
+php --no-php-ini \
+    --define extension_dir=%{buildroot}%{php_extdir} \
+    --define extension=%peclName.so \
+    --modules | grep %peclName
 
 %clean
 rm -rf %{buildroot}
@@ -77,12 +93,17 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%doc %peclName-%{version}/examples %peclName-%{version}/{CREDITS,TODO,INSTALL}
-%{_libdir}/php/modules/%peclName.so
+%doc %peclName-%{version}%{?prever}/examples %peclName-%{version}%{?prever}/{CREDITS,TODO,INSTALL}
+%{php_extdir}/%peclName.so
 %{pecl_xmldir}/%peclName.xml
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.d/%peclName.ini
 
 %changelog
+* Thu Jan 19 2012 Remi Collet <remi@fedoraproject.org> - 3.1.0-0.1.RC1
+- update to 3.1.0RC1 for php 5.4
+- add filter to avoid private-shared-object-provides
+- add minimal %%check
+
 * Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.0.0-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
