@@ -1,0 +1,11 @@
+--- cpp/src/utils/ev++0x.h.orig	2012-01-25 17:52:13.417474301 +0600
++++ cpp/src/utils/ev++0x.h	2012-01-25 17:52:38.082098908 +0600
+@@ -1,7 +1,7 @@
+ #ifndef EVPP0X_H
+ #define EVPP0X_H
+ 
+-#include <ev++.h>
++#include <libev/ev++.h>
+ namespace ev0x {
+ 
+ // Unfortunately we do not yet have typedef templates, so use plain old macros.

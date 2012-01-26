@@ -1,21 +1,29 @@
+#TODO: split into dklab_realplexor-cpp and dklab_realplexor-perl
+
+%global git b9f4277
+%global github DmitryKoterov-dklab_realplexor
+
 Summary:	Comet server which handles 1000000+ parallel browser connections
 Name:		dklab_realplexor
-Version:	1.40
-Release:	1%{?dist}
+Version:	1.41
+Release:	0.2.git%{git}%{?dist}
 Group:		Development/Libraries
 License:	GPLv2
-URL:		http://dklab.ru/lib/dklab_realplexor/
-# git clone http://github.com/DmitryKoterov/dklab_realplexor.git dklab_realplexor
-# GIT_DIR=dklab_realplexor/.git git archive --format=tar --prefix=dklab_realplexor-1.32/ 1e7a3236affeeeaf42068f166540f42b0c1708b9 | bzip2 > dklab_realplexor-1.32.tar.bz2
-Source0:	%{name}-%{version}.tar.bz2
+#Source0:	%{name}-%{version}.tar.bz2
+Source0:        https://github.com/DmitryKoterov/dklab_realplexor/tarball/master/%{github}-%{git}.tar.gz
 Source1:	%{name}.sysconfig
 
-Requires:	perl-EV
+Patch0:         dklab_realplexor-ev++0x.h.patch
+
+Requires:	perl-EV 
+Requires:       libev boost-system boost-regex boost-filesystem
 
 Requires(post):		/sbin/chkconfig
 Requires(preun):	/sbin/chkconfig
 Requires(preun):	/sbin/service
 Requires(postun):	/sbin/service
+
+BuildRequires: boost-devel libev-devel
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -32,27 +40,35 @@ Requires:	php
 PHP bindings for Dklab Realplexor
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q -n %{github}-%{git}
+%patch0 -p0
 
-#%build
+%build
+pushd cpp/src 
+g++ -std=gnu++0x dklab_realplexor.cpp \
+	-lpthread -lcrypt -lboost_filesystem -lboost_system -lboost_regex -lev \
+	-o ../../dklab_realplexor
+popd
 
 %install
 %{__rm} -rf %{buildroot}
 #%{__make} DESTDIR=%{buildroot} install
 #%{__install} -d -m 755 %{buildroot}%{sysconfig}
-%{__install} -D -m 644 dklab_realplexor.conf %{buildroot}%{_sysconfdir}/%{name}.conf
-%{__install} -D -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
-%{__install} -D -m 755 dklab_realplexor.init %{buildroot}%{_initddir}/%{name}
+%{__install} -Dp -m 644 dklab_realplexor.conf %{buildroot}%{_sysconfdir}/%{name}.conf
+%{__install} -Dp -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
+%{__install} -Dp -m 755 dklab_realplexor.init %{buildroot}%{_initddir}/%{name}
 
-%{__install} -D -d -m 755 %{buildroot}%{_datadir}/%{name}
+%{__install} -Dp -d -m 755 %{buildroot}%{_datadir}/%{name}
 %{__cp} -r Connection Storage Tie Realplexor dklab_realplexor.pl %{buildroot}%{_datadir}/%{name}
-%{__install} -D -m 755 dklab_realplexor.pl %{buildroot}%{_datadir}/%{name}/dklab_realplexor.pl
+%{__install} -Dp -m 755 dklab_realplexor.pl %{buildroot}%{_datadir}/%{name}/dklab_realplexor.pl
+#TODO: copy to bindir
+%{__install} -Dp -m 755 dklab_realplexor %{buildroot}%{_datadir}/%{name}/dklab_realplexor
 
-%{__install} -D -m 644 dklab_realplexor.html %{buildroot}%{_datadir}/%{name}/dklab_realplexor.html
-%{__install} -D -m 644 dklab_realplexor.js %{buildroot}%{_datadir}/%{name}/dklab_realplexor.js
-%{__install} -D -m 644 dklab_realplexor.htpasswd %{buildroot}%{_datadir}/%{name}/dklab_realplexor.htpasswd
+%{__install} -Dp -m 644 dklab_realplexor.html %{buildroot}%{_datadir}/%{name}/dklab_realplexor.html
+%{__install} -Dp -m 644 dklab_realplexor.js %{buildroot}%{_datadir}/%{name}/dklab_realplexor.js
+%{__install} -Dp -m 644 dklab_realplexor.htpasswd %{buildroot}%{_datadir}/%{name}/dklab_realplexor.htpasswd
 
-%{__install} -D -d -m 755 %{buildroot}%{_datadir}/php
+%{__install} -Dp -d -m 755 %{buildroot}%{_datadir}/php
 %{__cp} -r api/php/Dklab %{buildroot}%{_datadir}/php
 
 
@@ -92,6 +108,10 @@ fi
 %{_datadir}/php/Dklab/Realplexor.php
 
 %changelog
+* Thu Oct 10 2011 Timon <timosha@gmail.com> - 1.41-0.2.gitb9f4277
+- git version
+- cpp version of server
+
 * Thu Oct 10 2011 Timon <timosha@gmail.com> - 1.40-1
 - new version
 
