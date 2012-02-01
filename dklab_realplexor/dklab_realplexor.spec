@@ -6,7 +6,7 @@
 Summary:	Comet server which handles 1000000+ parallel browser connections
 Name:		dklab_realplexor
 Version:	1.41
-Release:	0.2.git%{git}%{?dist}
+Release:	0.3.git%{git}%{?dist}
 Group:		Development/Libraries
 License:	GPLv2
 #Source0:	%{name}-%{version}.tar.bz2
@@ -60,6 +60,7 @@ popd
 
 %{__install} -Dp -d -m 755 %{buildroot}%{_datadir}/%{name}
 %{__cp} -r Connection Storage Tie Realplexor dklab_realplexor.pl %{buildroot}%{_datadir}/%{name}
+%{__install} -Dp -m 644 dklab_realplexor.conf %{buildroot}%{_datadir}/%{name}/dklab_realplexor.conf
 %{__install} -Dp -m 755 dklab_realplexor.pl %{buildroot}%{_datadir}/%{name}/dklab_realplexor.pl
 #TODO: copy to bindir
 %{__install} -Dp -m 755 dklab_realplexor %{buildroot}%{_datadir}/%{name}/dklab_realplexor
@@ -108,7 +109,10 @@ fi
 %{_datadir}/php/Dklab/Realplexor.php
 
 %changelog
-* Thu Oct 10 2011 Timon <timosha@gmail.com> - 1.41-0.2.gitb9f4277
+* Thu Jan 26 2012 Timon <timosha@gmail.com> - 1.41-0.3.gitb9f4277
+- default config
+
+* Wed Jan 25 2012 Timon <timosha@gmail.com> - 1.41-0.2.gitb9f4277
 - git version
 - cpp version of server
 
