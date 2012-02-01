@@ -7,8 +7,8 @@
 %endif
 
 Name:             redis
-Version:          2.2.5
-Release:          2%{?dist}
+Version:          2.2.11
+Release:          1%{?dist}
 Summary:          A persistent key-value database
 
 Group:            Applications/Databases
@@ -108,6 +108,9 @@ fi
 %{_initrddir}/%{name}
 
 %changelog
+* Mon Jun 27 2011 Timon <timosha@gmail.com> - 2.2.11-1
+- Update to redis 2.2.11
+
 * Fri May 06 2011 Dan Horák <dan[at]danny.cz> - 2.2.5-2
 - google-perftools exists only on selected architectures
 
