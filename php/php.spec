@@ -36,7 +36,7 @@
 
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
-Version: 5.3.9
+Version: 5.3.10
 Release: 1%{?dist}
 License: PHP
 Group: Development/Languages
@@ -59,7 +59,7 @@ Patch6: php-5.2.4-embed.patch
 Patch7: php-5.3.0-recode.patch
 # from http://svn.php.net/viewvc?view=revision&revision=311042
 # and  http://svn.php.net/viewvc?view=revision&revision=311908
-Patch8: php-5.3.9-aconf259.patch
+Patch8: php-5.3.10-aconf259.patch
 
 # Fixes for extension modules
 Patch20: php-4.3.11-shutdown.patch
@@ -1112,6 +1112,10 @@ fi
 
 
 %changelog
+* Wed Jan 11 2012 Timon <timosha@gmail.com> 5.3.10-1
+- 5.3.10
+- fix aconf patch
+
 * Wed Jan 11 2012 Timon <timosha@gmail.com> 5.3.9-1
 - backport pg_notify patch from trunk
 - 5.3.9
