@@ -1,24 +1,28 @@
-%{!?javabuild:%define	javabuild 0}
+%{!?javabuild:%define	javabuild 1}
 %{!?utils:%define	utils 1}
 %{!?gcj_support:%define	gcj_support 1}
 
 %global majorversion 1.5
 
+%global pg_version_minimum 8.2
+%global pg_version_built  %(if [ -x %{_bindir}/pg_config ]; then %{_bindir}/pg_config --version | /bin/sed 's,^PostgreSQL *,,gi'; else echo %{pg_version_minimum}; fi)
+
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
-Version:	1.5.2
-Release:	1%{?dist}
+Version:	1.5.3
+Release:	3%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
 Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
 Source2:	http://www.postgis.org/download/%{name}-%{version}.pdf
 Source4:	filter-requires-perl-Pg.sh
+Patch0:		postgis-1.5.1-pgsql9.patch
 URL:		http://postgis.refractions.net/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:	postgresql-devel >= 8.2, proj-devel, geos-devel >= 3.1.1, byacc, proj-devel, flex, sinjdoc, java, java-devel, ant
+BuildRequires:	postgresql-devel >= %{pg_version_minimum}, proj-devel, geos-devel >= 3.1.1, byacc, proj-devel, flex, sinjdoc, java, java-devel, ant
 BuildRequires:	gtk2-devel, libxml2-devel
-Requires:	postgresql >= 8.2, geos >= 3.1.1, proj
+Requires:	postgresql >= %{pg_version_built}, geos >= 3.1.1, proj
 
 %description
 PostGIS adds support for geographic objects to the PostgreSQL object-relational
@@ -67,6 +71,7 @@ The postgis-utils package provides the utilities for PostGIS.
 
 %prep
 %setup -q -n %{name}-%{version}
+%patch0 -p1 -b .pgsql9
 # Copy .pdf file to top directory before installing.
 cp -p %{SOURCE2} .
 
@@ -93,6 +98,7 @@ popd
 rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
 install -d %{buildroot}%{_libdir}/pgsql/
+install -d %{buildroot}%{_bindir}/
 install -d  %{buildroot}%{_datadir}/pgsql/contrib/
 install -m 644 *.sql %{buildroot}%{_datadir}/pgsql/contrib/
 install -m 755 loader/shp2pgsql loader/shp2pgsql-gui %{buildroot}%{_bindir}/
@@ -106,7 +112,7 @@ fi
 
 %if %javabuild
 install -d %{buildroot}%{_javadir}
-install -m 755 java/jdbc/%{name}-%{version}.jar %{buildroot}%{_javadir}
+install -m 755 java/jdbc/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
 %if %{gcj_support}
 aot-compile-rpm
 %endif
@@ -140,7 +146,7 @@ rm -rf %{buildroot}
 %files jdbc
 %defattr(-,root,root)
 %doc java/jdbc/COPYING_LGPL java/jdbc/README
-%attr(755,root,root) %{_javadir}/%{name}-%{version}.jar
+%attr(755,root,root) %{_javadir}/%{name}.jar
 %if %{gcj_support}
 %dir %{_libdir}/gcj/%{name}
 %{_libdir}/gcj/%{name}/*.jar.so
@@ -170,9 +176,22 @@ rm -rf %{buildroot}
 %doc postgis*.pdf
 
 %changelog
-* Mon Feb 28 2011 Timon <timosha@gmail.com> - 1.5.2-1
-- update to 1.5.2
-- disbale javabuild
+* Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.5.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
+* Tue Oct 4 2011 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5.3-2
+- Provide postgis.jar instead of provide postgis-1.5.2.jar,
+  per #714856
+
+* Tue Oct 4 2011 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5.3-1
+- Update to 1.5.3
+
+* Tue Apr 19 2011 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5.2-1
+- Update to 1.5.2
+
+* Sun Apr 03 2011 Nils Philippsen <nils@redhat.com> - 1.5.1-3
+- cope with PostgreSQL 9.0 build environment
+- require pgsql version used for building
 
 * Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.5.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
