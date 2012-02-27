@@ -1,5 +1,5 @@
-%global VER 6.7.1
-%global Patchlevel 9
+%global VER 6.7.5
+%global Patchlevel 6
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
@@ -9,7 +9,6 @@ Group:		Applications/Multimedia
 License:		ImageMagick
 Url:			http://www.imagemagick.org/
 Source0:		ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.xz
-Patch1:		ImageMagick-6.4.0-multilib.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
@@ -127,7 +126,6 @@ however.
 
 %prep
 %setup -q -n %{name}-%{VER}-%{Patchlevel}
-%patch1 -p1 -b .multilib
 sed -i 's/libltdl.la/libltdl.so/g' configure
 iconv -f ISO-8859-1 -t UTF-8 README.txt > README.txt.tmp
 touch -r README.txt README.txt.tmp
@@ -162,30 +160,30 @@ make
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
-cp -a www/source $RPM_BUILD_ROOT%{_datadir}/doc/%{name}-%{VER}
+make install DESTDIR=%{buildroot} INSTALL="install -p"
+cp -a www/source %{buildroot}%{_datadir}/doc/%{name}-%{VER}
 # Delete *ONLY* _libdir/*.la files! .la files used internally to handle plugins - BUG#185237!!!
-rm $RPM_BUILD_ROOT%{_libdir}/*.la
+rm %{buildroot}%{_libdir}/*.la
 
 # fix weird perl Magick.so permissions
-chmod 755 $RPM_BUILD_ROOT%{perl_vendorarch}/auto/Image/Magick/Magick.so
+chmod 755 %{buildroot}%{perl_vendorarch}/auto/Image/Magick/Magick.so
 
 # perlmagick: fix perl path of demo files
 %{__perl} -MExtUtils::MakeMaker -e 'MY->fixin(@ARGV)' PerlMagick/demo/*.pl
 
 # perlmagick: cleanup various perl tempfiles from the build which get installed
-find $RPM_BUILD_ROOT -name "*.bs" |xargs rm -f
-find $RPM_BUILD_ROOT -name ".packlist" |xargs rm -f
-find $RPM_BUILD_ROOT -name "perllocal.pod" |xargs rm -f
+find %{buildroot} -name "*.bs" |xargs rm -f
+find %{buildroot} -name ".packlist" |xargs rm -f
+find %{buildroot} -name "perllocal.pod" |xargs rm -f
 
 # perlmagick: build files list
 echo "%defattr(-,root,root,-)" > perl-pkg-files
-find $RPM_BUILD_ROOT/%{_libdir}/perl* -type f -print \
-        | sed "s@^$RPM_BUILD_ROOT@@g" > perl-pkg-files 
-find $RPM_BUILD_ROOT%{perl_vendorarch} -type d -print \
-        | sed "s@^$RPM_BUILD_ROOT@%dir @g" \
+find %{buildroot}/%{_libdir}/perl* -type f -print \
+        | sed "s@^%{buildroot}@@g" > perl-pkg-files 
+find %{buildroot}%{perl_vendorarch} -type d -print \
+        | sed "s@^%{buildroot}@%dir @g" \
         | grep -v '^%dir %{perl_vendorarch}$' \
         | grep -v '/auto$' >> perl-pkg-files 
 if [ -z perl-pkg-files ] ; then
@@ -200,10 +198,10 @@ fi
 %define wordsize 32
 %endif
 
-mv $RPM_BUILD_ROOT%{_includedir}/%{name}/magick/magick-config.h \
-   $RPM_BUILD_ROOT%{_includedir}/%{name}/magick/magick-config-%{wordsize}.h
+mv %{buildroot}%{_includedir}/%{name}/magick/magick-config.h \
+   %{buildroot}%{_includedir}/%{name}/magick/magick-config-%{wordsize}.h
 
-cat >$RPM_BUILD_ROOT%{_includedir}/%{name}/magick/magick-config.h <<EOF
+cat >%{buildroot}%{_includedir}/%{name}/magick/magick-config.h <<EOF
 #ifndef IMAGEMAGICK_MULTILIB
 #define IMAGEMAGICK_MULTILIB
 
@@ -223,8 +221,11 @@ EOF
 # Fonts must be packaged separately. It does nothave matter and demos work without it.
 rm PerlMagick/demo/Generic.ttf
 
+# From version around 6.7.5-6 docs go to unversioned dir. Fixing
+mv %{buildroot}/%{_datadir}/doc/%{name} %{buildroot}/%{_datadir}/doc/%{name}-%{VER}
+
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 
 %post -p /sbin/ldconfig
@@ -240,8 +241,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc QuickStart.txt ChangeLog Platforms.txt
 %doc README.txt LICENSE NOTICE AUTHORS.txt NEWS.txt
-%{_libdir}/libMagickCore.so.4*
-%{_libdir}/libMagickWand.so.4*
+%{_libdir}/libMagickCore.so.5*
+%{_libdir}/libMagickWand.so.5*
 %{_bindir}/[a-z]*
 %{_libdir}/%{name}-%{VER}
 %{_datadir}/%{name}-%{VER}
@@ -283,7 +284,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc Magick++/AUTHORS Magick++/ChangeLog Magick++/NEWS Magick++/README
 %doc www/Magick++/COPYING
-%{_libdir}/libMagick++.so.4*
+%{_libdir}/libMagick++.so.5*
 
 %files c++-devel
 %defattr(-,root,root,-)
@@ -303,6 +304,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sat Feb 25 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 6.7.5.6-1
+- Update by request https://bugzilla.redhat.com/show_bug.cgi?id=755827#c8
+- Delete multilib patch as it should be in main sources.
+- Replace $RPM_BUILD_ROOT by %%buildroot
+
 * Mon Aug 22 2011 Pavel Alexeev <Pahan@Hubbitus.info> - 6.7.1.9-1
 - New version 6.7.1-9.
 
