@@ -3,7 +3,7 @@
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
-Release:		1%{?dist}
+Release:		3%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
@@ -302,12 +302,17 @@ rm -rf %{buildroot}
 %{_mandir}/man3/*
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
-
 %changelog
 * Sat Feb 25 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 6.7.5.6-1
 - Update by request https://bugzilla.redhat.com/show_bug.cgi?id=755827#c8
 - Delete multilib patch as it should be in main sources.
 - Replace $RPM_BUILD_ROOT by %%buildroot
+
+* Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 6.7.1.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
+* Mon Dec 05 2011 Adam Jackson <ajax@redhat.com> 6.7.1.9-2
+- Rebuild for new libpng
 
 * Mon Aug 22 2011 Pavel Alexeev <Pahan@Hubbitus.info> - 6.7.1.9-1
 - New version 6.7.1-9.
