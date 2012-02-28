@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 4.10.7
-Release: 3%{?dist}
+Version: 5.0.4
+Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -10,7 +10,7 @@ Source: http://collectd.org/files/%{name}-%{version}.tar.bz2
 Source1: collectd-httpd.conf
 Source2: collection.conf
 Source3: collectd.service
-Patch1: %{name}-4.10.4-include-collectd.d.patch
+Patch1: %{name}-include-collectd.d.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -187,7 +187,7 @@ This plugin collects information from virtualized guests.
 
 %prep
 %setup -q
-%patch1 -p1
+%patch1
 
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
@@ -451,6 +451,7 @@ fi
 %{_initrddir}/collectd
 %endif
 %{_bindir}/collectd-nagios
+%{_bindir}/collectdctl
 %{_sbindir}/collectd
 %{_sbindir}/collectdmon
 %dir %{_localstatedir}/lib/collectd/
@@ -493,9 +494,11 @@ fi
 %{_libdir}/collectd/syslog.so
 %{_libdir}/collectd/tail.so
 %{_libdir}/collectd/target_scale.so
+%{_libdir}/collectd/target_v5upgrade.so
 %{_libdir}/collectd/tcpconns.so
 %{_libdir}/collectd/teamspeak2.so
 %{_libdir}/collectd/thermal.so
+%{_libdir}/collectd/threshold.so
 %{_libdir}/collectd/unixsock.so
 %{_libdir}/collectd/users.so
 %{_libdir}/collectd/uuid.so
@@ -532,12 +535,14 @@ fi
 
 %doc AUTHORS ChangeLog COPYING INSTALL README
 %doc %{_mandir}/man1/collectd.1*
+%doc %{_mandir}/man1/collectdctl.1*
 %doc %{_mandir}/man1/collectd-nagios.1*
 %doc %{_mandir}/man1/collectdmon.1*
 %doc %{_mandir}/man5/collectd.conf.5*
 %doc %{_mandir}/man5/collectd-exec.5*
 %doc %{_mandir}/man5/collectd-java.5*
 %doc %{_mandir}/man5/collectd-python.5*
+%doc %{_mandir}/man5/collectd-threshold.5*
 %doc %{_mandir}/man5/collectd-unixsock.5*
 %doc %{_mandir}/man5/types.db.5*
 
@@ -644,6 +649,9 @@ fi
 %endif
 
 %changelog
+* Mon Sep 17 2012 Alan Pevec <apevec@redhat.com> 5.0.4-1
+- New upstream release, version bump to 5 (#743894) from Andrew Elwell
+
 * Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.10.7-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
