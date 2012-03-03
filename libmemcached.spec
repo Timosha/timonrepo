@@ -2,8 +2,8 @@
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   1.0.2
-Release:   3%{?dist}
+Version:   1.0.4
+Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -29,19 +29,25 @@ BuildRequires: libevent-devel
 
 
 %description
-libmemcached is a C client library to the memcached server
-(http://danga.com/memcached). It has been designed to be light on memory
+libmemcached is a C/C++ client library and tools for the memcached server
+(http://memcached.org/). It has been designed to be light on memory
 usage, and provide full access to server side methods.
 
 It also implements several command line tools:
 
-memcat - Copy the value of a key to standard output.
-memflush - Flush the contents of your servers.
-memrm - Remove a key(s) from the server.
-memstat - Dump the stats of your servers to standard output.
-memslap - Generate testing loads on a memcached cluster.
-memcp - Copy files to memcached servers.
-memerror - Creates human readable messages from libmemcached error codes.
+memcapable  Checking a Memcached server capibilities and compatibility
+memcat      Copy the value of a key to standard output
+memcp       Copy data to a server
+memdump     Dumping your server
+memerror    Translate an error code to a string
+memexist    Check for the existance of a key
+memflush    Flush the contents of your servers
+memparse    Parse an option string
+memping     Test to see if a server is available.
+memrm       Remove a key(s) from the server
+memslap     Generate testing loads on a memcached cluster
+memstat     Dump the stats of your servers to standard output
+memtouch    Touches a key
 
 
 %package devel
@@ -61,7 +67,7 @@ you will need to install %{name}-devel.
 %setup -q
 
 mkdir examples
-cp -p tests/*.{cc,cpp,h} examples/
+cp -p tests/*.{cc,h} examples/
 
 
 %build
@@ -106,7 +112,7 @@ rm -rf %{buildroot}
 %{_bindir}/mem*
 %exclude %{_libdir}/lib*.la
 %{_libdir}/libhashkit.so.1*
-%{_libdir}/libmemcached.so.8*
+%{_libdir}/libmemcached.so.9*
 %{_libdir}/libmemcachedprotocol.so.0*
 %{_libdir}/libmemcachedutil.so.2*
 %{_mandir}/man1/mem*
@@ -133,6 +139,11 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat Mar 03 2012 Remi Collet <remi@fedoraproject.org> - 1.0.4-1
+- update to 1.0.4
+- soname bump to libmemcached.so.9
+- update description
+
 * Tue Feb 28 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.2-3
 - Rebuilt for c++ ABI breakage
 
