@@ -5,12 +5,12 @@
 
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
-Version:      2.0.0
+Version:      2.0.1
 %if 0%{?gitver:1}
 Release:      0.1.git%{gitver}%{?dist}
 Source:       php-memcached-dev-php-memcached-v2.0.0b2-14-g%{gitver}.tar.gz
 %else
-Release:      1%{?dist}
+Release:      2%{?dist}
 Source:       http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 %endif
 # memcached is PHP, FastLZ is MIT
@@ -63,9 +63,6 @@ It also provides a session handler (memcached).
 mv php-memcached-dev-php-memcached-%{gitver}/package.xml .
 mv php-memcached-dev-php-memcached-%{gitver} %{pecl_name}-%{version}
 %endif
-
-# https://bugs.php.net/61261
-sed -i -e '/PHP_MEMCACHED_VERSION/s/2.0.0-dev/%{version}/' %{pecl_name}-%{version}/php_memcached.h
 
 # Chech version as upstream often forget to update this
 extver=$(sed -n '/#define PHP_MEMCACHED_VERSION/{s/.* "//;s/".*$//;p}' %{pecl_name}-%{version}/php_memcached.h)
@@ -140,6 +137,9 @@ ln -s %{php_extdir}/igbinary.so modules/
 
 
 %changelog
+* Sat Mar 03 2012  Remi Collet <remi@fedoraproject.org> - 2.0.1-1
+- update to 2.0.1
+
 * Sat Mar 03 2012  Remi Collet <remi@fedoraproject.org> - 2.0.0-1
 - update to 2.0.0
 
