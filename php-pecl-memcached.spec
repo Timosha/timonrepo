@@ -1,7 +1,7 @@
 %{!?__pecl:     %{expand: %%global __pecl     %{_bindir}/pecl}}
 
 %global pecl_name memcached
-%global gitver    1736623
+#global gitver    1736623
 
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
@@ -10,10 +10,11 @@ Version:      2.0.0
 Release:      0.1.git%{gitver}%{?dist}
 Source:       php-memcached-dev-php-memcached-v2.0.0b2-14-g%{gitver}.tar.gz
 %else
-Release:      11%{?dist}
+Release:      1%{?dist}
 Source:       http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 %endif
-License:      PHP
+# memcached is PHP, FastLZ is MIT
+License:      PHP and MIT
 Group:        Development/Languages
 URL:          http://pecl.php.net/package/%{pecl_name}
 
@@ -23,6 +24,7 @@ BuildRequires: php-pear
 BuildRequires: php-pecl-igbinary-devel
 BuildRequires: libmemcached-devel
 BuildRequires: zlib-devel
+BuildRequires: cyrus-sasl-devel
 
 Requires(post): %{__pecl}
 Requires(postun): %{__pecl}
@@ -62,6 +64,19 @@ mv php-memcached-dev-php-memcached-%{gitver}/package.xml .
 mv php-memcached-dev-php-memcached-%{gitver} %{pecl_name}-%{version}
 %endif
 
+# https://bugs.php.net/61261
+sed -i -e '/PHP_MEMCACHED_VERSION/s/2.0.0-dev/%{version}/' %{pecl_name}-%{version}/php_memcached.h
+
+# Chech version as upstream often forget to update this
+extver=$(sed -n '/#define PHP_MEMCACHED_VERSION/{s/.* "//;s/".*$//;p}' %{pecl_name}-%{version}/php_memcached.h)
+if test "x${extver}" != "x%{version}"; then
+   : Error: Upstream HTTP version is now ${extver}, expecting %{version}.
+   : Update the pdover macro and rebuild.
+   exit 1
+fi
+
+cp %{pecl_name}-%{version}/fastlz/LICENSE LICENSE-FastLZ
+
 cat > %{pecl_name}.ini << 'EOF'
 ; Enable %{pecl_name} extension module
 extension=%{pecl_name}.so
@@ -84,7 +99,6 @@ make %{?_smp_mflags}
 
 
 %install
-rm -rf %{buildroot}
 make install -C %{pecl_name}-%{version} INSTALL_ROOT=%{buildroot}
 
 # Drop in the bit of configuration
@@ -119,12 +133,16 @@ ln -s %{php_extdir}/igbinary.so modules/
 
 %files
 %doc %{pecl_name}-%{version}/{CREDITS,LICENSE,README.markdown,ChangeLog}
+%doc LICENSE-FastLZ
 %config(noreplace) %{_sysconfdir}/php.d/%{pecl_name}.ini
 %{php_extdir}/%{pecl_name}.so
 %{pecl_xmldir}/%{name}.xml
 
 
 %changelog
+* Sat Mar 03 2012  Remi Collet <remi@fedoraproject.org> - 2.0.0-1
+- update to 2.0.0
+
 * Thu Jan 19 2012 Remi Collet <remi@fedoraproject.org> - 2.0.0-0.1.1736623
 - update to git snapshot (post 2.0.0b2) for php 5.4 build
 
