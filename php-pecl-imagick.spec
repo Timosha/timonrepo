@@ -8,7 +8,7 @@
 Summary:		Provides a wrapper to the ImageMagick library
 Name:		php-pecl-%peclName
 Version:		3.1.0
-Release:		0.1.%{prever}%{?dist}
+Release:		0.2.%{prever}%{?dist}
 License:		PHP
 Group:		Development/Libraries
 Source0:		http://pecl.php.net/get/%peclName-%{version}%{?prever}.tgz
@@ -99,6 +99,9 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.d/%peclName.ini
 
 %changelog
+* Sun Mar 4 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 3.1.0-0.2.RC1
+- Rebuild to ImageMagick soname change.
+
 * Thu Jan 19 2012 Remi Collet <remi@fedoraproject.org> - 3.1.0-0.1.RC1
 - update to 3.1.0RC1 for php 5.4
 - add filter to avoid private-shared-object-provides
