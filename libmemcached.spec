@@ -2,7 +2,7 @@
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   1.0.4
+Version:   1.0.6
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -111,8 +111,8 @@ rm -rf %{buildroot}
 %doc AUTHORS COPYING README THANKS TODO ChangeLog
 %{_bindir}/mem*
 %exclude %{_libdir}/lib*.la
-%{_libdir}/libhashkit.so.1*
-%{_libdir}/libmemcached.so.9*
+%{_libdir}/libhashkit.so.2*
+%{_libdir}/libmemcached.so.10*
 %{_libdir}/libmemcachedprotocol.so.0*
 %{_libdir}/libmemcachedutil.so.2*
 %{_mandir}/man1/mem*
@@ -139,6 +139,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat Apr 21 2012 Remi Collet <remi@fedoraproject.org> - 1.0.6-1
+- update to 1.0.6
+- soname bump to libmemcached.so.10 and libhashkit.so.2
+
 * Sat Mar 03 2012 Remi Collet <remi@fedoraproject.org> - 1.0.4-1
 - update to 1.0.4
 - soname bump to libmemcached.so.9
