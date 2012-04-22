@@ -3,7 +3,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
 Version:   1.0.6
-Release:   1%{?dist}
+Release:   2%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -68,6 +68,9 @@ you will need to install %{name}-devel.
 
 mkdir examples
 cp -p tests/*.{cc,h} examples/
+
+# Temporary fix for SASL detection
+sed -i -e s/ax_cv_sasl/ac_enable_sasl/ configure
 
 
 %build
@@ -139,6 +142,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sun Apr 22 2012 Remi Collet <remi@fedoraproject.org> - 1.0.6-2
+- workaround for SASL detection
+
 * Sat Apr 21 2012 Remi Collet <remi@fedoraproject.org> - 1.0.6-1
 - update to 1.0.6
 - soname bump to libmemcached.so.10 and libhashkit.so.2
