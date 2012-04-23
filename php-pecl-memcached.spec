@@ -10,7 +10,7 @@ Version:      2.0.1
 Release:      0.1.git%{gitver}%{?dist}
 Source:       php-memcached-dev-php-memcached-v2.0.0b2-14-g%{gitver}.tar.gz
 %else
-Release:      2%{?dist}
+Release:      3%{?dist}
 Source:       http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 %endif
 # memcached is PHP, FastLZ is MIT
@@ -39,10 +39,10 @@ Provides:     php-pecl(%{pecl_name})%{?_isa} = %{version}-%{release}
 
 
 # RPM 4.8
-%{?filter_provides_in: %filter_provides_in %{php_extdir}/.*\.so$}
+%{?filter_provides_in: %filter_provides_in %{_libdir}/.*\.so$}
 %{?filter_setup}
 # RPM 4.9
-%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}%{php_extdir}/.*\\.so$
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}%{_libdir}/.*\\.so$
 
 
 %description
@@ -86,16 +86,31 @@ extension=%{pecl_name}.so
 ;session.save_path="localhost:11211"
 EOF
 
+cp -r %{pecl_name}-%{version} %{pecl_name}-%{version}-zts
+
 
 %build
 cd %{pecl_name}-%{version}
-phpize
+%{_bindir}/phpize
 %configure --enable-memcached-igbinary \
-           --enable-memcached-json
+           --enable-memcached-json \
+           --enable-memcached-sasl \
+           --with-php-config=%{_bindir}/php-config
 make %{?_smp_mflags}
+
+%if 0%{?__ztsphp:1}
+cd ../%{pecl_name}-%{version}-zts
+%{_bindir}/zts-phpize
+%configure --enable-memcached-igbinary \
+           --enable-memcached-json \
+           --enable-memcached-sasl \
+           --with-php-config=%{_bindir}/zts-php-config
+make %{?_smp_mflags}
+%endif
 
 
 %install
+# Install the NTS extension
 make install -C %{pecl_name}-%{version} INSTALL_ROOT=%{buildroot}
 
 # Drop in the bit of configuration
@@ -103,6 +118,12 @@ install -D -m 644 %{pecl_name}.ini %{buildroot}%{_sysconfdir}/php.d/%{pecl_name}
 
 # Install XML package description
 install -D -m 644 package.xml %{buildroot}%{pecl_xmldir}/%{name}.xml
+
+# Install the ZTS extension
+%if 0%{?__ztsphp:1}
+make install -C %{pecl_name}-%{version}-zts INSTALL_ROOT=%{buildroot}
+install -D -m 644 %{pecl_name}.ini %{buildroot}%{php_ztsinidir}/%{pecl_name}.ini
+%endif
 
 
 %post
@@ -127,6 +148,19 @@ ln -s %{php_extdir}/igbinary.so modules/
     -d extension=%{pecl_name}.so \
     --modules | grep %{pecl_name}
 
+%if 0%{?__ztsphp:1}
+cd ../%{pecl_name}-%{version}-zts
+# only check if build extension can be loaded
+ln -s %{php_ztsextdir}/json.so modules/
+ln -s %{php_ztsextdir}/igbinary.so modules/
+%{__ztsphp} -n -q \
+    -d extension_dir=modules \
+    -d extension=json.so \
+    -d extension=igbinary.so \
+    -d extension=%{pecl_name}.so \
+    --modules | grep %{pecl_name}
+%endif
+
 
 %files
 %doc %{pecl_name}-%{version}/{CREDITS,LICENSE,README.markdown,ChangeLog}
@@ -135,8 +169,16 @@ ln -s %{php_extdir}/igbinary.so modules/
 %{php_extdir}/%{pecl_name}.so
 %{pecl_xmldir}/%{name}.xml
 
+%if 0%{?__ztsphp:1}
+%config(noreplace) %{php_ztsinidir}/%{pecl_name}.ini
+%{php_ztsextdir}/%{pecl_name}.so
+%endif
+
 
 %changelog
+* Mon Apr 23 2012  Remi Collet <remi@fedoraproject.org> - 2.0.1-3
+- enable ZTS extension
+
 * Sat Mar 03 2012  Remi Collet <remi@fedoraproject.org> - 2.0.1-1
 - update to 2.0.1
 
