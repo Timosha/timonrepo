@@ -30,13 +30,14 @@
 %global isasuffix %nil
 %endif
 
+# Flip these to 0 and %nil% respectively to disable zip support
 # Flip these to 1 and zip respectively to enable zip support again
-%global with_zip 0
-%global zipmod %nil
+%global with_zip 1
+%global zipmod zip
 
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
-Version: 5.3.10
+Version: 5.3.11
 Release: 1%{?dist}
 License: PHP
 Group: Development/Languages
@@ -50,9 +51,10 @@ Source4: php-fpm.conf
 Source5: php-fpm-www.conf
 Source6: php-fpm.init
 Source7: php-fpm.logrotate
+Source8: php-fpm.sysconfig
 
 # Build fixes
-Patch1: php-5.3.9-gnusrc.patch
+Patch1: php-5.3.11-gnusrc.patch
 Patch2: php-5.3.0-install.patch
 Patch3: php-5.2.4-norpath.patch
 Patch5: php-5.2.0-includedir.patch
@@ -60,7 +62,7 @@ Patch6: php-5.2.4-embed.patch
 Patch7: php-5.3.0-recode.patch
 # from http://svn.php.net/viewvc?view=revision&revision=311042
 # and  http://svn.php.net/viewvc?view=revision&revision=311908
-Patch8: php-5.3.9-aconf259.patch
+Patch8: php-5.3.11-aconf259.patch
 # fix harcoded mysql.sock path
 Patch9: php-5.3.9-mysqlnd.patch
 
@@ -913,6 +915,9 @@ install -m 755 %{SOURCE6} $RPM_BUILD_ROOT%{_initrddir}/php-fpm
 # LogRotate
 install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
 install -m 644 %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/php-fpm
+# Environment file
+install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+install -m 644 %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/php-fpm
 # tmpfiles.d
 install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/tmpfiles.d
 install -m 644 php-fpm.tmpfiles $RPM_BUILD_ROOT%{_sysconfdir}/tmpfiles.d/php-fpm.conf
@@ -1049,6 +1054,7 @@ fi
 %config(noreplace) %{_sysconfdir}/php-fpm.conf
 %config(noreplace) %{_sysconfdir}/php-fpm.d/www.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/php-fpm
+%config(noreplace) %{_sysconfdir}/sysconfig/php-fpm
 %config(noreplace) %{_sysconfdir}/tmpfiles.d/php-fpm.conf
 %{_sbindir}/php-fpm
 %{_initrddir}/php-fpm
@@ -1102,6 +1108,13 @@ fi
 
 
 %changelog
+* Fri Apr 27 2012 Remi Collet <remi@fedoraproject.org> 5.3.11-1
+- update to 5.3.11
+  http://www.php.net/ChangeLog-5.php#5.3.11
+- add /etc/sysconfig/php-fpm environment file (#784770)
+- php-fpm: add security.limit_extensions in provided conf
+- zip extension is back (unbundled in f17)
+
 * Thu Feb  2 2012 Joe Orton <jorton@redhat.com> - 5.3.10-1
 - update to 5.3.10
 
