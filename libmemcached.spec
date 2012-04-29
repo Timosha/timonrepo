@@ -71,7 +71,9 @@ mkdir examples
 cp -p tests/*.{cc,h} examples/
 
 # Will be regenerated during build
+%if 0%{?fedora} > 9 || 0%{?rhel} > 5
 rm -f libmemcached/csl/{parser,scanner}.cc
+%endif
 
 # Temporary fix for SASL detection
 sed -i -e s/ax_cv_sasl/ac_enable_sasl/ configure
