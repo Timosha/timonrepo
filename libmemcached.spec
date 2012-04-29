@@ -2,8 +2,8 @@
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   1.0.6
-Release:   2%{?dist}
+Version:   1.0.7
+Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -17,6 +17,7 @@ Source0:   libmemcached-%{version}-exhsieh.tar.gz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: cyrus-sasl-devel
+BuildRequires: flex bison
 %if %{with_tests}
 BuildRequires: memcached
 %endif
@@ -68,6 +69,9 @@ you will need to install %{name}-devel.
 
 mkdir examples
 cp -p tests/*.{cc,h} examples/
+
+# Will be regenerated during build
+rm -f libmemcached/csl/{parser,scanner}.cc
 
 # Temporary fix for SASL detection
 sed -i -e s/ax_cv_sasl/ac_enable_sasl/ configure
@@ -142,6 +146,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sun Apr 22 2012 Remi Collet <remi@fedoraproject.org> - 1.0.7-1
+- update to 1.0.7
+- regenerate parser using flex/bison (#816766)
+
 * Sun Apr 22 2012 Remi Collet <remi@fedoraproject.org> - 1.0.6-2
 - workaround for SASL detection
 
