@@ -37,7 +37,7 @@
 
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
-Version: 5.3.11
+Version: 5.3.12
 Release: 1%{?dist}
 License: PHP
 Group: Development/Languages
@@ -1060,6 +1060,9 @@ fi
 %files enchant -f files.enchant
 
 %changelog
+* Thu May 03 2012 Remi Collet <remi@fedoraproject.org> 5.3.12
+- update to 5.3.12 (CVE-2012-1823)
+
 * Fri Apr 27 2012 Remi Collet <remi@fedoraproject.org> 5.3.11-1
 - update to 5.3.11
   http://www.php.net/ChangeLog-5.php#5.3.11
