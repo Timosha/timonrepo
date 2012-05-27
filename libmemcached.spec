@@ -2,7 +2,7 @@
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   1.0.7
+Version:   1.0.8
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -21,10 +21,10 @@ BuildRequires: flex bison
 %if %{with_tests}
 BuildRequires: memcached
 %endif
-%if 0%{?fedora} >= 12
+%if 0%{?fedora} >= 12 || 0%{?rhel} >= 6
 BuildRequires: systemtap-sdt-devel
 %endif
-%if 0%{?fedora} >= 11 || 0%{?rhel} >= 6
+%if 0%{?fedora} >= 11 || 0%{?rhel} >= 5
 BuildRequires: libevent-devel
 %endif
 
@@ -148,6 +148,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sun May 27 2012 Remi Collet <remi@fedoraproject.org> - 1.0.8-1
+- update to 1.0.8
+
 * Sun Apr 22 2012 Remi Collet <remi@fedoraproject.org> - 1.0.7-1
 - update to 1.0.7
 - regenerate parser using flex/bison (#816766)
