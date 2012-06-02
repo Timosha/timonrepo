@@ -1,9 +1,9 @@
-%global VER 6.7.6
+%global VER 6.7.7
 %global Patchlevel 5
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
-Release:		2%{?dist}
+Release:		1%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
@@ -221,9 +221,6 @@ EOF
 # Fonts must be packaged separately. It does nothave matter and demos work without it.
 rm PerlMagick/demo/Generic.ttf
 
-# From version around 6.7.5-6 docs go to unversioned dir. Fixing
-mv %{buildroot}/%{_datadir}/doc/%{name} %{buildroot}/%{_datadir}/doc/%{name}-%{VER}
-
 %clean
 rm -rf %{buildroot}
 
@@ -303,6 +300,9 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Sat Jun 2 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 6.7.7.5-1
+- Update to 6.7.7-5 version. Prepare and update in stable Fedora 16 to address security problems (f.e. bz#808159).
+
 * Fri May 11 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 6.7.6.5-2
 - Rebuild due libtiff update http://www.mail-archive.com/devel@lists.fedoraproject.org/msg42846.html
 
