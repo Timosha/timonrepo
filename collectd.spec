@@ -1,7 +1,7 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
 Version: 4.10.7
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
 URL: http://collectd.org/
@@ -644,6 +644,9 @@ fi
 %endif
 
 %changelog
+* Mon Jun 11 2012 Petr Pisar <ppisar@redhat.com> - 4.10.7-2
+- Perl 5.16 rebuild
+
 * Tue Apr 03 2012 Alan Pevec <apevec@redhat.com> 4.10.7-1
 - new upstream release 4.10.7
   http://mailman.verplant.org/pipermail/collectd/2012-April/005045.html
