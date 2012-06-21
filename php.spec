@@ -166,9 +166,9 @@ Provides: php-date, php-date%{?_isa}
 Provides: php-ereg, php-ereg%{?_isa}
 Provides: php-exif, php-exif%{?_isa}
 Provides: php-fileinfo, php-fileinfo%{?_isa}
-Provides: php-filter, php-filter%{?_isa}
 Provides: php-pecl-Fileinfo = %{fileinfover}, php-pecl-Fileinfo%{?_isa} = %{fileinfover}
 Provides: php-pecl(Fileinfo) = %{fileinfover}, php-pecl(Fileinfo)%{?_isa} = %{fileinfover}
+Provides: php-filter, php-filter%{?_isa}
 Provides: php-ftp, php-ftp%{?_isa}
 Provides: php-gettext, php-gettext%{?_isa}
 Provides: php-gmp, php-gmp%{?_isa}
@@ -188,8 +188,8 @@ Provides: php-session, php-session%{?_isa}
 Provides: php-shmop, php-shmop%{?_isa}
 Provides: php-simplexml, php-simplexml%{?_isa}
 Provides: php-sockets, php-sockets%{?_isa}
-Provides: php-standard = %{version}, php-standard%{?_isa} = %{version}
 Provides: php-spl, php-spl%{?_isa}
+Provides: php-standard = %{version}, php-standard%{?_isa} = %{version}
 Provides: php-tokenizer, php-tokenizer%{?_isa}
 %if %{with_zip}
 Provides: php-zip, php-zip%{?_isa}
