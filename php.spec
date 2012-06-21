@@ -37,7 +37,7 @@
 
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
-Version: 5.3.13
+Version: 5.3.14
 Release: 1%{?dist}
 License: PHP
 Group: Development/Languages
@@ -62,7 +62,7 @@ Patch6: php-5.2.4-embed.patch
 Patch7: php-5.3.0-recode.patch
 # from http://svn.php.net/viewvc?view=revision&revision=311042
 # and  http://svn.php.net/viewvc?view=revision&revision=311908
-Patch8: php-5.3.11-aconf259.patch
+Patch8: php-5.3.14-aconf259.patch
 # fix harcoded mysql.sock path
 Patch9: php-5.3.9-mysqlnd.patch
 
@@ -159,11 +159,14 @@ Provides: php(api) = %{apiver}%{isasuffix}, php(zend-abi) = %{zendver}%{isasuffi
 # Provides for all builtin/shared modules:
 Provides: php-bz2, php-bz2%{?_isa}
 Provides: php-calendar, php-calendar%{?_isa}
+Provides: php-core = %{version}, php-core%{?_isa} = %{version}
 Provides: php-ctype, php-ctype%{?_isa}
 Provides: php-curl, php-curl%{?_isa}
 Provides: php-date, php-date%{?_isa}
+Provides: php-ereg, php-ereg%{?_isa}
 Provides: php-exif, php-exif%{?_isa}
 Provides: php-fileinfo, php-fileinfo%{?_isa}
+Provides: php-filter, php-filter%{?_isa}
 Provides: php-pecl-Fileinfo = %{fileinfover}, php-pecl-Fileinfo%{?_isa} = %{fileinfover}
 Provides: php-pecl(Fileinfo) = %{fileinfover}, php-pecl(Fileinfo)%{?_isa} = %{fileinfover}
 Provides: php-ftp, php-ftp%{?_isa}
@@ -185,6 +188,7 @@ Provides: php-session, php-session%{?_isa}
 Provides: php-shmop, php-shmop%{?_isa}
 Provides: php-simplexml, php-simplexml%{?_isa}
 Provides: php-sockets, php-sockets%{?_isa}
+Provides: php-standard = %{version}, php-standard%{?_isa} = %{version}
 Provides: php-spl, php-spl%{?_isa}
 Provides: php-tokenizer, php-tokenizer%{?_isa}
 %if %{with_zip}
@@ -1108,6 +1112,10 @@ fi
 
 
 %changelog
+* Thu Jun 21 2012 Remi Collet <remi@fedoraproject.org> 5.3.14-1
+- update to 5.3.14 (CVE-2012-2143, CVE-2012-2386)
+- add missing provides (core, ereg, filter, standard)
+
 * Wed May 09 2012 Remi Collet <remi@fedoraproject.org> 5.3.13-1
 - update to 5.3.13 (CVE-2012-2311)
 
