@@ -1,0 +1,11 @@
+--- agent/lib/libstatsinfo.c.orig	2012-06-29 13:21:02.451745124 +0600
++++ agent/lib/libstatsinfo.c	2012-06-29 14:31:03.379684934 +0600
+@@ -1043,7 +1043,7 @@
+ 			 errmsg("unexpected file format: \"%s\"", FILE_CPUSTAT)));
+ 
+ 	record = (char *) list_nth(records, 0);
+-	if (exec_split(record, "\\s+", &fields) != NUM_STAT_FIELDS)
++	if (exec_split(record, "\\s+", &fields) != NUM_STAT_FIELDS + 1)
+ 		ereport(ERROR,
+ 			(errcode(ERRCODE_DATA_EXCEPTION),
+ 			 errmsg("unexpected file format: \"%s\"", FILE_CPUSTAT),
