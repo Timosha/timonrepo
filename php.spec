@@ -38,7 +38,7 @@
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
 Version: 5.3.14
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: PHP
 Group: Development/Languages
 URL: http://www.php.net/
@@ -156,6 +156,7 @@ Provides: php(api) = %{apiver}, php(zend-abi) = %{zendver}
 # New ABI/API check - Arch specific
 Provides: php-api = %{apiver}%{isasuffix}, php-zend-abi = %{zendver}%{isasuffix}
 Provides: php(api) = %{apiver}%{isasuffix}, php(zend-abi) = %{zendver}%{isasuffix}
+Provides: php(language) = %{version}, php(language)%{?_isa} = %{version}
 # Provides for all builtin/shared modules:
 Provides: php-bz2, php-bz2%{?_isa}
 Provides: php-calendar, php-calendar%{?_isa}
@@ -985,6 +986,7 @@ install -d $RPM_BUILD_ROOT%{_sysconfdir}/rpm
 sed -e "s/@PHP_APIVER@/%{apiver}%{isasuffix}/" \
     -e "s/@PHP_ZENDVER@/%{zendver}%{isasuffix}/" \
     -e "s/@PHP_PDOVER@/%{pdover}%{isasuffix}/" \
+    -e "s/@PHP_VERSION@/%{version}/" \
     < %{SOURCE3} > macros.php
 install -m 644 -c macros.php \
            $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.php
@@ -1112,6 +1114,10 @@ fi
 
 
 %changelog
+* Mon Jul 02 2012 Remi Collet <remi@fedoraproject.org> 5.3.14-2
+- provide php(language) to allow version check
+- define %%{php_version}
+
 * Thu Jun 21 2012 Remi Collet <remi@fedoraproject.org> 5.3.14-1
 - update to 5.3.14 (CVE-2012-2143, CVE-2012-2386)
 - add missing provides (core, ereg, filter, standard)
