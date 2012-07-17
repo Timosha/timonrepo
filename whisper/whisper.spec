@@ -2,7 +2,7 @@
 
 Name:           whisper
 Version:        0.9.10
-Release:        1
+Release:        1%{?dist}
 Summary:        Fixed size round-robin style database
 Group:          Applications/Databases
 License:        Apache Software License 2.0
@@ -41,6 +41,9 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python} -c 'import setuptools; execfile("setup.py")'
 /usr/bin/*
 
 %changelog
+* Tue Jul 17 2012 Timon <timosha@gmail.com> - 0.9.10-2
+- add ?dist
+
 * Fri Jun 1 2012 Ben P <ben@g.megatron.org> - 0.9.10-1
 - New upstream version.
 

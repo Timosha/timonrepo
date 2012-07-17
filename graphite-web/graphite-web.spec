@@ -5,7 +5,7 @@
 
 Name:           graphite-web
 Version:        0.9.10
-Release:        1
+Release:        2%{?dist}
 Summary:        Enterprise scalable realtime graphing
 Group:          Applications/Internet
 License:        Apache License
@@ -116,6 +116,9 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python} -c 'import setuptools; execfile("setup.py")'
 %ghost %{_localstatedir}/lib/%{name}/graphite.db
 
 %changelog
+* Tue Jul 17 2012 Timon <timosha@gmail.com> - 0.9.10-2
+- add ?dist
+
 * Fri Jun 1 2012 Ben P <ben@g.megatron.org> - 0.9.10-1
 - New upstream version.
 
