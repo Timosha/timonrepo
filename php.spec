@@ -6,7 +6,7 @@
 # Extension version
 %global fileinfover 1.0.5-dev
 %global pharver     2.0.1
-%global zipver      1.9.1
+%global zipver      1.11.0
 %global jsonver     1.2.1
 
 %global httpd_mmn %(cat %{_includedir}/httpd/.mmn || echo missing-httpd-devel)
@@ -37,8 +37,8 @@
 
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
-Version: 5.3.14
-Release: 2%{?dist}
+Version: 5.3.15
+Release: 1%{?dist}
 License: PHP
 Group: Development/Languages
 URL: http://www.php.net/
@@ -139,7 +139,6 @@ Group: Development/Languages
 Summary: PHP FastCGI Process Manager
 Requires: php-common%{?_isa} = %{version}-%{release}
 Requires: systemd-units
-BuildRequires: libevent-devel >= 1.4.11
 
 %description fpm
 PHP-FPM (FastCGI Process Manager) is an alternative PHP FastCGI
@@ -1114,6 +1113,10 @@ fi
 
 
 %changelog
+* Fri Jul 20 2012 Remi Collet <remi@fedoraproject.org> 5.3.15-1
+- update to 5.3.15 (CVE-2012-2688)
+- drop BR for libevent
+
 * Mon Jul 02 2012 Remi Collet <remi@fedoraproject.org> 5.3.14-2
 - provide php(language) to allow version check
 - define %%{php_version}
