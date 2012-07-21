@@ -7,7 +7,7 @@ Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
 Version:      2.0.1
 %if 0%{?gitver:1}
-Release:      0.1.git%{gitver}%{?dist}
+Release:      0.2.git%{gitver}%{?dist}
 Source:       php-memcached-dev-php-memcached-v2.0.0b2-14-g%{gitver}.tar.gz
 %else
 Release:      3%{?dist}
@@ -176,6 +176,9 @@ ln -s %{php_ztsextdir}/igbinary.so modules/
 
 
 %changelog
+* Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
 * Mon Apr 23 2012  Remi Collet <remi@fedoraproject.org> - 2.0.1-3
 - enable ZTS extension
 
