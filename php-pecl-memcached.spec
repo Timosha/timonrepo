@@ -10,7 +10,7 @@ Version:      2.0.1
 Release:      0.2.git%{gitver}%{?dist}
 Source:       php-memcached-dev-php-memcached-v2.0.0b2-14-g%{gitver}.tar.gz
 %else
-Release:      3%{?dist}
+Release:      4%{?dist}
 Source:       http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 %endif
 # memcached is PHP, FastLZ is MIT
@@ -176,6 +176,9 @@ ln -s %{php_ztsextdir}/igbinary.so modules/
 
 
 %changelog
+* Tue Jul 31 2012 Remi Collet <remi@fedoraproject.org> - 2.0.1-4
+- bump release
+
 * Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
