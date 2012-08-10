@@ -1,24 +1,28 @@
-%define debug 0
+%global debug 0
 
 Name:		pgbouncer
-Version:	1.4
-Release:	2%{?dist}
+Version:	1.5.2
+Release:	3%{?dist}
 Summary:	Lightweight connection pooler for PostgreSQL
 Group:		Applications/Databases
 License:	MIT and BSD
 URL:		http://pgfoundry.org/projects/pgbouncer/
-Source0:	http://pgfoundry.org/frs/download.php/2912/%{name}-%{version}.tgz
-Source1:	%{name}.init
-Source2:	%{name}.sysconfig
+Source0:	http://ftp.postgresql.org/pub/projects/pgFoundry/%{name}/%{name}-%{version}.tar.gz
+Source1:	%{name}.service
 Patch0:		%{name}-ini.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:	libevent-devel >= 1.3b
-Requires:	initscripts
+BuildRequires:	libevent-devel >= 2.0
+BuildRequires:  systemd-units
 
-Requires(post):	chkconfig
-Requires(preun):	chkconfig, initscripts
-Requires(postun):	initscripts
+Requires:	postgresql-server
+
+# pre/post stuff needs systemd too
+Requires(post): systemd-units
+Requires(preun): systemd-units
+Requires(postun): systemd-units
+
+Requires(post): chkconfig
 
 %description
 pgbouncer is a lightweight connection pooler for PostgreSQL.
@@ -41,31 +45,41 @@ sed -i.fedora \
 %endif
 --datadir=%{_datadir} 
 
-make %{?_smp_mflags} V=1
+%{__make} %{?_smp_mflags} V=1
 
 %install
-rm -rf %{buildroot}
-make install DESTDIR=%{buildroot}
-install -p -d %{buildroot}%{_sysconfdir}/
-install -p -d %{buildroot}%{_sysconfdir}/sysconfig
-install -p -m 644 etc/pgbouncer.ini %{buildroot}%{_sysconfdir}/
-rm -f %{buildroot}%{_docdir}/%{name}/pgbouncer.ini
-install -p -d %{buildroot}%{_initrddir}
-install -p -m 755 %{SOURCE1} %{buildroot}%{_initrddir}/%{name}
-install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
+%{__rm} -rf %{buildroot}
+%{__make} install DESTDIR=%{buildroot}
+install -p -d %{buildroot}%{_sysconfdir}/%{name}/
+install -p -m 644 etc/pgbouncer.ini %{buildroot}%{_sysconfdir}/%{name}
+
+install -d -m 755 %{buildroot}%{_localstatedir}/run/%{name}
+install -d -m 755 %{buildroot}%{_localstatedir}/log/%{name}
+
+install -d $RPM_BUILD_ROOT%{_unitdir}
+install -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_unitdir}/%{name}.service
+
+# Remove duplicated files
+%{__rm} -rf %{buildroot}%{_docdir}/%{name}
 
 %post
-chkconfig --add pgbouncer
+if [ $1 -eq 1 ] ; then
+    # Initial installation
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+fi
 
 %preun
-if [ $1 = 0 ] ; then
-	/sbin/service pgbouncer condstop >/dev/null 2>&1
-	chkconfig --del pgbouncer
+if [ $1 -eq 0 ] ; then
+    # Package removal, not upgrade
+    /bin/systemctl --no-reload disable %{name}.service >/dev/null 2>&1 || :
+    /bin/systemctl stop %{name}.service >/dev/null 2>&1 || :
 fi
 
 %postun
-if [ "$1" -ge "1" ] ; then
-	/sbin/service pgbouncer condrestart >/dev/null 2>&1 || :
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+    /bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
 %clean
@@ -75,83 +89,54 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %doc README NEWS AUTHORS
 %{_bindir}/*
-%config(noreplace) %{_sysconfdir}/%{name}.ini
-%{_initrddir}/%{name}
-%config(noreplace) %{_sysconfdir}/sysconfig/%{name}
+%config(noreplace) %{_sysconfdir}/%{name}/%{name}.ini
+%{_unitdir}/%{name}.service
 %{_mandir}/man1/%{name}.*
 %{_mandir}/man5/%{name}.*
 
+%attr(755,postgres,postgres) %{_localstatedir}/run/%{name}
+%attr(755,postgres,postgres) %{_localstatedir}/log/%{name}
+
+
 %changelog
-* Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.4-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+* Wed Aug 8 2012 Timon <timosha@gmail.com> - 1.5.2-3
+- remove pgbouncer user
+- systemd
 
-* Tue Feb 15 2011 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.4-1
-- Update to 1.4
+* Thu Jun 21 2012 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5.2-2
+- Fix useradd line.
 
-* Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.3-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+* Tue Jun 5 2012 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5.2-1
+- Update to 1.5.2, per changes described at:
+  http://pgfoundry.org/forum/forum.php?forum_id=1885
 
-* Mon May 10 2010 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.3.3-1
-- Update to 1.3.3, per changes described in:
-- http://pgfoundry.org/frs/shownotes.php?release_id=1645
+* Tue Apr 24 2012 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5.1-1
+- Update to 1.5.1, for the changes described here:
+  http://pgfoundry.org/frs/shownotes.php?release_id=1936
 
-* Tue Mar 16 2010 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.3.2-1
-- Update to 1.3.2, per changes described in:
-- http://pgfoundry.org/frs/shownotes.php?release_id=1605
+* Sun Apr 08 2012 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5-2
+- Fix shell of pgbouncer user, to avoid startup errors.
 
-* Sat Dec 05 2009 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.3.1-2
-- Fix init script, per report from Scott Bowers:
-  http://lists.pgfoundry.org/pipermail/pgbouncer-general/2009-December/000477.html
+* Fri Apr 6 2012 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.5-1
+- Update to 1.5, for the changes described here:
+  http://pgfoundry.org/frs/shownotes.php?release_id=1920
+- Trim changelog
 
-* Tue Dec 1 2009 - Devrim GUNDUZ <devrim@gunduz.org> 1.3.1-1
-- Update to 1.3.1
+* Fri Aug 12 2011 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.4.2-1
+- Update to 1.4.2, for the changes described here:
+  http://pgfoundry.org/frs/shownotes.php?release_id=1863
 
-* Sun Jul 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2.3-5
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+* Mon Sep 13 2010 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.3.4-1
+- Update to 1.3.4, for the changes described here:
+  http://pgfoundry.org/frs/shownotes.php?prelease_id=1698
+* Fri Aug 06 2010 Devrim GÜNDÜZ <devrim@gunduz.org> - 1.3.3-2
+- Sleep 2 seconds before getting pid during start(), like we do in PostgreSQL
+  init script, to avoid false positive startup errors.
 
-* Thu Feb 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2.3-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+* Tue May 11 2010 Devrim GUNDUZ <devrim@gunduz.org> - 1.3.3-1
+- Update to 1.3.3, per pgrpms.org #25, for the fixes described at:
+  http://pgfoundry.org/frs/shownotes.php?release_id=1645
 
-* Fri Aug 29 2008 - Devrim GUNDUZ <devrim@commandprompt.com> 1.2.3-3
-- More fixes, per Fedora review.
+* Tue Mar 16 2010 Devrim GUNDUZ <devrim@gunduz.org> - 1.3.2-1
+- Fix some issues in init script. Fixes pgrpms.org #9.
 
-* Fri Aug 29 2008 - Devrim GUNDUZ <devrim@commandprompt.com> 1.2.3-2
-- More fixes, per Fedora review.
-
-* Fri Aug 8 2008 - Devrim GUNDUZ <devrim@commandprompt.com> 1.2.3-1
-- Update to 1.2.3
-- Final fixes for Fedora review
-
-* Sun Mar 23 2008 - Devrim GUNDUZ <devrim@commandprompt.com> 1.1.2-3
-- Mark sysconfig file as config file, per Guillaume Smet.
-
-* Fri Mar 7 2008 - Devrim GUNDUZ <devrim@commandprompt.com> 1.1.2-2
-- Add a patch for pgbouncer.ini to satisfy Red Hat defaults and security.
-  Per Darcy Buskermolen.
-- Fix chkconfig line
-- Add sysconfig file
-- Refactor init script
-
-* Sat Mar 1 2008 - Devrim GUNDUZ <devrim@commandprompt.com> 1.1.2-1
-- Update to 1.1.2
-- Various spec file improvements, per bz review #244593 .
-
-* Fri Oct 26 2007 - Devrim GUNDUZ <devrim@commandprompt.com> 1.1.1-1
-- Update to 1.1.1
-
-* Tue Oct 9 2007 - Devrim GUNDUZ <devrim@commandprompt.com> 1.1-1
-- Update to 1.1
-
-* Tue Sep 25 2007 - Devrim GUNDUZ <devrim@commandprompt.com> 1.0.8-2
-- Added init script from Darcy.
-
-* Tue Sep 18 2007 - Darcy Buskermolen <darcyb@commandprompt.com> 1.0.8-1
-- Update to pgBouncer 1.0.8
-- Add libevent to requires
-
-* Sat Jun 18 2007 - Devrim GUNDUZ <devrim@commandprompt.com> 1.0.7-2
-- Prepare for Fedora review
-- Change spec file name
-
-* Thu May 03 2007 David Fetter <david@fetter.org> 1.0.7-1
-- Initial build 
