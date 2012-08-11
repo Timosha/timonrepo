@@ -1,9 +1,9 @@
-%global VER 6.7.7
-%global Patchlevel 5
+%global VER 6.7.8
+%global Patchlevel 9
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
-Release:		3%{?dist}
+Release:		1%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
@@ -300,6 +300,9 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Sat Aug 11 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 6.7.8.9-1
+- Update to 6.7.8-9 to fix CVE-2012-3437 (bz#844101, 844103).
+
 * Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 6.7.7.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
