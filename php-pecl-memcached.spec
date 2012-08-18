@@ -18,6 +18,7 @@ Source0:      http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 Patch0:        %{pecl_name}-build.patch
 
 
+BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # 5.2.10 required to HAVE_JSON enabled
 BuildRequires: php-devel >= 5.2.10
 BuildRequires: php-pear
@@ -162,6 +163,7 @@ ln -s %{php_ztsextdir}/igbinary.so modules/
 
 
 %files
+%defattr(-,root,root,-)
 %doc %{pecl_name}-%{version}/{CREDITS,LICENSE,README.markdown,ChangeLog}
 %doc LICENSE-FastLZ
 %config(noreplace) %{_sysconfdir}/php.d/%{pecl_name}.ini
