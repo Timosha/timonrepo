@@ -1,28 +1,28 @@
 %{!?__pecl:     %{expand: %%global __pecl     %{_bindir}/pecl}}
 
 %global pecl_name memcached
-#global gitver    1736623
 
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
-Version:      2.0.1
-%if 0%{?gitver:1}
-Release:      0.2.git%{gitver}%{?dist}
-Source:       php-memcached-dev-php-memcached-v2.0.0b2-14-g%{gitver}.tar.gz
-%else
-Release:      4%{?dist}
-Source:       http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
-%endif
+Version:      2.1.0
+Release:      1%{?dist}
 # memcached is PHP, FastLZ is MIT
 License:      PHP and MIT
 Group:        Development/Languages
 URL:          http://pecl.php.net/package/%{pecl_name}
 
+Source0:      http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
+
+# https://github.com/php-memcached-dev/php-memcached/issues/25
+# https://github.com/remicollet/php-memcached/commit/a66b1286b06ec0c8b11790d772725a2a7bb33d57.patch
+Patch0:        %{pecl_name}-build.patch
+
+
 # 5.2.10 required to HAVE_JSON enabled
 BuildRequires: php-devel >= 5.2.10
 BuildRequires: php-pear
 BuildRequires: php-pecl-igbinary-devel
-BuildRequires: libmemcached-devel
+BuildRequires: libmemcached-devel >= 1.0.0
 BuildRequires: zlib-devel
 BuildRequires: cyrus-sasl-devel
 
@@ -59,11 +59,6 @@ It also provides a session handler (memcached).
 %prep 
 %setup -c -q
 
-%if 0%{?gitver:1}
-mv php-memcached-dev-php-memcached-%{gitver}/package.xml .
-mv php-memcached-dev-php-memcached-%{gitver} %{pecl_name}-%{version}
-%endif
-
 # Chech version as upstream often forget to update this
 extver=$(sed -n '/#define PHP_MEMCACHED_VERSION/{s/.* "//;s/".*$//;p}' %{pecl_name}-%{version}/php_memcached.h)
 if test "x${extver}" != "x%{version}"; then
@@ -85,6 +80,10 @@ extension=%{pecl_name}.so
 ;  Defines a comma separated list of server urls to use for session storage
 ;session.save_path="localhost:11211"
 EOF
+
+cd %{pecl_name}-%{version}
+%patch0 -p1 -b .build
+cd ..
 
 cp -r %{pecl_name}-%{version} %{pecl_name}-%{version}-zts
 
@@ -176,6 +175,10 @@ ln -s %{php_ztsextdir}/igbinary.so modules/
 
 
 %changelog
+* Tue Aug 07 2012 Remi Collet <remi@fedoraproject.org> - 2.1.0-1
+- update to 2.1.0
+- add patch to lower libmemcached required version
+
 * Tue Jul 31 2012 Remi Collet <remi@fedoraproject.org> - 2.0.1-4
 - bump release
 
