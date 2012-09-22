@@ -2,8 +2,8 @@
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   1.0.8
-Release:   2%{?dist}
+Version:   1.0.11
+Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -16,7 +16,7 @@ URL:       http://libmemcached.org/
 Source0:   libmemcached-%{version}-exhsieh.tar.gz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires: cyrus-sasl-devel
+# For now without SASL support BuildRequires: cyrus-sasl-devel
 BuildRequires: flex bison
 %if %{with_tests}
 BuildRequires: memcached
@@ -76,7 +76,7 @@ rm -f libmemcached/csl/{parser,scanner}.cc
 %endif
 
 # Temporary fix for SASL detection
-sed -i -e s/ax_cv_sasl/ac_enable_sasl/ configure
+# sed -i -e s/ax_cv_sasl/ac_enable_sasl/ configure
 
 
 %build
@@ -84,6 +84,11 @@ sed -i -e s/ax_cv_sasl/ac_enable_sasl/ configure
 %configure --disable-static \
 %if ! %{with_tests}
    --with-memcached=false
+%endif
+
+%if 0%{?fedora} < 14 && 0%{?rhel} < 7
+# for warning: unknown option after '#pragma GCC diagnostic' kind
+sed -e 's/-Werror//' -i Makefile
 %endif
 
 make %{_smp_mflags}
@@ -97,11 +102,15 @@ make install  DESTDIR="%{buildroot}" AM_INSTALL_PROGRAM_FLAGS=""
 %check
 %if %{with_tests}
 # test suite cannot run in mock (same port use for memcache servers on all arch)
-# All tests completed successfully
 # diff output.res output.cmp fails but result depend on server version
+# ======================
+# All 25 tests passed
+# (3 tests were not run)
+# ======================
+# Tests completed
 make test
 %else
-echo 'Test suite disabled (missing "--with tests" option)'
+: 'Test suite disabled (missing "--with tests" option)'
 %endif
 
 
@@ -121,7 +130,7 @@ rm -rf %{buildroot}
 %{_bindir}/mem*
 %exclude %{_libdir}/lib*.la
 %{_libdir}/libhashkit.so.2*
-%{_libdir}/libmemcached.so.10*
+%{_libdir}/libmemcached.so.11*
 %{_libdir}/libmemcachedprotocol.so.0*
 %{_libdir}/libmemcachedutil.so.2*
 %{_mandir}/man1/mem*
@@ -148,6 +157,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat Sep 22 2012 Remi Collet <remi@fedoraproject.org> - 1.0.11-2
+- update to 1.0.11, soname bump to libmemcached.so.11
+- drop broken SASL support
+
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.8-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
