@@ -70,9 +70,12 @@ you will need to install %{name}-devel.
 mkdir examples
 cp -p tests/*.{cc,h} examples/
 
-# Will be regenerated during build
 %if 0%{?fedora} > 9 || 0%{?rhel} > 5
+%if 0%{?fedora} < 18 && 0%{?rhel} < 7
+# Will be regenerated during build
+# Only works with bison 2.4 - 2.5
 rm -f libmemcached/csl/{parser,scanner}.cc
+%endif
 %endif
 
 # Temporary fix for SASL detection
@@ -160,6 +163,7 @@ rm -rf %{buildroot}
 * Sat Sep 22 2012 Remi Collet <remi@fedoraproject.org> - 1.0.11-2
 - update to 1.0.11, soname bump to libmemcached.so.11
 - drop broken SASL support
+- don't generate parser (bison 2.6 not supported)
 
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.8-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
