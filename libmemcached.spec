@@ -3,7 +3,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
 Version:   1.0.11
-Release:   1%{?dist}
+Release:   2%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -14,6 +14,7 @@ URL:       http://libmemcached.org/
 # source tarball, and run "./strip-hsieh.sh <version>" to produce the
 # "-exhsieh" tarball.
 Source0:   libmemcached-%{version}-exhsieh.tar.gz
+Patch0:    libmemcached-bigendian.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # For now without SASL support BuildRequires: cyrus-sasl-devel
@@ -66,6 +67,7 @@ you will need to install %{name}-devel.
 
 %prep
 %setup -q
+%patch0 -p1
 
 mkdir examples
 cp -p tests/*.{cc,h} examples/
@@ -160,7 +162,10 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Sat Sep 22 2012 Remi Collet <remi@fedoraproject.org> - 1.0.11-2
+* Tue Sep 25 2012 Karsten Hopp <karsten@redhat.com> 1.0.11-2
+- fix defined but not used variable error on bigendian machines
+
+* Sat Sep 22 2012 Remi Collet <remi@fedoraproject.org> - 1.0.11-1
 - update to 1.0.11, soname bump to libmemcached.so.11
 - drop broken SASL support
 - don't generate parser (bison 2.6 not supported)
