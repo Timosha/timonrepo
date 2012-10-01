@@ -38,7 +38,7 @@
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
 Version: 5.3.17
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: PHP
 Group: Development/Languages
 URL: http://www.php.net/
@@ -69,6 +69,8 @@ Patch9: php-5.3.9-mysqlnd.patch
 # Fixes for extension modules
 Patch20: php-4.3.11-shutdown.patch
 Patch21: php-5.3.3-macropen.patch
+# https://bugs.php.net/bug.php?id=62886 - php-fpm startup
+Patch22: php-5.3.17-fpm.patch
 
 # Functional changes
 Patch40: php-5.0.4-dlopen.patch
@@ -561,6 +563,7 @@ support for using the enchant library to PHP.
 
 %patch20 -p1 -b .shutdown
 %patch21 -p1 -b .macropen
+%patch22 -p1 -b .fpmstartup
 
 %patch40 -p1 -b .dlopen
 %patch41 -p1 -b .easter
@@ -1113,6 +1116,9 @@ fi
 
 
 %changelog
+* Mon Oct  1 2012 Remi Collet <remi@fedoraproject.org> 5.3.17-2
+- add upstream patch for fpm startup issue (#846858)
+
 * Fri Sep 14 2012 Remi Collet <remi@fedoraproject.org> 5.3.17-1
 - update to 5.3.17
   http://www.php.net/releases/5_3_17.php
