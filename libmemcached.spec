@@ -1,9 +1,10 @@
 %global with_tests       %{?_with_tests:1}%{!?_with_tests:0}
+%global with_sasl        0
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   1.0.11
-Release:   2%{?dist}
+Version:   1.0.12
+Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -17,7 +18,9 @@ Source0:   libmemcached-%{version}-exhsieh.tar.gz
 Patch0:    libmemcached-bigendian.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-# For now without SASL support BuildRequires: cyrus-sasl-devel
+%if %{with_sasl}
+BuildRequires: cyrus-sasl-devel
+%endif
 BuildRequires: flex bison
 %if %{with_tests}
 BuildRequires: memcached
@@ -57,7 +60,9 @@ Summary: Header files and development libraries for %{name}
 Group: Development/Libraries
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
+%if %{with_sasl}
 Requires: cyrus-sasl-devel%{?_isa}
+%endif
 
 %description devel
 This package contains the header files and development libraries
@@ -80,9 +85,10 @@ rm -f libmemcached/csl/{parser,scanner}.cc
 %endif
 %endif
 
+%if %{with_sasl}
 # Temporary fix for SASL detection
-# sed -i -e s/ax_cv_sasl/ac_enable_sasl/ configure
-
+sed -i -e s/ax_cv_sasl/ac_enable_sasl/ configure
+%endif
 
 %build
 # option --with-memcached=false to disable server binary check (as we don't run test)
@@ -155,6 +161,7 @@ rm -rf %{buildroot}
 %{_libdir}/libmemcachedprotocol.so
 %{_libdir}/libmemcachedutil.so
 %{_libdir}/pkgconfig/libmemcached.pc
+%{_datadir}/aclocal/ax_lib_libmemcached.m4
 %{_mandir}/man3/libmemcached*
 %{_mandir}/man3/libhashkit*
 %{_mandir}/man3/memcached*
@@ -162,6 +169,11 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Oct 11 2012 Remi Collet <remi@fedoraproject.org> - 1.0.12-1
+- update to 1.0.12
+- add aclocal/ax_lib_libmemcached.m4
+- abi-compliance-checker verdict : Compatible
+
 * Tue Sep 25 2012 Karsten Hopp <karsten@redhat.com> 1.0.11-2
 - fix defined but not used variable error on bigendian machines
 
