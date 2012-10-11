@@ -21,7 +21,9 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %if %{with_sasl}
 BuildRequires: cyrus-sasl-devel
 %endif
-BuildRequires: flex bison
+BuildRequires: flex
+BuildRequires: bison
+BuildRequires: python-sphinx
 %if %{with_tests}
 BuildRequires: memcached
 %endif
@@ -90,6 +92,7 @@ rm -f libmemcached/csl/{parser,scanner}.cc
 sed -i -e s/ax_cv_sasl/ac_enable_sasl/ configure
 %endif
 
+
 %build
 # option --with-memcached=false to disable server binary check (as we don't run test)
 %configure --disable-static \
@@ -108,6 +111,15 @@ make %{_smp_mflags}
 %install
 rm -rf %{buildroot}
 make install  DESTDIR="%{buildroot}" AM_INSTALL_PROGRAM_FLAGS=""
+
+# Hack: when sphinx-build too old (fedora < 14 and rhel < 7)
+# install upstream provided man pages
+if [ ! -d %{buildroot}%{_mandir}/man1 ]; then
+   install -d %{buildroot}%{_mandir}/man1
+   install -p -m 644 man/*1 %{buildroot}%{_mandir}/man1
+   install -d %{buildroot}%{_mandir}/man3
+   install -p -m 644 man/*3 %{buildroot}%{_mandir}/man3
+fi
 
 
 %check
@@ -173,6 +185,7 @@ rm -rf %{buildroot}
 - update to 1.0.12
 - add aclocal/ax_lib_libmemcached.m4
 - abi-compliance-checker verdict : Compatible
+- uggly hack for man pages
 
 * Tue Sep 25 2012 Karsten Hopp <karsten@redhat.com> 1.0.11-2
 - fix defined but not used variable error on bigendian machines
