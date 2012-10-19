@@ -4,7 +4,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
 Version:   1.0.12
-Release:   1%{?dist}
+Release:   2%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -91,6 +91,10 @@ rm -f libmemcached/csl/{parser,scanner}.cc
 # Temporary fix for SASL detection
 sed -i -e s/ax_cv_sasl/ac_enable_sasl/ configure
 %endif
+
+# Temporary uggly hack: fix version macro
+sed -e '/LIBMEMCACHED_VERSION_HEX/s/@PANDORA_HEX_VERSION@/@HEX_VERSION@/' \
+    -i libmemcached-*/configure.h.in
 
 
 %build
@@ -181,6 +185,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Oct 19 2012 Remi Collet <remi@fedoraproject.org> - 1.0.12-2
+- temporary hack: fix LIBMEMCACHED_VERSION_HEX value
+
 * Thu Oct 11 2012 Remi Collet <remi@fedoraproject.org> - 1.0.12-1
 - update to 1.0.12
 - add aclocal/ax_lib_libmemcached.m4
