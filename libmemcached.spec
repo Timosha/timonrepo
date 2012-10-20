@@ -3,8 +3,8 @@
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   1.0.12
-Release:   2%{?dist}
+Version:   1.0.13
+Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -30,9 +30,7 @@ BuildRequires: memcached
 %if 0%{?fedora} >= 12 || 0%{?rhel} >= 6
 BuildRequires: systemtap-sdt-devel
 %endif
-%if 0%{?fedora} >= 11 || 0%{?rhel} >= 5
 BuildRequires: libevent-devel
-%endif
 
 
 %description
@@ -91,10 +89,6 @@ rm -f libmemcached/csl/{parser,scanner}.cc
 # Temporary fix for SASL detection
 sed -i -e s/ax_cv_sasl/ac_enable_sasl/ configure
 %endif
-
-# Temporary uggly hack: fix version macro
-sed -e '/LIBMEMCACHED_VERSION_HEX/s/@PANDORA_HEX_VERSION@/@HEX_VERSION@/' \
-    -i libmemcached-*/configure.h.in
 
 
 %build
@@ -177,7 +171,7 @@ rm -rf %{buildroot}
 %{_libdir}/libmemcachedprotocol.so
 %{_libdir}/libmemcachedutil.so
 %{_libdir}/pkgconfig/libmemcached.pc
-%{_datadir}/aclocal/ax_lib_libmemcached.m4
+%{_datadir}/aclocal/ax_libmemcached.m4
 %{_mandir}/man3/libmemcached*
 %{_mandir}/man3/libhashkit*
 %{_mandir}/man3/memcached*
@@ -185,6 +179,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat Oct 20 2012 Remi Collet <remi@fedoraproject.org> - 1.0.13-1
+- update to 1.0.13
+
 * Fri Oct 19 2012 Remi Collet <remi@fedoraproject.org> - 1.0.12-2
 - temporary hack: fix LIBMEMCACHED_VERSION_HEX value
 
