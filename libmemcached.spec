@@ -1,9 +1,10 @@
-%global with_tests       %{?_with_tests:1}%{!?_with_tests:0}
-%global with_sasl        0
+# Regression tests take a long time, you can skip 'em with this
+%{!?runselftest: %{expand: %%global runselftest 1}}
+%global with_sasl        1
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   1.0.13
+Version:   1.0.14
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -15,6 +16,8 @@ URL:       http://libmemcached.org/
 # source tarball, and run "./strip-hsieh.sh <version>" to produce the
 # "-exhsieh" tarball.
 Source0:   libmemcached-%{version}-exhsieh.tar.gz
+
+# https://bugs.launchpad.net/libmemcached/+bug/1079994
 Patch0:    libmemcached-bigendian.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -24,9 +27,7 @@ BuildRequires: cyrus-sasl-devel
 BuildRequires: flex
 BuildRequires: bison
 BuildRequires: python-sphinx
-%if %{with_tests}
 BuildRequires: memcached
-%endif
 %if 0%{?fedora} >= 12 || 0%{?rhel} >= 6
 BuildRequires: systemtap-sdt-devel
 %endif
@@ -77,26 +78,34 @@ you will need to install %{name}-devel.
 mkdir examples
 cp -p tests/*.{cc,h} examples/
 
-%if 0%{?fedora} > 9 || 0%{?rhel} > 5
-%if 0%{?fedora} < 18 && 0%{?rhel} < 7
-# Will be regenerated during build
-# Only works with bison 2.4 - 2.5
-rm -f libmemcached/csl/{parser,scanner}.cc
-%endif
-%endif
-
-%if %{with_sasl}
-# Temporary fix for SASL detection
-sed -i -e s/ax_cv_sasl/ac_enable_sasl/ configure
+# Workaround https://bugs.launchpad.net/libmemcached/+bug/1080000
+%if 0%{?fedora} < 17 && 0%{?rhel} < 7
+sed -e 's:/usr/bin/touch:/bin/touch:' \
+    -i libtest/unittest.cc
 %endif
 
 
 %build
+# Workaround for https://bugs.launchpad.net/libmemcached/+bug/1079997
+export LIBS="-ldl"
+
 # option --with-memcached=false to disable server binary check (as we don't run test)
-%configure --disable-static \
-%if ! %{with_tests}
-   --with-memcached=false
+# option --enable-libmemcachedprotocol and --enable-memaslap not used (missing config.h)
+# see https://bugs.launchpad.net/libmemcached/+bug/1079995
+# option --enable-dtrace not used (breaks build)
+# see https://bugs.launchpad.net/libmemcached/+bug/1079996
+%configure \
+%if %{runselftest}
+   --with-memcached=%{_bindir}/memcached \
+%else
+   --with-memcached=false \
 %endif
+%if %{with_sasl}
+   --enable-sasl \
+%else
+   --disable-sasl \
+%endif
+   --disable-static
 
 %if 0%{?fedora} < 14 && 0%{?rhel} < 7
 # for warning: unknown option after '#pragma GCC diagnostic' kind
@@ -121,17 +130,8 @@ fi
 
 
 %check
-%if %{with_tests}
-# test suite cannot run in mock (same port use for memcache servers on all arch)
-# diff output.res output.cmp fails but result depend on server version
-# ======================
-# All 25 tests passed
-# (3 tests were not run)
-# ======================
-# Tests completed
+%if %{runselftest}
 make test
-%else
-: 'Test suite disabled (missing "--with tests" option)'
 %endif
 
 
@@ -152,7 +152,7 @@ rm -rf %{buildroot}
 %exclude %{_libdir}/lib*.la
 %{_libdir}/libhashkit.so.2*
 %{_libdir}/libmemcached.so.11*
-%{_libdir}/libmemcachedprotocol.so.0*
+#%{_libdir}/libmemcachedprotocol.so.0*
 %{_libdir}/libmemcachedutil.so.2*
 %{_mandir}/man1/mem*
 
@@ -164,11 +164,11 @@ rm -rf %{buildroot}
 %{_includedir}/libmemcached-1.0
 %{_includedir}/libhashkit
 %{_includedir}/libhashkit-1.0
-%{_includedir}/libmemcachedprotocol-0.0
+#%{_includedir}/libmemcachedprotocol-0.0
 %{_includedir}/libmemcachedutil-1.0
 %{_libdir}/libhashkit.so
 %{_libdir}/libmemcached.so
-%{_libdir}/libmemcachedprotocol.so
+#%{_libdir}/libmemcachedprotocol.so
 %{_libdir}/libmemcachedutil.so
 %{_libdir}/pkgconfig/libmemcached.pc
 %{_datadir}/aclocal/ax_libmemcached.m4
@@ -179,6 +179,18 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat Nov 17 2012 Remi Collet <remi@fedoraproject.org> - 1.0.14-1
+- update to 1.0.14
+- libmemcachedprotocol removed
+- sasl support is back
+- run test during build
+- report various issues to upstream
+  https://bugs.launchpad.net/libmemcached/+bug/1079994 (bigendian)
+  https://bugs.launchpad.net/libmemcached/+bug/1079995 (config.h)
+  https://bugs.launchpad.net/libmemcached/+bug/1079996 (dtrace)
+  https://bugs.launchpad.net/libmemcached/+bug/1079997 (-ldl)
+  https://bugs.launchpad.net/libmemcached/+bug/1080000 (touch)
+
 * Sat Oct 20 2012 Remi Collet <remi@fedoraproject.org> - 1.0.13-1
 - update to 1.0.13
 
