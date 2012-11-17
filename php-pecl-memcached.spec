@@ -1,3 +1,4 @@
+
 %{!?__pecl:     %{expand: %%global __pecl     %{_bindir}/pecl}}
 
 %global pecl_name memcached
@@ -5,7 +6,7 @@
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
 Version:      2.1.0
-Release:      3%{?dist}
+Release:      4%{?dist}
 # memcached is PHP, FastLZ is MIT
 License:      PHP and MIT
 Group:        Development/Languages
@@ -14,36 +15,36 @@ URL:          http://pecl.php.net/package/%{pecl_name}
 Source0:      http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 
 # https://github.com/php-memcached-dev/php-memcached/issues/25
-# https://github.com/remicollet/php-memcached/commit/a66b1286b06ec0c8b11790d772725a2a7bb33d57.patch
+# https://github.com/php-memcached-dev/php-memcached/commit/74542111f175fe2ec41c8bf722fc2cd3dac93eea.patch
 Patch0:        %{pecl_name}-build.patch
+# https://github.com/php-memcached-dev/php-memcached/pull/43
+Patch1:        %{pecl_name}-info.patch
 
 
-BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # 5.2.10 required to HAVE_JSON enabled
 BuildRequires: php-devel >= 5.2.10
 BuildRequires: php-pear
 BuildRequires: php-pecl-igbinary-devel
 BuildRequires: libmemcached-devel >= 1.0.0
 BuildRequires: zlib-devel
-# BuildRequires: cyrus-sasl-devel
+BuildRequires: cyrus-sasl-devel
 
 Requires(post): %{__pecl}
 Requires(postun): %{__pecl}
 
-Requires:     php-common%{?_isa} >= 5.2.10
 Requires:     php-pecl-igbinary%{?_isa}
 Requires:     php(zend-abi) = %{php_zend_api}
 Requires:     php(api) = %{php_core_api}
 
-Provides:     php-pecl(%{pecl_name}) = %{version}-%{release}
-Provides:     php-pecl(%{pecl_name})%{?_isa} = %{version}-%{release}
+Provides:     php-%{pecl_name} = %{version}
+Provides:     php-%{pecl_name}%{?_isa} = %{version}
+Provides:     php-pecl(%{pecl_name}) = %{version}
+Provides:     php-pecl(%{pecl_name})%{?_isa} = %{version}
 
 
-# RPM 4.8
+# Filter private shared
 %{?filter_provides_in: %filter_provides_in %{_libdir}/.*\.so$}
 %{?filter_setup}
-# RPM 4.9
-%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}%{_libdir}/.*\\.so$
 
 
 %description
@@ -88,17 +89,20 @@ EOF
 
 cd %{pecl_name}-%{version}
 %patch0 -p1 -b .build
+%patch1 -p1 -b .info
 cd ..
 
 cp -r %{pecl_name}-%{version} %{pecl_name}-%{version}-zts
 
 
 %build
-# no --enable-memcached-sasl, droped from libmemcached
 cd %{pecl_name}-%{version}
 %{_bindir}/phpize
 %configure --enable-memcached-igbinary \
            --enable-memcached-json \
+%if 0%{?fedora} >= 19
+           --enable-memcached-sasl \
+%endif
            --with-php-config=%{_bindir}/php-config
 make %{?_smp_mflags}
 
@@ -107,6 +111,9 @@ cd ../%{pecl_name}-%{version}-zts
 %{_bindir}/zts-phpize
 %configure --enable-memcached-igbinary \
            --enable-memcached-json \
+%if 0%{?fedora} >= 19
+           --enable-memcached-sasl \
+%endif
            --with-php-config=%{_bindir}/zts-php-config
 make %{?_smp_mflags}
 %endif
@@ -166,7 +173,6 @@ ln -s %{php_ztsextdir}/igbinary.so modules/
 
 
 %files
-%defattr(-,root,root,-)
 %doc %{pecl_name}-%{version}/{CREDITS,LICENSE,README.markdown,ChangeLog}
 %doc LICENSE-FastLZ
 %config(noreplace) %{_sysconfdir}/php.d/%{pecl_name}.ini
@@ -180,6 +186,11 @@ ln -s %{php_ztsextdir}/igbinary.so modules/
 
 
 %changelog
+* Sat Nov 17 2012  Remi Collet <remi@fedoraproject.org> - 2.1.0-4
+- rebuild for libmemcached 1.0.14 (with SASL)
+- switch to upstream patch
+- add patch to report about SASL support in phpinfo
+
 * Fri Oct 19 2012 Remi Collet <remi@fedoraproject.org> - 2.1.0-3
 - improve comment in configuration about session.
 
