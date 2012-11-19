@@ -1,6 +1,6 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 5.0.4
+Version: 5.0.5
 Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
@@ -649,6 +649,9 @@ fi
 %endif
 
 %changelog
+* Mon Nov 19 2012 Alan Pevec <apevec@redhat.com> 5.0.5-1
+- new upstream version 5.0.5
+
 * Mon Sep 17 2012 Alan Pevec <apevec@redhat.com> 5.0.4-1
 - New upstream release, version bump to 5 (#743894) from Andrew Elwell
 
