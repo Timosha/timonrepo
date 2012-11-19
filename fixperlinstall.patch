@@ -1,0 +1,24 @@
+diff -Nur bindings/Makefile.am bindings/Makefile.am
+--- bindings/Makefile.am	2012-11-11 03:43:05.000000000 -0700
++++ bindings/Makefile.am	2012-11-18 10:34:15.937674174 -0700
+@@ -48,7 +48,7 @@
+ 
+ buildperl/Makefile: .perl-directory-stamp buildperl/Makefile.PL \
+ 	$(top_builddir)/config.status
+-	cd buildperl && @PERL@ Makefile.PL INSTALL_BASE=$(prefix) @PERL_BINDINGS_OPTIONS@
++	cd buildperl && @PERL@ Makefile.PL @PERL_BINDINGS_OPTIONS@
+ 
+ buildperl/Makefile.PL: .perl-directory-stamp $(top_builddir)/config.status
+ 
+diff -Nur bindings/Makefile.in bindings/Makefile.in
+--- bindings/Makefile.in	2012-11-18 10:33:13.530044620 -0700
++++ bindings/Makefile.in	2012-11-18 10:34:21.340724920 -0700
+@@ -710,7 +710,7 @@
+ 
+ buildperl/Makefile: .perl-directory-stamp buildperl/Makefile.PL \
+ 	$(top_builddir)/config.status
+-	cd buildperl && @PERL@ Makefile.PL INSTALL_BASE=$(prefix) @PERL_BINDINGS_OPTIONS@
++	cd buildperl && @PERL@ Makefile.PL @PERL_BINDINGS_OPTIONS@
+ 
+ buildperl/Makefile.PL: .perl-directory-stamp $(top_builddir)/config.status
+ 

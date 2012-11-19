@@ -11,6 +11,7 @@ Source1: collectd-httpd.conf
 Source2: collection.conf
 Source3: collectd.service
 Patch1: %{name}-include-collectd.d.patch
+Patch2: fixperlinstall.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -188,6 +189,7 @@ This plugin collects information from virtualized guests.
 %prep
 %setup -q
 %patch1
+%patch2
 
 sed -i.orig -e 's|-Werror||g' Makefile.in */Makefile.in
 
@@ -651,6 +653,7 @@ fi
 %changelog
 * Mon Nov 19 2012 Alan Pevec <apevec@redhat.com> 5.0.5-1
 - new upstream version 5.0.5
+  http://mailman.verplant.org/pipermail/collectd/2012-November/005465.html
 
 * Mon Sep 17 2012 Alan Pevec <apevec@redhat.com> 5.0.4-1
 - New upstream release, version bump to 5 (#743894) from Andrew Elwell
