@@ -2,11 +2,12 @@
 %{!?__pecl:     %{expand: %%global __pecl     %{_bindir}/pecl}}
 
 %global pecl_name memcached
+%global libmemcached_build_version %(pkg-config --silence-errors --modversion libmemcached 2>/dev/null || echo 65536)
 
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
 Version:      2.1.0
-Release:      4%{?dist}
+Release:      5%{?dist}
 # memcached is PHP, FastLZ is MIT
 License:      PHP and MIT
 Group:        Development/Languages
@@ -32,6 +33,7 @@ BuildRequires: cyrus-sasl-devel
 Requires(post): %{__pecl}
 Requires(postun): %{__pecl}
 
+Requires:     libmemcached%{?_isa} >= %{libmemcached_build_version}
 Requires:     php-pecl-igbinary%{?_isa}
 Requires:     php(zend-abi) = %{php_zend_api}
 Requires:     php(api) = %{php_core_api}
@@ -186,6 +188,9 @@ ln -s %{php_ztsextdir}/igbinary.so modules/
 
 
 %changelog
+* Mon Nov 19 2012  Remi Collet <remi@fedoraproject.org> - 2.1.0-5
+- requires libmemcached >= build version
+
 * Sat Nov 17 2012  Remi Collet <remi@fedoraproject.org> - 2.1.0-4
 - rebuild for libmemcached 1.0.14 (with SASL)
 - switch to upstream patch
