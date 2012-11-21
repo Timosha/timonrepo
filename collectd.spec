@@ -347,9 +347,6 @@ chmod +x %{buildroot}/%{_datadir}/collectd/collection3/bin/*.cgi
 mkdir perl-examples
 find contrib -name '*.p[lm]' -exec mv {} perl-examples/ \;
 
-# postresql config example will be included by %doc
-rm %{buildroot}%{_datadir}/collectd/postgresql_default.conf
-
 # Move config contribs
 mkdir -p %{buildroot}/etc/collectd.d/
 cp contrib/redhat/apache.conf %{buildroot}/etc/collectd.d/apache.conf
@@ -445,6 +442,7 @@ fi
 %exclude %{_sysconfdir}/collectd.d/perl.conf
 %exclude %{_sysconfdir}/collectd.d/ping.conf
 %exclude %{_sysconfdir}/collectd.d/postgresql.conf
+%exclude %{_datadir}/collectd/postgresql_default.conf
 %exclude %{_sysconfdir}/collectd.d/rrdtool.conf
 %exclude %{_sysconfdir}/collectd.d/sensors.conf
 %exclude %{_sysconfdir}/collectd.d/snmp.conf
@@ -620,7 +618,7 @@ fi
 %defattr(-, root, root, -)
 %{_libdir}/collectd/postgresql.so
 %config(noreplace) %{_sysconfdir}/collectd.d/postgresql.conf
-%doc src/postgresql_default.conf
+%{_datadir}/collectd/postgresql_default.conf
 
 
 %files rrdtool
@@ -660,6 +658,7 @@ fi
 * Wed Nov 21 2012 Alan Pevec <apevec@redhat.com> 5.1.1-1
 - update to 5.1.1
 - spec cleanups from Ruben Kerkhof
+- fix postgresql_default.conf location rhbz#681615
 
 * Mon Nov 19 2012 Alan Pevec <apevec@redhat.com> 5.0.5-1
 - new upstream version 5.0.5
