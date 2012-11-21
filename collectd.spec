@@ -384,6 +384,7 @@ rm -f %{buildroot}/%{_libdir}/{collectd/,}*.la
 
 
 %post
+/sbin/ldconfig
 if [ $1 -eq 1 ] ; then
     # Initial installation
 %if 0%{?fedora} >= 15
@@ -408,6 +409,7 @@ fi
 
 
 %postun
+/sbin/ldconfig
 %if 0%{?fedora} >= 15
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 %endif
