@@ -535,7 +535,7 @@ fi
 %{_includedir}/collectd/client.h
 %{_includedir}/collectd/lcc_features.h
 
-%doc AUTHORS ChangeLog COPYING INSTALL README
+%doc AUTHORS ChangeLog COPYING README
 %doc %{_mandir}/man1/collectd.1*
 %doc %{_mandir}/man1/collectdctl.1*
 %doc %{_mandir}/man1/collectd-nagios.1*
