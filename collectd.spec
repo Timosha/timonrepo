@@ -125,7 +125,7 @@ This package contains Perl bindings and plugin for collectd.
 
 
 %package ping
-Summary:       ping module for collectd
+Summary:       Ping module for collectd
 Group:         System Environment/Daemons
 Requires:      collectd = %{version}-%{release}
 %description ping
