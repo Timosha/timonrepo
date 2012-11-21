@@ -1,6 +1,6 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 5.0.5
+Version: 5.1.1
 Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
@@ -526,6 +526,10 @@ fi
 %{_libdir}/collectd/target_set.so
 %{_libdir}/collectd/ted.so
 %{_libdir}/collectd/uptime.so
+%{_libdir}/collectd/ethstat.so
+%{_libdir}/collectd/md.so
+%{_libdir}/collectd/numa.so
+%{_libdir}/collectd/write_graphite.so
 
 %{_datadir}/collectd/types.db
 
@@ -653,6 +657,10 @@ fi
 %endif
 
 %changelog
+* Wed Nov 21 2012 Alan Pevec <apevec@redhat.com> 5.1.1-1
+- update to 5.1.1
+- spec cleanups from Ruben Kerkhof
+
 * Mon Nov 19 2012 Alan Pevec <apevec@redhat.com> 5.0.5-1
 - new upstream version 5.0.5
   http://mailman.verplant.org/pipermail/collectd/2012-November/005465.html
