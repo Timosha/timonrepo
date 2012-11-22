@@ -37,7 +37,7 @@
 
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
-Version: 5.3.18
+Version: 5.3.19
 Release: 1%{?dist}
 License: PHP
 Group: Development/Languages
@@ -408,6 +408,8 @@ Provides: php-dom, php-dom%{?_isa}
 Provides: php-xsl, php-xsl%{?_isa}
 Provides: php-domxml, php-domxml%{?_isa}
 Provides: php-wddx, php-wddx%{?_isa}
+Provides: php-xmlreader, php-xmlreader%{?_isa}
+Provides: php-xmlwriter, php-xmlwriter%{?_isa}
 BuildRequires: libxslt-devel >= 1.0.18-1, libxml2-devel >= 2.4.14-1
 
 %description xml
@@ -1114,6 +1116,10 @@ fi
 
 
 %changelog
+* Thu Nov 22 2012 Remi Collet <remi@fedoraproject.org> 5.3.19-1
+- update to 5.3.19
+- provides php-xmlreader and php-xmlwriter
+
 * Thu Oct 18 2012 Remi Collet <remi@fedoraproject.org> 5.3.18-1
 - update to 5.3.18
 - provides php-phar
