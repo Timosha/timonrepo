@@ -820,7 +820,7 @@ fi
 * Sun Nov 30 2008 Alan Pevec <apevec@redhat.com> 4.5.1-2
 - workaround for https://bugzilla.redhat.com/show_bug.cgi?id=468067
 
-* Sun Oct 22 2008 Alan Pevec <apevec@redhat.com> 4.5.1-1
+* Wed Oct 22 2008 Alan Pevec <apevec@redhat.com> 4.5.1-1
 - New upstream version 4.5.1, bz# 470943
   http://collectd.org/news.shtml#news59
 - enable Network UPS Tools (nut) plugin, bz# 465729
@@ -838,7 +838,7 @@ fi
 - Turn dependencies on packages to dependencies on Perl modules
 - Add default attributes for files
 
-* Wed Jun 12 2008 Alan Pevec <apevec@redhat.com> 4.4.1-2
+* Thu Jun 12 2008 Alan Pevec <apevec@redhat.com> 4.4.1-2
 - Split rrdtool into a subpackage (Chris Lalancette)
 - cleanup subpackages, split dns plugin, enable ipmi
 - include /etc/collectd.d (bz#443942)
