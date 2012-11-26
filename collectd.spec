@@ -1,6 +1,6 @@
 Summary: Statistics collection daemon for filling RRD files
 Name: collectd
-Version: 5.1.1
+Version: 5.2.0
 Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Daemons
@@ -454,6 +454,7 @@ fi
 %endif
 %{_bindir}/collectd-nagios
 %{_bindir}/collectdctl
+%{_bindir}/collectd-tg
 %{_sbindir}/collectd
 %{_sbindir}/collectdmon
 %dir %{_localstatedir}/lib/collectd/
@@ -524,6 +525,7 @@ fi
 %{_libdir}/collectd/target_set.so
 %{_libdir}/collectd/ted.so
 %{_libdir}/collectd/uptime.so
+%{_libdir}/collectd/aggregation.so
 %{_libdir}/collectd/ethstat.so
 %{_libdir}/collectd/md.so
 %{_libdir}/collectd/numa.so
@@ -533,11 +535,13 @@ fi
 
 # collectdclient - TBD reintroduce -devel subpackage?
 %{_libdir}/libcollectdclient.so
-%{_libdir}/libcollectdclient.so.0
-%{_libdir}/libcollectdclient.so.0.0.0
+%{_libdir}/libcollectdclient.so.1
+%{_libdir}/libcollectdclient.so.1.0.0
 %{_libdir}/pkgconfig/libcollectdclient.pc
 %{_includedir}/collectd/client.h
 %{_includedir}/collectd/lcc_features.h
+%{_includedir}/collectd/network.h
+%{_includedir}/collectd/network_buffer.h
 
 %doc AUTHORS ChangeLog COPYING README
 %doc %{_mandir}/man1/collectd.1*
@@ -655,6 +659,9 @@ fi
 %endif
 
 %changelog
+* Mon Nov 26 2012 Alan Pevec <apevec@redhat.com> 5.2.0-1
+- update to 5.2.0 from Steve Traylen rhbz#877721
+
 * Wed Nov 21 2012 Alan Pevec <apevec@redhat.com> 5.1.1-1
 - update to 5.1.1
 - spec cleanups from Ruben Kerkhof
