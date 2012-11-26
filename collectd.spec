@@ -659,6 +659,7 @@ fi
 - update to 5.1.1
 - spec cleanups from Ruben Kerkhof
 - fix postgresql_default.conf location rhbz#681615
+- fix broken configuration for httpd 2.4 rhbz#871385
 
 * Mon Nov 19 2012 Alan Pevec <apevec@redhat.com> 5.0.5-1
 - new upstream version 5.0.5
