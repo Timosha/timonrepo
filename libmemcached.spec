@@ -4,7 +4,7 @@
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   1.0.14
+Version:   1.0.15
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -16,9 +16,6 @@ URL:       http://libmemcached.org/
 # source tarball, and run "./strip-hsieh.sh <version>" to produce the
 # "-exhsieh" tarball.
 Source0:   libmemcached-%{version}-exhsieh.tar.gz
-
-# https://bugs.launchpad.net/libmemcached/+bug/1079994
-Patch0:    libmemcached-bigendian.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %if %{with_sasl}
@@ -41,6 +38,7 @@ usage, and provide full access to server side methods.
 
 It also implements several command line tools:
 
+memaslap    Load testing and benchmarking a server
 memcapable  Checking a Memcached server capibilities and compatibility
 memcat      Copy the value of a key to standard output
 memcp       Copy data to a server
@@ -73,27 +71,20 @@ you will need to install %{name}-devel.
 
 %prep
 %setup -q
-%patch0 -p1
 
 mkdir examples
 cp -p tests/*.{cc,h} examples/
 
-# Workaround https://bugs.launchpad.net/libmemcached/+bug/1080000
-%if 0%{?fedora} < 17 && 0%{?rhel} < 7
-sed -e 's:/usr/bin/touch:/bin/touch:' \
-    -i libtest/unittest.cc
-%endif
+# https://bugs.launchpad.net/libmemcached/+bug/1094413
+sed -e s/LIBEVENT_LDFLAGS/LIBEVENT_LIB/ \
+    -i Makefile.in
 
 
 %build
-# Workaround for https://bugs.launchpad.net/libmemcached/+bug/1079997
-export LIBS="-ldl"
+# https://bugs.launchpad.net/libmemcached/+bug/1094414
+export CFLAGS="$RPM_OPT_FLAGS  -std=c99"
 
 # option --with-memcached=false to disable server binary check (as we don't run test)
-# option --enable-libmemcachedprotocol and --enable-memaslap not used (missing config.h)
-# see https://bugs.launchpad.net/libmemcached/+bug/1079995
-# option --enable-dtrace not used (breaks build)
-# see https://bugs.launchpad.net/libmemcached/+bug/1079996
 %configure \
 %if %{runselftest}
    --with-memcached=%{_bindir}/memcached \
@@ -105,6 +96,9 @@ export LIBS="-ldl"
 %else
    --disable-sasl \
 %endif
+   --enable-libmemcachedprotocol \
+   --enable-memaslap \
+   --enable-dtrace \
    --disable-static
 
 %if 0%{?fedora} < 14 && 0%{?rhel} < 7
@@ -152,7 +146,7 @@ rm -rf %{buildroot}
 %exclude %{_libdir}/lib*.la
 %{_libdir}/libhashkit.so.2*
 %{_libdir}/libmemcached.so.11*
-#%{_libdir}/libmemcachedprotocol.so.0*
+%{_libdir}/libmemcachedprotocol.so.0*
 %{_libdir}/libmemcachedutil.so.2*
 %{_mandir}/man1/mem*
 
@@ -164,11 +158,11 @@ rm -rf %{buildroot}
 %{_includedir}/libmemcached-1.0
 %{_includedir}/libhashkit
 %{_includedir}/libhashkit-1.0
-#%{_includedir}/libmemcachedprotocol-0.0
+%{_includedir}/libmemcachedprotocol-0.0
 %{_includedir}/libmemcachedutil-1.0
 %{_libdir}/libhashkit.so
 %{_libdir}/libmemcached.so
-#%{_libdir}/libmemcachedprotocol.so
+%{_libdir}/libmemcachedprotocol.so
 %{_libdir}/libmemcachedutil.so
 %{_libdir}/pkgconfig/libmemcached.pc
 %{_datadir}/aclocal/ax_libmemcached.m4
@@ -179,6 +173,14 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat Dec 29 2012 Remi Collet <remi@fedoraproject.org> - 1.0.15-1
+- update to 1.0.15
+- libmemcachedprotocol is back
+- add memaslap command line tool
+- report various issues to upstream
+  https://bugs.launchpad.net/libmemcached/+bug/1094413 (libevent)
+  https://bugs.launchpad.net/libmemcached/+bug/1094414 (c99 MODE)
+
 * Sat Nov 17 2012 Remi Collet <remi@fedoraproject.org> - 1.0.14-1
 - update to 1.0.14
 - libmemcachedprotocol removed
