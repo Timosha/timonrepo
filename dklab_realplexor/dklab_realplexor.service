@@ -1,0 +1,15 @@
+[Unit]
+Description=dklab_realplexor COMET server
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=simple
+
+ExecStart=-/usr/share/dklab_realplexor/dklab_realplexor /etc/dklab_realplexor.conf
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill $MAINPID
+#SuccessExitStatus=1 SIGTERM SIGKILL
+
+[Install]
+WantedBy=multi-user.target
+
