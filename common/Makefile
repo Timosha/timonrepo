@@ -4,7 +4,7 @@ RPMDEFINES := --define "_sourcedir $(SRCDIR)" \
               --define "_rpmdir $(SRCDIR)"
 
 REPODIR := /home/timon/development/repo
-RELEASE := 16
+RELEASE := 17
 ARCH := x86_64
 
 build: prep
