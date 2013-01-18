@@ -3,7 +3,7 @@
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
-Release:		2%{?dist}
+Release:		3%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
@@ -300,6 +300,9 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Fri Jan 18 2013 Adam Tkac <atkac redhat com> - 6.7.8.9-3
+- rebuild due to "jpeg8-ABI" feature drop
+
 * Fri Dec 21 2012 Adam Tkac <atkac redhat com> - 6.7.8.9-2
 - rebuild against new libjpeg
 
