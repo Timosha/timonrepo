@@ -4,7 +4,7 @@
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   1.0.15
+Version:   1.0.16
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -75,15 +75,8 @@ you will need to install %{name}-devel.
 mkdir examples
 cp -p tests/*.{cc,h} examples/
 
-# https://bugs.launchpad.net/libmemcached/+bug/1094413
-sed -e s/LIBEVENT_LDFLAGS/LIBEVENT_LIB/ \
-    -i Makefile.in
-
 
 %build
-# https://bugs.launchpad.net/libmemcached/+bug/1094414
-export CFLAGS="$RPM_OPT_FLAGS  -std=c99"
-
 # option --with-memcached=false to disable server binary check (as we don't run test)
 %configure \
 %if %{runselftest}
@@ -125,7 +118,15 @@ fi
 
 %check
 %if %{runselftest}
-make test
+make test 2>&1 | tee rpmtests.log
+# Ignore test result for memaslap (XFAIL but PASS)
+# https://bugs.launchpad.net/libmemcached/+bug/1115357
+if grep "XPASS: clients/memaslap" rpmtests.log && grep "1 of 21" rpmtests.log
+then
+  exit 0
+else
+  exit 1
+fi
 %endif
 
 
@@ -173,6 +174,11 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Feb  4 2013 Remi Collet <remi@fedoraproject.org> - 1.0.16-1
+- update to 1.0.16
+- ignore test result for memaslap (XFAIL but PASS)
+  https://bugs.launchpad.net/libmemcached/+bug/1115357
+
 * Sat Dec 29 2012 Remi Collet <remi@fedoraproject.org> - 1.0.15-1
 - update to 1.0.15
 - libmemcachedprotocol is back
