@@ -1,0 +1,17 @@
+[Unit]
+Description=The pgbouncer lightweight connection pooler for PostgreSQL
+After=syslog.target network.target remote-fs.target nss-lookup.target
+ 
+[Service]
+Type=forking
+User=pgbouncer
+Group=pgbouncer
+
+PIDFile=/run/pgbouncer/pgbouncer.pid
+ExecStart=/usr/bin/pgbouncer -q -d /etc/pgbouncer/pgbouncer.ini
+
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+ 
+[Install]
+WantedBy=multi-user.target

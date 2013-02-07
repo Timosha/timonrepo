@@ -1,21 +1,21 @@
 %global debug 0
 
 Name:		pgbouncer
-Version:	1.5.2
-Release:	3%{?dist}
+Version:	1.5.4
+Release:	1%{?dist}
 Summary:	Lightweight connection pooler for PostgreSQL
 Group:		Applications/Databases
 License:	MIT and BSD
 URL:		http://pgfoundry.org/projects/pgbouncer/
-Source0:	http://ftp.postgresql.org/pub/projects/pgFoundry/%{name}/%{name}-%{version}.tar.gz
+Source0:	http://ftp.postgresql.org/pub/projects/pgFoundry/%{name}/%{name}/%{version}/%{name}-%{version}.tar.gz
 Source1:	%{name}.service
-Patch0:		%{name}-ini.patch
+Source2:	%{name}.tmpfiles.d
+
+Patch0:		%{name}.ini.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:	libevent-devel >= 2.0
 BuildRequires:  systemd-units
-
-Requires:	postgresql-server
 
 # pre/post stuff needs systemd too
 Requires(post): systemd-units
@@ -52,21 +52,34 @@ sed -i.fedora \
 %{__make} install DESTDIR=%{buildroot}
 install -p -d %{buildroot}%{_sysconfdir}/%{name}/
 install -p -m 644 etc/pgbouncer.ini %{buildroot}%{_sysconfdir}/%{name}
+install -p -m 700 etc/mkauth.py %{buildroot}%{_sysconfdir}/%{name}/
 
 install -d -m 755 %{buildroot}%{_localstatedir}/run/%{name}
+
+mkdir -p %{buildroot}%{_prefix}/lib/tmpfiles.d
+install -m 0644 %{SOURCE2} %{buildroot}%{_prefix}/lib/tmpfiles.d/%{name}.conf
+
 install -d -m 755 %{buildroot}%{_localstatedir}/log/%{name}
 
-install -d $RPM_BUILD_ROOT%{_unitdir}
-install -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_unitdir}/%{name}.service
+install -d %{buildroot}%{_unitdir}
+install -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
 
 # Remove duplicated files
-%{__rm} -rf %{buildroot}%{_docdir}/%{name}
+%{__rm} -f %{buildroot}%{_docdir}/%{name}/*
 
 %post
 if [ $1 -eq 1 ] ; then
     # Initial installation
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 fi
+
+%pre
+groupadd -r pgbouncer >/dev/null 2>&1 || :
+useradd -m -g pgbouncer -r -s /bin/bash \
+        -c "PgBouncer Server" pgbouncer >/dev/null 2>&1 || :
+#touch /var/log/pgbouncer.log
+#chown pgbouncer:pgbouncer /var/log/pgbouncer.log
+#chmod 0700 /var/log/pgbouncer.log
 
 %preun
 if [ $1 -eq 0 ] ; then
@@ -87,18 +100,24 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%doc README NEWS AUTHORS
+%doc README NEWS COPYRIGHT AUTHORS doc/README.html doc/config.html doc/faq.html doc/todo.html doc/usage.html
 %{_bindir}/*
 %config(noreplace) %{_sysconfdir}/%{name}/%{name}.ini
 %{_unitdir}/%{name}.service
 %{_mandir}/man1/%{name}.*
 %{_mandir}/man5/%{name}.*
-
-%attr(755,postgres,postgres) %{_localstatedir}/run/%{name}
-%attr(755,postgres,postgres) %{_localstatedir}/log/%{name}
+%{_sysconfdir}/%{name}/mkauth.py*
+%attr(755,pgbouncer,pgbouncer) %dir %{_localstatedir}/run/%{name}
+%attr(755,pgbouncer,pgbouncer) %dir %{_localstatedir}/log/%{name}
+%{_prefix}/lib/tmpfiles.d/%{name}.conf
 
 
 %changelog
+* Thu Feb 7 2013 Timon <timosha@gmail.com> - 1.5.4-1
+- pgbouncer 1.5.4
+- systemd fixes
+- pgbouncer user
+
 * Wed Aug 8 2012 Timon <timosha@gmail.com> - 1.5.2-3
 - remove pgbouncer user
 - systemd
