@@ -30,13 +30,14 @@
 %global isasuffix %nil
 %endif
 
+# Flip these to 0 and %nil% respectively to disable zip support
 # Flip these to 1 and zip respectively to enable zip support again
-%global with_zip 0
-%global zipmod %nil
+%global with_zip 1
+%global zipmod   zip
 
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
-Version: 5.3.10
+Version: 5.3.13
 Release: 1%{?dist}
 License: PHP
 Group: Development/Languages
@@ -50,8 +51,10 @@ Source4: php-fpm.conf
 Source5: php-fpm-www.conf
 Source6: php-fpm.init
 Source7: php-fpm.logrotate
+Source8: php-fpm.sysconfig
 
 # Build fixes
+Patch1: php-5.3.11-gnusrc.patch
 Patch2: php-5.3.0-install.patch
 Patch3: php-5.2.4-norpath.patch
 Patch5: php-5.2.0-includedir.patch
@@ -59,7 +62,7 @@ Patch6: php-5.2.4-embed.patch
 Patch7: php-5.3.0-recode.patch
 # from http://svn.php.net/viewvc?view=revision&revision=311042
 # and  http://svn.php.net/viewvc?view=revision&revision=311908
-Patch8: php-5.3.10-aconf259.patch
+Patch8: php-5.3.11-aconf259.patch
 
 # Fixes for extension modules
 Patch20: php-4.3.11-shutdown.patch
@@ -85,12 +88,7 @@ BuildRequires: httpd-devel >= 2.0.46-1, pam-devel
 BuildRequires: libstdc++-devel, openssl-devel, sqlite-devel >= 3.6.0
 BuildRequires: zlib-devel, pcre-devel >= 6.6, smtpdaemon, libedit-devel
 BuildRequires: bzip2, perl, libtool >= 1.4.3, gcc-c++
-BuildRequires: libtool-ltdl-devel
-
-Obsoletes: php-dbg, php3, phpfi, stronghold-php, php-zts < 5.3.7
-Provides: php-zts = %{version}-%{release}
-Provides: php-zts%{?_isa} = %{version}-%{release}
-
+Obsoletes: php-dbg, php3, phpfi, stronghold-php
 Requires: httpd-mmn = %{httpd_mmn}
 Provides: mod_php = %{version}-%{release}
 Requires: php-common%{?_isa} = %{version}-%{release}
@@ -274,8 +272,7 @@ Summary: A module for PHP applications that use MySQL databases
 Group: Development/Languages
 Requires: php-pdo%{?_isa} = %{version}-%{release}
 Provides: php_database
-Provides: php-mysqli = %{version}-%{release}
-Provides: php-mysqli%{?_isa} = %{version}-%{release}
+Provides: php-mysqli, php-mysqli%{?_isa}
 Provides: php-pdo_mysql, php-pdo_mysql%{?_isa}
 Obsoletes: mod_php3-mysql, stronghold-php-mysql
 BuildRequires: mysql-devel >= 4.1.0
@@ -554,6 +551,7 @@ support for using the enchant library to PHP.
 
 %prep
 %setup -q
+%patch1 -p1 -b .gnusrc
 %patch2 -p1 -b .install
 %patch3 -p1 -b .norpath
 %patch5 -p1 -b .includedir
@@ -740,9 +738,8 @@ build --enable-force-cgi-redirect \
       --enable-dba=shared --with-db4=%{_prefix} \
       --with-xmlrpc=shared \
       --with-ldap=shared --with-ldap-sasl \
-      --enable-mysqlnd=shared \
-      --with-mysql=shared,mysqlnd \
-      --with-mysqli=shared,mysqlnd \
+      --with-mysql=shared,%{_prefix} \
+      --with-mysqli=shared,%{mysql_config} \
       --with-interbase=shared,%{_libdir}/firebird \
       --with-pdo-firebird=shared,%{_libdir}/firebird \
       --enable-dom=shared \
@@ -756,7 +753,7 @@ build --enable-force-cgi-redirect \
       --enable-fastcgi \
       --enable-pdo=shared \
       --with-pdo-odbc=shared,unixODBC,%{_prefix} \
-      --with-pdo-mysql=shared,mysqlnd \
+      --with-pdo-mysql=shared,%{mysql_config} \
       --with-pdo-pgsql=shared,%{_prefix} \
       --with-pdo-sqlite=shared,%{_prefix} \
       --with-pdo-dblib=shared,%{_prefix} \
@@ -782,9 +779,9 @@ build --enable-force-cgi-redirect \
       --with-recode=shared,%{_prefix}
 popd
 
-without_shared="--without-gd \
+without_shared="--without-mysql --without-gd \
       --disable-dom --disable-dba --without-unixODBC \
-      --disable-xmlreader --disable-xmlwriter \
+      --disable-pdo --disable-xmlreader --disable-xmlwriter \
       --without-sqlite3 --disable-phar --disable-fileinfo \
       --disable-json --without-pspell --disable-wddx \
       --without-curl --disable-posix \
@@ -794,11 +791,6 @@ without_shared="--without-gd \
 pushd build-apache
 build --with-apxs2=%{_sbindir}/apxs \
       --libdir=%{_libdir}/php \
-      --enable-pdo=shared \
-      --with-mysql=shared,%{_prefix} \
-      --with-mysqli=shared,%{mysql_config} \
-      --with-pdo-mysql=shared,%{mysql_config} \
-      --with-pdo-sqlite=shared,%{_prefix} \
       ${without_shared}
 popd
 
@@ -807,7 +799,6 @@ popd
 pushd build-fpm
 build --enable-fpm \
       --libdir=%{_libdir}/php \
-      --without-mysql --disable-pdo \
       ${without_shared}
 popd
 %endif
@@ -815,17 +806,14 @@ popd
 # Build for inclusion as embedded script language into applications,
 # /usr/lib[64]/libphp5.so
 pushd build-embedded
-build --enable-embed \
-      --without-mysql --disable-pdo \
-      ${without_shared}
+build --enable-embed ${without_shared}
 popd
 
 # Build a special thread-safe Apache SAPI
 pushd build-zts
-EXTENSION_DIR=%{_libdir}/php-zts/modules
+EXTENSION_DIR=%{_libdir}/php/modules-zts
 build --with-apxs2=%{_sbindir}/apxs ${without_shared} \
       --libdir=%{_libdir}/php-zts \
-      --without-mysql --disable-pdo \
       --enable-maintainer-zts \
       --with-config-file-scan-dir=%{_sysconfdir}/php-zts.d
 popd
@@ -860,25 +848,11 @@ make -C build-embedded install-sapi install-headers INSTALL_ROOT=$RPM_BUILD_ROOT
 
 %if %{with_fpm}
 # Install the php-fpm binary
-make -C build-fpm install-fpm \
-     INSTALL_ROOT=$RPM_BUILD_ROOT
+make -C build-fpm install-fpm INSTALL_ROOT=$RPM_BUILD_ROOT 
 %endif
 
 # Install everything from the CGI SAPI build
-make -C build-cgi install \
-     INSTALL_ROOT=$RPM_BUILD_ROOT
-
-# rename extensions build with mysqlnd
-mv $RPM_BUILD_ROOT%{_libdir}/php/modules/mysql.so \
-   $RPM_BUILD_ROOT%{_libdir}/php/modules/mysqlnd_mysql.so
-mv $RPM_BUILD_ROOT%{_libdir}/php/modules/mysqli.so \
-   $RPM_BUILD_ROOT%{_libdir}/php/modules/mysqlnd_mysqli.so
-mv $RPM_BUILD_ROOT%{_libdir}/php/modules/pdo_mysql.so \
-   $RPM_BUILD_ROOT%{_libdir}/php/modules/pdo_mysqlnd.so
-
-# Install the mysql extension build with libmysql
-make -C build-apache install-modules \
-     INSTALL_ROOT=$RPM_BUILD_ROOT
+make -C build-cgi install INSTALL_ROOT=$RPM_BUILD_ROOT 
 
 # Install the default configuration file and icons
 install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/
@@ -922,6 +896,9 @@ install -m 755 %{SOURCE6} $RPM_BUILD_ROOT%{_initrddir}/php-fpm
 # LogRotate
 install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
 install -m 644 %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/php-fpm
+# Environment file
+install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+install -m 644 %{SOURCE8} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/php-fpm
 # tmpfiles.d
 install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/tmpfiles.d
 install -m 644 php-fpm.tmpfiles $RPM_BUILD_ROOT%{_sysconfdir}/tmpfiles.d/php-fpm.conf
@@ -1034,7 +1011,7 @@ fi
 #dir %{_sysconfdir}/php-zts.d
 %dir %{_libdir}/php
 %dir %{_libdir}/php/modules
-#dir %{_libdir}/php-zts/modules
+#dir %{_libdir}/php/modules-zts
 %dir %{_localstatedir}/lib/php
 %dir %{_libdir}/php/pear
 %dir %{_datadir}/php
@@ -1051,6 +1028,10 @@ fi
 %{_mandir}/man1/phpize.1*
 %doc sapi/cgi/README* sapi/cli/README
 
+%files zts
+%defattr(-,root,root)
+%{_libdir}/httpd/modules/libphp5-zts.so
+
 %if %{with_fpm}
 %files fpm
 %defattr(-,root,root)
@@ -1058,16 +1039,18 @@ fi
 %config(noreplace) %{_sysconfdir}/php-fpm.conf
 %config(noreplace) %{_sysconfdir}/php-fpm.d/www.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/php-fpm
+%config(noreplace) %{_sysconfdir}/sysconfig/php-fpm
 %config(noreplace) %{_sysconfdir}/tmpfiles.d/php-fpm.conf
 %{_sbindir}/php-fpm
 %{_initrddir}/php-fpm
 %dir %{_sysconfdir}/php-fpm.d
 # log owned by apache for log
-%attr(770,apache,apache) %dir %{_localstatedir}/log/php-fpm
+%attr(770,apache,root) %dir %{_localstatedir}/log/php-fpm
 %dir %{_localstatedir}/run/php-fpm
 %dir %{_datadir}/php-fpm
 %{_datadir}/php-fpm/status.html
 %{_mandir}/man8/php-fpm.8*
+%{_datadir}/fpm/status.html
 %endif
 
 %files devel
@@ -1112,25 +1095,31 @@ fi
 
 
 %changelog
-* Wed Jan 11 2012 Timon <timosha@gmail.com> 5.3.10-1
-- 5.3.10
-- fix aconf patch
+* Wed May 09 2012 Remi Collet <remi@fedoraproject.org> 5.3.13-1
+- update to 5.3.13 (CVE-2012-2311)
 
-* Wed Jan 11 2012 Timon <timosha@gmail.com> 5.3.9-1
-- backport pg_notify patch from trunk
-- 5.3.9
+* Thu May 03 2012 Remi Collet <remi@fedoraproject.org> 5.3.12
+- update to 5.3.12 (CVE-2012-1823)
 
-* Wed Oct 12 2011 Peter Schiffer <pschiffe@redhat.com> - 5.3.8-3.1
-- rebuild with new gmp
+* Fri Apr 27 2012 Remi Collet <remi@fedoraproject.org> 5.3.11-1
+- update to 5.3.11
+  http://www.php.net/ChangeLog-5.php#5.3.11
+- add /etc/sysconfig/php-fpm environment file (#784770)
+- php-fpm: add security.limit_extensions in provided conf
+
+* Thu Feb  2 2012 Joe Orton <jorton@redhat.com> - 5.3.10-1
+- update to 5.3.10
+
+* Wed Jan 11 2012 Remi Collet <remi@fedoraproject.org> 5.3.9-1
+- update to 5.3.9
+  http://www.php.net/ChangeLog-5.php#5.3.9
+- fix owner of /var/log/php-fpm (bug #773077)
+- add max_input_vars, max_file_uploads, zend.enable_gc to php.ini
+- drop patch4, use --libdir to use /usr/lib*/php/build
 
 * Wed Sep 28 2011 Remi Collet <remi@fedoraproject.org> 5.3.8-3
 - revert is_a() to php <= 5.3.6 behavior (from upstream)
   with new option (allow_string) for new behavior
-
-* Tue Sep 13 2011 Remi Collet <remi@fedoraproject.org> 5.3.8-2
-- add mysqlnd sub-package
-- drop patch4, use --libdir to use /usr/lib*/php/build
-- add patch to redirect mysql.sock (in mysqlnd)
 
 * Tue Aug 23 2011 Remi Collet <remi@fedoraproject.org> 5.3.8-1
 - update to 5.3.8
@@ -1139,12 +1128,6 @@ fi
 * Thu Aug 18 2011 Remi Collet <remi@fedoraproject.org> 5.3.7-1
 - update to 5.3.7
   http://www.php.net/ChangeLog-5.php#5.3.7
-- merge php-zts into php (#698084)
-
-* Tue Jul 12 2011 Joe Orton <jorton@redhat.com> - 5.3.6-4
-- rebuild for net-snmp SONAME bump
-
-* Mon Apr  4 2011 Remi Collet <Fedora@famillecollet.com> 5.3.6-3
 - enable mhash extension (emulated by hash extension)
 
 * Wed Mar 23 2011 Remi Collet <Fedora@famillecollet.com> 5.3.6-2
@@ -1154,9 +1137,6 @@ fi
 - update to 5.3.6
   http://www.php.net/ChangeLog-5.php#5.3.6
 - fix php-pdo arch specific requires
-
-* Tue Mar 15 2011 Joe Orton <jorton@redhat.com> - 5.3.5-6
-- disable zip extension per "No Bundled Libraries" policy (#551513)
 
 * Mon Mar 07 2011 Caolán McNamara <caolanm@redhat.com> 5.3.5-5
 - rebuild for icu 4.6
