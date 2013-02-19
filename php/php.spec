@@ -1,3 +1,4 @@
+%global runselftest 0
 %global contentdir  /var/www
 # API/ABI check
 %global apiver      20090626
@@ -6,7 +7,7 @@
 # Extension version
 %global fileinfover 1.0.5-dev
 %global pharver     2.0.1
-%global zipver      1.9.1
+%global zipver      1.11.0
 %global jsonver     1.2.1
 
 %global httpd_mmn %(cat %{_includedir}/httpd/.mmn || echo missing-httpd-devel)
@@ -37,7 +38,7 @@
 
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
-Version: 5.3.13
+Version: 5.3.21
 Release: 1%{?dist}
 License: PHP
 Group: Development/Languages
@@ -62,7 +63,7 @@ Patch6: php-5.2.4-embed.patch
 Patch7: php-5.3.0-recode.patch
 # from http://svn.php.net/viewvc?view=revision&revision=311042
 # and  http://svn.php.net/viewvc?view=revision&revision=311908
-Patch8: php-5.3.11-aconf259.patch
+Patch8: php-5.3.21-aconf259.patch
 
 # Fixes for extension modules
 Patch20: php-4.3.11-shutdown.patch
@@ -1050,7 +1051,6 @@ fi
 %dir %{_datadir}/php-fpm
 %{_datadir}/php-fpm/status.html
 %{_mandir}/man8/php-fpm.8*
-%{_datadir}/fpm/status.html
 %endif
 
 %files devel
