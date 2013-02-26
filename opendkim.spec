@@ -82,9 +82,9 @@ make DESTDIR=%{buildroot} install %{?_smp_mflags}
 install -d %{buildroot}%{_sysconfdir}
 install -d %{buildroot}%{_sysconfdir}/sysconfig
 install -d %{buildroot}%{_initrddir}
-install -d -m 0755 %{buildroot}%{_unitdir}
+install -d -m 0755 %{buildroot}/%{_unitdir}
 install -m 0755 contrib/init/redhat/%{name} %{buildroot}%{_initrddir}/%{name}
-install -m 0644 contrib/systemd/%{name}.service %{buildroot}%{_unitdir}/%{name}.service
+install -m 0644 contrib/systemd/%{name}.service %{buildroot}/%{_unitdir}/%{name}.service
 install -m 0755 contrib/init/redhat/%{name}-default-keygen %{buildroot}%{_sbindir}/%{name}-default-keygen
 
 cat > %{buildroot}%{_sysconfdir}/%{name}.conf << 'EOF'
