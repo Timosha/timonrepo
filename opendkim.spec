@@ -1,31 +1,31 @@
-# Copyright (c) 2010, 2011, The OpenDKIM Project.
-#
-# $Id: opendkim.spec.in,v 1.2 2010/10/25 17:13:47 cm-msk Exp $
+# systemd-compatible version
 
 Summary: A DomainKeys Identified Mail (DKIM) milter to sign and/or verify mail
 Name: opendkim
 Version: 2.8.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD and Sendmail
 URL: http://opendkim.org/
 Group: System Environment/Daemons
 Requires: lib%{name} = %{version}-%{release}
 Requires (pre): shadow-utils
+
+# Uncomment for systemd version
 Requires (post): systemd-units
 Requires (preun): systemd-units
 Requires (postun): systemd-units
-# This is actually needed for the %triggerun script but Requires(triggerun)
-# is not valid.  We can use %post because this particular %triggerun script
-# should fire just after this package is installed.
 Requires (post): systemd-sysv
+
+# Uncomment for SystemV version
+#Requires (post): chkconfig
+#Requires (preun): chkconfig, initscripts
+#Requires (postun): initscripts
 
 BuildRequires: openssl-devel
 BuildRequires: pkgconfig
 BuildRequires: sendmail-devel
 
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-#Source1: %{name}.service
-#Source2: %{name}-default-keygen
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -82,9 +82,9 @@ make DESTDIR=%{buildroot} install %{?_smp_mflags}
 install -d %{buildroot}%{_sysconfdir}
 install -d %{buildroot}%{_sysconfdir}/sysconfig
 install -d %{buildroot}%{_initrddir}
-install -d -m 0755 %{buildroot}/%{_unitdir}
+install -d -m 0755 %{buildroot}%{_unitdir}
+install -m 0644 contrib/systemd/%{name}.service %{buildroot}%{_unitdir}/%{name}.service
 install -m 0755 contrib/init/redhat/%{name} %{buildroot}%{_initrddir}/%{name}
-install -m 0644 contrib/systemd/%{name}.service %{buildroot}/%{_unitdir}/%{name}.service
 install -m 0755 contrib/init/redhat/%{name}-default-keygen %{buildroot}%{_sbindir}/%{name}-default-keygen
 
 cat > %{buildroot}%{_sysconfdir}/%{name}.conf << 'EOF'
@@ -263,7 +263,6 @@ getent passwd %{name} >/dev/null || \
 exit 0
 
 %post
-#%systemd_post %{name}.service
 if [ $1 -eq 1 ] ; then 
     # Initial installation 
     /bin/systemctl enable %{name}.service >/dev/null 2>&1 || :
@@ -273,7 +272,6 @@ fi
 /sbin/chkconfig --add %{name} || :
 
 %preun
-#%systemd_preun %{name}.service
 if [ $1 -eq 0 ] ; then
     # Package removal, not upgrade
     /bin/systemctl --no-reload disable %{name}.service > /dev/null 2>&1 || :
@@ -288,7 +286,6 @@ fi
 exit 0
 
 %postun
-#%systemd_postun_with_restart %{name}.service
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 if [ $1 -ge 1 ] ; then
     # Package upgrade, not uninstall
@@ -341,7 +338,6 @@ rm -rf %{buildroot}
 
 %files sysvinit
 %defattr(-,root,root)
-#%{_initrddir}/%{name}
 %attr(0755,root,root) %{_initrddir}/%{name}
 
 %files -n libopendkim
@@ -361,7 +357,13 @@ rm -rf %{buildroot}
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Thu Feb 25 2013 Steve Jenkins <steve stevejenkins com> 2.8.0-2
+* Tue Feb 26 2013 Steve Jenkins <steve stevejenkins com> 2.8.0-3
+- Split into two spec files: systemd (F17+) and SysV (EL5-6)
+- Removed leading / from unitdir variables
+- Removed commented source lines
+- Created comment sections for easy switching between systemd and SysV
+
+* Mon Feb 25 2013 Steve Jenkins <steve stevejenkins com> 2.8.0-2
 - Added / in front of unitdir variables
 
 * Thu Feb 21 2013 Steve Jenkins <steve stevejenkins com> 2.8.0-1
