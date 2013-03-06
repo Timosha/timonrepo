@@ -39,6 +39,7 @@ sed -i.fedora \
  configure
 
 %configure \
+	--disable-evdns \
 %if %debug
 	--enable-debug \
 	--enable-cassert \
@@ -100,7 +101,8 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%doc README NEWS COPYRIGHT AUTHORS doc/README.html doc/config.html doc/faq.html doc/todo.html doc/usage.html
+%doc README NEWS COPYRIGHT AUTHORS 
+#%doc doc/README.html doc/config.html doc/faq.html doc/todo.html doc/usage.html
 %{_bindir}/*
 %config(noreplace) %{_sysconfdir}/%{name}/%{name}.ini
 %{_unitdir}/%{name}.service
@@ -110,7 +112,6 @@ rm -rf %{buildroot}
 %attr(755,pgbouncer,pgbouncer) %dir %{_localstatedir}/run/%{name}
 %attr(755,pgbouncer,pgbouncer) %dir %{_localstatedir}/log/%{name}
 %{_prefix}/lib/tmpfiles.d/%{name}.conf
-
 
 %changelog
 * Thu Feb 7 2013 Timon <timosha@gmail.com> - 1.5.4-1
