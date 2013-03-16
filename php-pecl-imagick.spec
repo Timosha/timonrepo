@@ -8,7 +8,7 @@
 Summary:		Provides a wrapper to the ImageMagick library
 Name:		php-pecl-%peclName
 Version:		3.1.0
-Release:		0.4.%{prever}%{?dist}
+Release:		0.5.%{prever}%{?dist}
 License:		PHP
 Group:		Development/Libraries
 Source0:		http://pecl.php.net/get/%peclName-%{version}%{?prever}.tgz
@@ -16,7 +16,8 @@ Source1:		%peclName.ini
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root-%(%{__id_u} -n)
 URL:			http://pecl.php.net/package/%peclName
 BuildRequires:	php-pear >= 1.4.7
-BuildRequires: php-devel >= 5.1.3, ImageMagick-devel >= 6.2.4
+# IM version 6.8.3.9 has changed so-name for what patch0 applied
+BuildRequires: php-devel >= 5.1.3, ImageMagick-devel >= 6.8.3.9
 Requires(post):	%{__pecl}
 Requires(postun):	%{__pecl}
 %if 0%{?php_zend_api:1}
@@ -28,6 +29,9 @@ Requires:		php-api = %{php_apiver}
 Provides:		php-pecl(%peclName) = %{version}
 
 Conflicts:	php-pecl-gmagick
+
+# http://svn.php.net/viewvc?view=revision&revision=329769
+Patch0:		imagick-3.1.0RC1-IM-so6.patch
 
 # RPM 4.8
 %{?filter_provides_in: %filter_provides_in %{php_extdir}/.*\.so$}
@@ -45,6 +49,9 @@ IMPORTANT: Version 2.x API is not compatible with earlier versions.
 
 %prep
 %setup -qc
+
+cd %peclName-%{version}%{?prever}
+%patch0 -p3 -b .im-so6
 
 %build
 cd %peclName-%{version}%{?prever}
@@ -99,6 +106,10 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.d/%peclName.ini
 
 %changelog
+* Sat Mar 16 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 3.1.0-0.5.RC1
+- Rebuild to ImageMagick soname change (ml: http://www.mail-archive.com/devel@lists.fedoraproject.org/msg57163.html).
+	Thanks to Remi Collet for the patch: http://svn.php.net/viewvc?view=revision&revision=329769
+
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.0-0.4.RC1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
