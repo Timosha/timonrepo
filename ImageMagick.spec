@@ -1,14 +1,16 @@
-%global VER 6.7.8
+%global VER 6.8.3
 %global Patchlevel 9
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
-Release:		5%{?dist}
+Release:		1%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
 Url:			http://www.imagemagick.org/
 Source0:		ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.xz
+
+Requires:		%{name}-libs = %{version}-%{release}
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
@@ -35,18 +37,19 @@ ImageMagick-devel as well.
 
 
 %package devel
-Summary: Library links and header files for ImageMagick app development
-Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
-Requires: libX11-devel, libXext-devel, libXt-devel
-Requires: ghostscript-devel
-Requires: bzip2-devel
-Requires: freetype-devel
-Requires: libtiff-devel
-Requires: libjpeg-devel
-Requires: lcms-devel
-Requires: jasper-devel
-Requires: pkgconfig
+Summary:	Library links and header files for ImageMagick app development
+Group:	Development/Libraries
+Requires:	%{name} = %{version}-%{release}
+Requires:	libX11-devel, libXext-devel, libXt-devel
+Requires:	ghostscript-devel
+Requires:	bzip2-devel
+Requires:	freetype-devel
+Requires:	libtiff-devel
+Requires:	libjpeg-devel
+Requires:	lcms-devel
+Requires:	jasper-devel
+Requires:	pkgconfig
+Requires:	%{name}-libs = %{version}-%{release}
 
 %description devel
 ImageMagick-devel contains the library links and header files you'll
@@ -57,6 +60,14 @@ If you want to create applications that will use ImageMagick code or
 APIs, you need to install ImageMagick-devel as well as ImageMagick.
 You do not need to install it if you just want to use ImageMagick,
 however.
+
+
+%package libs
+Summary: ImageMagick libraries to link with
+Group: Applications/Multimedia
+
+%description libs
+This packages contains a shared libraries to use within other applications.
 
 
 %package djvu
@@ -198,10 +209,10 @@ fi
 %define wordsize 32
 %endif
 
-mv %{buildroot}%{_includedir}/%{name}/magick/magick-config.h \
-   %{buildroot}%{_includedir}/%{name}/magick/magick-config-%{wordsize}.h
+mv %{buildroot}%{_includedir}/%{name}-6/magick/magick-config.h \
+   %{buildroot}%{_includedir}/%{name}-6/magick/magick-config-%{wordsize}.h
 
-cat >%{buildroot}%{_includedir}/%{name}/magick/magick-config.h <<EOF
+cat >%{buildroot}%{_includedir}/%{name}-6/magick/magick-config.h <<EOF
 #ifndef IMAGEMAGICK_MULTILIB
 #define IMAGEMAGICK_MULTILIB
 
@@ -221,32 +232,36 @@ EOF
 # Fonts must be packaged separately. It does nothave matter and demos work without it.
 rm PerlMagick/demo/Generic.ttf
 
+
+
 %clean
 rm -rf %{buildroot}
 
 
-%post -p /sbin/ldconfig
+%post libs -p /sbin/ldconfig
 
 %post c++ -p /sbin/ldconfig
 
-%postun -p /sbin/ldconfig
+%postun libs -p /sbin/ldconfig
 
 %postun c++ -p /sbin/ldconfig
 
 
 %files
-%defattr(-,root,root,-)
-%doc QuickStart.txt ChangeLog Platforms.txt
-%doc README.txt LICENSE NOTICE AUTHORS.txt NEWS.txt
-%{_libdir}/libMagickCore.so.5*
-%{_libdir}/libMagickWand.so.5*
+%doc README.txt LICENSE NOTICE AUTHORS.txt NEWS.txt ChangeLog Platforms.txt
 %{_bindir}/[a-z]*
-%{_libdir}/%{name}-%{VER}
-%{_datadir}/%{name}-%{VER}
 %{_mandir}/man[145]/[a-z]*
 %{_mandir}/man1/%{name}.*
+
+%files libs
+%defattr(-,root,root,-)
+%doc LICENSE NOTICE AUTHORS.txt QuickStart.txt
+%{_libdir}/libMagickCore-6.Q16.so.*
+%{_libdir}/libMagickWand-6.Q16.so.*
+%{_libdir}/%{name}-%{VER}
+%{_datadir}/%{name}-6
 %exclude %{_libdir}/%{name}-%{VER}/modules-Q16/coders/djvu.*
-%{_sysconfdir}/%{name}
+%{_sysconfdir}/%{name}-6
 
 %files devel
 %defattr(-,root,root,-)
@@ -254,15 +269,19 @@ rm -rf %{buildroot}
 %{_bindir}/Magick-config
 %{_bindir}/MagickWand-config
 %{_bindir}/Wand-config
-%{_libdir}/libMagickCore.so
-%{_libdir}/libMagickWand.so
+%{_libdir}/libMagickCore-6.Q16.so
+%{_libdir}/libMagickWand-6.Q16.so
 %{_libdir}/pkgconfig/MagickCore.pc
+%{_libdir}/pkgconfig/MagickCore-6.Q16.pc
 %{_libdir}/pkgconfig/ImageMagick.pc
+%{_libdir}/pkgconfig/ImageMagick-6.Q16.pc
 %{_libdir}/pkgconfig/MagickWand.pc
+%{_libdir}/pkgconfig/MagickWand-6.Q16.pc
 %{_libdir}/pkgconfig/Wand.pc
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/magick
-%{_includedir}/%{name}/wand
+%{_libdir}/pkgconfig/Wand-6.Q16.pc
+%dir %{_includedir}/%{name}-6
+%{_includedir}/%{name}-6/magick
+%{_includedir}/%{name}-6/wand
 %{_mandir}/man1/Magick-config.*
 %{_mandir}/man1/MagickCore-config.*
 %{_mandir}/man1/Wand-config.*
@@ -274,6 +293,7 @@ rm -rf %{buildroot}
 
 %files doc
 %defattr(-,root,root,-)
+%doc %{_datadir}/doc/%{name}-6
 %doc %{_datadir}/doc/%{name}-%{VER}
 %doc LICENSE
 
@@ -281,17 +301,19 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %doc Magick++/AUTHORS Magick++/ChangeLog Magick++/NEWS Magick++/README
 %doc www/Magick++/COPYING
-%{_libdir}/libMagick++.so.5*
+%{_libdir}/libMagick++-6.Q16.so.*
 
 %files c++-devel
 %defattr(-,root,root,-)
 %doc Magick++/examples
 %{_bindir}/Magick++-config
-%{_includedir}/%{name}/Magick++
-%{_includedir}/%{name}/Magick++.h
-%{_libdir}/libMagick++.so
+%{_includedir}/%{name}-6/Magick++
+%{_includedir}/%{name}-6/Magick++.h
+%{_libdir}/libMagick++-6.Q16.so
 %{_libdir}/pkgconfig/Magick++.pc
+%{_libdir}/pkgconfig/Magick++-6.Q16.pc
 %{_libdir}/pkgconfig/ImageMagick++.pc
+%{_libdir}/pkgconfig/ImageMagick++-6.Q16.pc
 %{_mandir}/man1/Magick++-config.*
 
 %files perl -f perl-pkg-files
@@ -300,6 +322,10 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Sun Mar 10 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 6.8.3.9-1
+- Update to 6.8.3-9 (so-naming scheme change to *-6.so) (ml: http://www.mail-archive.com/devel@lists.fedoraproject.org/msg57163.html).
+- Split out libs subpackage by Remi Collet request (bz#849065).
+
 * Sun Mar 10 2013 Rex Dieter <rdieter@fedoraproject.org> - 6.7.8.9-5
 - rebuild (OpenEXR)
 
