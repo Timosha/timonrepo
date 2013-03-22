@@ -9,15 +9,15 @@
 
 Summary:	Geographic Information Systems Extensions to PostgreSQL
 Name:		postgis
-Version:	2.0.2
-Release:	2%{?dist}
+Version:	2.0.3
+Release:	1%{?dist}
 License:	GPLv2+
 Group:		Applications/Databases
-Source0:	http://postgis.refractions.net/download/%{name}-%{version}.tar.gz
-Source2:	http://www.postgis.org/download/%{name}-%{version}.pdf
+Source0:	http://download.osgeo.org/postgis/source/%{name}-%{version}.tar.gz
+Source2:	http://download.osgeo.org/postgis/docs/%{name}-%{version}.pdf
 Source4:	filter-requires-perl-Pg.sh
 Patch0:		postgis-1.5.1-pgsql9.patch
-URL:		http://postgis.refractions.net/
+URL:		http://postgis.net/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:	postgresql-devel >= %{pg_version_minimum}, proj-devel, geos-devel >= 3.1.1 byacc, proj-devel, flex, sinjdoc, java, java-devel, ant
@@ -182,6 +182,9 @@ rm -rf %{buildroot}
 %doc postgis*.pdf
 
 %changelog
+* Wed Mar 20 2013 Timon <timosha@gmail.com> - 2.0.3-1
+- postgis 2.0.3
+
 * Fri Jan 25 2013 Devrim GÜNDÜZ <devrim@gunduz.org> - 2.0.2-2
 - Rebuilt against geos 3.3.7.
 - Apply changes for PostgreSQL 9.2 and extensions.
