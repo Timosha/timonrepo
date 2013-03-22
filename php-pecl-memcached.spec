@@ -7,7 +7,7 @@
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
 Version:      2.1.0
-Release:      6%{?dist}
+Release:      7%{?dist}
 # memcached is PHP, FastLZ is MIT
 License:      PHP and MIT
 Group:        Development/Languages
@@ -188,6 +188,9 @@ ln -s %{php_ztsextdir}/igbinary.so modules/
 
 
 %changelog
+* Fri Mar 22 2013 Remi Collet <rcollet@redhat.com> - 2.1.0-7
+- rebuild for http://fedoraproject.org/wiki/Features/Php55
+
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1.0-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
