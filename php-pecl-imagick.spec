@@ -16,8 +16,7 @@ Source1:		%peclName.ini
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root-%(%{__id_u} -n)
 URL:			http://pecl.php.net/package/%peclName
 BuildRequires:	php-pear >= 1.4.7
-# IM version 6.8.3.9 has changed so-name for what patch0 applied
-BuildRequires: php-devel >= 5.1.3, ImageMagick-devel >= 6.8.3.9
+BuildRequires: php-devel >= 5.1.3, ImageMagick-devel >= 6.2.4
 Requires(post):	%{__pecl}
 Requires(postun):	%{__pecl}
 %if 0%{?php_zend_api:1}
