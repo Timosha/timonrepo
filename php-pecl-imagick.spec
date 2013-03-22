@@ -3,12 +3,12 @@
 %{!?php_extdir:	%{expand:	%%global php_extdir	%(php-config --extension-dir)}}
 
 %global peclName  imagick
-%global prever    RC1
+%global prever    RC2
 
 Summary:		Provides a wrapper to the ImageMagick library
 Name:		php-pecl-%peclName
 Version:		3.1.0
-Release:		0.5.%{prever}%{?dist}
+Release:		0.6.%{prever}%{?dist}
 License:		PHP
 Group:		Development/Libraries
 Source0:		http://pecl.php.net/get/%peclName-%{version}%{?prever}.tgz
@@ -106,6 +106,10 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.d/%peclName.ini
 
 %changelog
+* Fri Mar 22 2013 Remi Collet <rcollet@redhat.com> - 3.1.0-0.6.RC2
+- update to 3.1.0RC2
+- rebuild for http://fedoraproject.org/wiki/Features/Php55
+
 * Sat Mar 16 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 3.1.0-0.5.RC1
 - Rebuild to ImageMagick soname change (ml: http://www.mail-archive.com/devel@lists.fedoraproject.org/msg57163.html).
 	Thanks to Remi Collet for the patch: http://svn.php.net/viewvc?view=revision&revision=329769
