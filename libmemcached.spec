@@ -4,7 +4,7 @@
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   1.0.16
+Version:   1.0.17
 Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
@@ -80,7 +80,7 @@ cp -p tests/*.{cc,h} examples/
 # option --with-memcached=false to disable server binary check (as we don't run test)
 %configure \
 %if %{runselftest}
-   --with-memcached=%{_bindir}/memcached \
+   --with-memcached \
 %else
    --with-memcached=false \
 %endif
@@ -121,7 +121,8 @@ fi
 make test 2>&1 | tee rpmtests.log
 # Ignore test result for memaslap (XFAIL but PASS)
 # https://bugs.launchpad.net/libmemcached/+bug/1115357
-if grep "XPASS: clients/memaslap" rpmtests.log && grep "1 of 21" rpmtests.log
+if grep "XPASS: clients/memaslap" rpmtests.log && \
+   grep "^1 of .. tests did not"  rpmtests.log
 then
   exit 0
 else
@@ -174,6 +175,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Apr  4 2013 Remi Collet <remi@fedoraproject.org> - 1.0.17-1
+- update to 1.0.17
+
 * Mon Feb  4 2013 Remi Collet <remi@fedoraproject.org> - 1.0.16-1
 - update to 1.0.16
 - ignore test result for memaslap (XFAIL but PASS)
