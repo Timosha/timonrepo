@@ -29,6 +29,9 @@ BuildRequires: memcached
 BuildRequires: systemtap-sdt-devel
 %endif
 BuildRequires: libevent-devel
+%if 0%{?fedora} >= 19
+BuildRequires: libasan
+%endif
 
 
 %description
