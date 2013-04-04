@@ -77,6 +77,10 @@ cp -p tests/*.{cc,h} examples/
 
 
 %build
+# Temporary hack for bug 1164442
+sed -e 's/sanitize=thread/sanitizethreadhack/' \
+    -i configure
+
 # option --with-memcached=false to disable server binary check (as we don't run test)
 %configure \
 %if %{runselftest}
