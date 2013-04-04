@@ -139,7 +139,7 @@ rm -rf %{buildroot}
 
 
 %postun -p /sbin/ldconfig
- 
+
 
 %files
 %defattr (-,root,root,-) 
