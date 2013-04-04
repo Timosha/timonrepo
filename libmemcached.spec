@@ -177,6 +177,10 @@ rm -rf %{buildroot}
 %changelog
 * Thu Apr  4 2013 Remi Collet <remi@fedoraproject.org> - 1.0.17-1
 - update to 1.0.17
+- fix option --with-memcached and report regression
+  https://bugs.launchpad.net/libmemcached/+bug/1164440
+- broken build when -fsanitize=thread available
+  https://bugs.launchpad.net/libmemcached/+bug/1164442
 
 * Mon Feb  4 2013 Remi Collet <remi@fedoraproject.org> - 1.0.16-1
 - update to 1.0.16
