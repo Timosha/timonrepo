@@ -103,7 +103,7 @@ sed -e 's/sanitize=thread/sanitizethreadhack/' \
 sed -e 's/-Werror//' -i Makefile
 %endif
 
-make %{_smp_mflags}
+make %{_smp_mflags} V=1
 
 
 %install
