@@ -3,7 +3,7 @@
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
-Release:		1%{?dist}
+Release:		2%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
@@ -19,6 +19,7 @@ BuildRequires:	ghostscript-devel, djvulibre-devel
 BuildRequires:	libwmf-devel, jasper-devel, libtool-ltdl-devel
 BuildRequires:	libX11-devel, libXext-devel, libXt-devel
 BuildRequires:	lcms-devel, libxml2-devel, librsvg2-devel, OpenEXR-devel
+BuildRequires:	fftw-devel
 
 %description
 ImageMagick is an image display and manipulation tool for the X
@@ -322,6 +323,10 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Thu Apr 18 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 6.8.3.9-2
+- Enable fftw to do Fourier transforms (add BuildRequires: fftw-devel) - bz#950254 by Søren Sandmann Pedersen request.
+
+
 * Sun Mar 10 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 6.8.3.9-1
 - Update to 6.8.3-9 (so-naming scheme change to *-6.so) (ml: http://www.mail-archive.com/devel@lists.fedoraproject.org/msg57163.html).
 - Split out libs subpackage by Remi Collet request (bz#849065).
