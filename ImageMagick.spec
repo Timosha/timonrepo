@@ -1,9 +1,9 @@
-%global VER 6.8.3
-%global Patchlevel 9
+%global VER 6.8.5
+%global Patchlevel 10
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
-Release:		2%{?dist}
+Release:		1%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
@@ -18,8 +18,8 @@ BuildRequires:	libtiff-devel, giflib-devel, zlib-devel, perl-devel >= 5.8.1
 BuildRequires:	ghostscript-devel, djvulibre-devel
 BuildRequires:	libwmf-devel, jasper-devel, libtool-ltdl-devel
 BuildRequires:	libX11-devel, libXext-devel, libXt-devel
-BuildRequires:	lcms-devel, libxml2-devel, librsvg2-devel, OpenEXR-devel
-BuildRequires:	fftw-devel
+BuildRequires:	lcms2-devel, libxml2-devel, librsvg2-devel, OpenEXR-devel
+BuildRequires:	fftw-devel, OpenEXR-devel, libwebp-devel
 
 %description
 ImageMagick is an image display and manipulation tool for the X
@@ -41,15 +41,9 @@ ImageMagick-devel as well.
 Summary:	Library links and header files for ImageMagick app development
 Group:	Development/Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	libX11-devel, libXext-devel, libXt-devel
-Requires:	ghostscript-devel
-Requires:	bzip2-devel
-Requires:	freetype-devel
-Requires:	libtiff-devel
-Requires:	libjpeg-devel
-Requires:	lcms-devel
-Requires:	jasper-devel
-Requires:	pkgconfig
+Requires:	libX11-devel, libXext-devel, libXt-devel, ghostscript-devel
+Requires:	bzip2-devel, freetype-devel, libtiff-devel, libjpeg-devel, lcms2-devel
+Requires:	libwebp-devel, OpenEXR-devel, jasper-devel, pkgconfig
 Requires:	%{name}-libs = %{version}-%{release}
 
 %description devel
@@ -157,7 +151,9 @@ cp -p Magick++/demo/*.cpp Magick++/demo/*.miff Magick++/examples
            --with-magick_plus_plus \
            --with-gslib \
            --with-wmf \
-           --with-lcms \
+           --with-lcms2 \
+           --with-webp \
+           --with-openexr \
            --with-rsvg \
            --with-xml \
            --with-perl-options="INSTALLDIRS=vendor %{?perl_prefix} CC='%__cc -L$PWD/magick/.libs' LDDLFLAGS='-shared -L$PWD/magick/.libs'" \
@@ -323,9 +319,15 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Wed Jun 12 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 6.5.5.10-1
+- Update to 6.8.5-10 upstream version (bz#720285).
+- By Remi Collet request (bz#969760) enable those features in ImageMagick:
+	--with-lcms2 (instead of --with-lcms): lcms2-devel
+	--with-openexr: OpenEXR-devel
+	--with-webp: libwebp-devel
+
 * Thu Apr 18 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 6.8.3.9-2
 - Enable fftw to do Fourier transforms (add BuildRequires: fftw-devel) - bz#950254 by Søren Sandmann Pedersen request.
-
 
 * Sun Mar 10 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 6.8.3.9-1
 - Update to 6.8.3-9 (so-naming scheme change to *-6.so) (ml: http://www.mail-archive.com/devel@lists.fedoraproject.org/msg57163.html).
@@ -503,6 +505,10 @@ rm -rf %{buildroot}
 
 * Sun Jul 27 2008 Hans de Goede <jwrdegoede@fedoraproject.org> 6.4.0.10-2
 - Fix ownership of /usr/include/ImageMagick (bz 444647)
+- By Remi request (bz#969760) enable those features in ImageMagick:
+	--with-lcms2 (instead of --with-lcms): lcms2-devel
+	--with-openexr: OpenEXR-devel
+	--with-webp: libwebp-devel
 
 * Sat Apr 26 2008 Hans de Goede <jwrdegoede@fedoraproject.org> 6.4.0.10-1
 - New upstream release 6.4.0.10
