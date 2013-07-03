@@ -1,5 +1,5 @@
-%global VER 6.8.5
-%global Patchlevel 10
+%global VER 6.8.6
+%global Patchlevel 3
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
@@ -136,30 +136,32 @@ sed -i 's/libltdl.la/libltdl.so/g' configure
 iconv -f ISO-8859-1 -t UTF-8 README.txt > README.txt.tmp
 touch -r README.txt README.txt.tmp
 mv README.txt.tmp README.txt
-# for %doc
+# for %%doc
 mkdir Magick++/examples
 cp -p Magick++/demo/*.cpp Magick++/demo/*.miff Magick++/examples
 
 
 %build
-%configure --enable-shared \
-           --disable-static \
-           --with-modules \
-           --with-perl \
-           --with-x \
-           --with-threads \
-           --with-magick_plus_plus \
-           --with-gslib \
-           --with-wmf \
-           --with-lcms2 \
-           --with-webp \
-           --with-openexr \
-           --with-rsvg \
-           --with-xml \
-           --with-perl-options="INSTALLDIRS=vendor %{?perl_prefix} CC='%__cc -L$PWD/magick/.libs' LDDLFLAGS='-shared -L$PWD/magick/.libs'" \
-           --without-dps \
-           --without-included-ltdl --with-ltdl-include=%{_includedir} \
-           --with-ltdl-lib=%{_libdir}
+%configure \
+	--enable-shared \
+	--disable-static \
+	--with-modules \
+	--with-perl \
+	--with-x \
+	--with-threads \
+	--with-magick_plus_plus \
+	--with-gslib \
+	--with-wmf \
+	--with-lcms2 \
+	--with-webp \
+	--with-openexr \
+	--with-rsvg \
+	--with-xml \
+	--with-perl-options="INSTALLDIRS=vendor %{?perl_prefix} CC='%__cc -L$PWD/magick/.libs' LDDLFLAGS='-shared -L$PWD/magick/.libs'" \
+	--without-dps \
+	--without-included-ltdl --with-ltdl-include=%{_includedir} \
+	--with-ltdl-lib=%{_libdir}
+
 # Disable rpath
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -189,25 +191,25 @@ find %{buildroot} -name "perllocal.pod" |xargs rm -f
 # perlmagick: build files list
 echo "%defattr(-,root,root,-)" > perl-pkg-files
 find %{buildroot}/%{_libdir}/perl* -type f -print \
-        | sed "s@^%{buildroot}@@g" > perl-pkg-files 
+	| sed "s@^%{buildroot}@@g" > perl-pkg-files
 find %{buildroot}%{perl_vendorarch} -type d -print \
-        | sed "s@^%{buildroot}@%dir @g" \
-        | grep -v '^%dir %{perl_vendorarch}$' \
-        | grep -v '/auto$' >> perl-pkg-files 
+	| sed "s@^%{buildroot}@%dir @g" \
+	| grep -v '^%dir %{perl_vendorarch}$' \
+	| grep -v '/auto$' >> perl-pkg-files
 if [ -z perl-pkg-files ] ; then
-    echo "ERROR: EMPTY FILE LIST"
-    exit -1
+	echo "ERROR: EMPTY FILE LIST"
+	exit -1
 fi
 
 # fix multilib issues
-%ifarch x86_64 s390x ia64 ppc64 alpha sparc64
+%ifarch x86_64 s390x ia64 ppc64 alpha sparc64 aarch64
 %define wordsize 64
 %else
 %define wordsize 32
 %endif
 
 mv %{buildroot}%{_includedir}/%{name}-6/magick/magick-config.h \
-   %{buildroot}%{_includedir}/%{name}-6/magick/magick-config-%{wordsize}.h
+	%{buildroot}%{_includedir}/%{name}-6/magick/magick-config-%{wordsize}.h
 
 cat >%{buildroot}%{_includedir}/%{name}-6/magick/magick-config.h <<EOF
 #ifndef IMAGEMAGICK_MULTILIB
@@ -228,8 +230,6 @@ EOF
 
 # Fonts must be packaged separately. It does nothave matter and demos work without it.
 rm PerlMagick/demo/Generic.ttf
-
-
 
 %clean
 rm -rf %{buildroot}
@@ -319,6 +319,10 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Mon Jul 1 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 6.8.6.3-1
+- Update to 6.8.6-3.
+- Added aarch64 to list of 64bit arches (bz#978339).
+
 * Wed Jun 12 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 6.5.5.10-1
 - Update to 6.8.5-10 upstream version (bz#720285).
 - By Remi Collet request (bz#969760) enable those features in ImageMagick:
@@ -565,7 +569,7 @@ rm -rf %{buildroot}
 
 * Thu May 25 2006 Matthias Clasen <mclasen@redhat.com> - 6.2.5.4-6
 - Fix a heap overflow CVE-2006-2440 (#192279)
-- Include required .la files  
+- Include required .la files
 
 * Mon Mar 20 2006 Matthias Clasen <mclasen@redhat.com> - 6.2.5.4-5
 - Don't ship .la and .a files (#185237)
@@ -613,7 +617,7 @@ rm -rf %{buildroot}
 * Tue Apr 26 2005 Matthias Clasen <mclasen@redhat.com> - 6.2.2.0-1
 - Update to 6.2.2 to fix a heap corruption issue
   in the pnm coder.
- 
+
 * Mon Apr 25 2005  Matthias Clasen <mclasen@redhat.com> - 6.2.1.7-4
 - .la files for modules are needed, actually
 
@@ -623,7 +627,7 @@ rm -rf %{buildroot}
 * Mon Apr 25 2005  <mclasen@redhat.com> - 6.2.1.7-1
 - Update to 6.2.1
 - Include multiple improvements and bugfixes
-  by Rex Dieter et al (111961, 145466, 151196, 149970, 
+  by Rex Dieter et al (111961, 145466, 151196, 149970,
   146518, 113951, 145449, 144977, 144570, 139298)
 
 * Sun Apr 24 2005  <mclasen@redhat.com> - 6.2.0.7-3
@@ -643,16 +647,16 @@ rm -rf %{buildroot}
 - The devel subpackage requires XFree86-devel (bug #126509).
 - Fixed build requirements (bug #120776).  From Robert Scheck.
 
-* Tue Sep 14 2004 Karsten Hopp <karsten@redhat.de> 6.0.7.1-3 
+* Tue Sep 14 2004 Karsten Hopp <karsten@redhat.de> 6.0.7.1-3
 - move *.mgk files (#132007, #131708, #132397)
 
-* Sun Sep 12 2004 Karsten Hopp <karsten@redhat.de> 6.0.7.1-1 
+* Sun Sep 12 2004 Karsten Hopp <karsten@redhat.de> 6.0.7.1-1
 - update to 6.0.7 Patchlevel 1, fixes #132106
 
 * Sat Sep 4 2004 Bill Nottingham <notting@redhat.com> 6.0.6.2-2
 - move libWand out of -devel, fix requirements (#131767)
 
-* Wed Sep 01 2004 Karsten Hopp <karsten@redhat.de> 6.0.6.2-1 
+* Wed Sep 01 2004 Karsten Hopp <karsten@redhat.de> 6.0.6.2-1
 - update to latest stable version
 - get rid of obsolete patches
 - fix remaining patches
@@ -664,7 +668,7 @@ rm -rf %{buildroot}
 * Tue Jun 15 2004 Elliot Lee <sopwith@redhat.com>
 - rebuilt
 
-* Tue Mar 23 2004 Karsten Hopp <karsten@redhat.de> 5.5.7.15-1.3 
+* Tue Mar 23 2004 Karsten Hopp <karsten@redhat.de> 5.5.7.15-1.3
 - freetype patch to fix convert (#115716)
 
 * Tue Mar 02 2004 Elliot Lee <sopwith@redhat.com>
@@ -929,7 +933,7 @@ rm -rf %{buildroot}
 
 * Mon Apr  5 1999 Bill Nottingham <notting@redhat.com>
 - update to 4.2.2
-- change ChangeLog to refer to actual dates. 
+- change ChangeLog to refer to actual dates.
 - strip binaries
 
 * Thu Apr  1 1999 Bill Nottingham <notting@redhat.com>
