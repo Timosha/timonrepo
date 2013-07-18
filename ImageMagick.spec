@@ -3,7 +3,7 @@
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
-Release:		1%{?dist}
+Release:		2%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
@@ -319,6 +319,9 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Thu Jul 18 2013 Petr Pisar <ppisar@redhat.com> - 6.8.6.3-2
+- Perl 5.18 rebuild
+
 * Mon Jul 1 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 6.8.6.3-1
 - Update to 6.8.6-3.
 - Added aarch64 to list of 64bit arches (bz#978339).
