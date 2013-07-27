@@ -819,10 +819,10 @@ rm -rf %{buildroot}
 - Remove Magick++ includes from -devel, they're already in -c++-devel
   (#51590)
 
-* Sun Jul 28 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.8-1
+* Sat Jul 28 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.8-1
 - 5.3.8 (bugfix release)
 
-* Sat Jul 27 2001 Than Ngo <than@redhat.com> 5.3.7-3
+* Fri Jul 27 2001 Than Ngo <than@redhat.com> 5.3.7-3
 - fix to build Perlmagic on s390 s390x
 
 * Thu Jul 26 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.3.7-2
