@@ -4,8 +4,8 @@
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   1.0.17
-Release:   2%{?dist}
+Version:   1.0.16
+Release:   1%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -29,12 +29,6 @@ BuildRequires: memcached
 BuildRequires: systemtap-sdt-devel
 %endif
 BuildRequires: libevent-devel
-%if 0%{?fedora} >= 19
-# from gcc spec, libasan not build on arm
-%ifarch %{ix86} x86_64 ppc ppc64
-BuildRequires: libasan
-%endif
-%endif
 
 
 %description
@@ -83,14 +77,10 @@ cp -p tests/*.{cc,h} examples/
 
 
 %build
-# Temporary hack for bug 1164442
-sed -e 's/-fsanitize=/sanitizehackforoption/' \
-    -i configure
-
 # option --with-memcached=false to disable server binary check (as we don't run test)
 %configure \
 %if %{runselftest}
-   --with-memcached \
+   --with-memcached=%{_bindir}/memcached \
 %else
    --with-memcached=false \
 %endif
@@ -131,8 +121,7 @@ fi
 make test 2>&1 | tee rpmtests.log
 # Ignore test result for memaslap (XFAIL but PASS)
 # https://bugs.launchpad.net/libmemcached/+bug/1115357
-if grep "XPASS: clients/memaslap" rpmtests.log && \
-   grep "^1 of .. tests did not"  rpmtests.log
+if grep "XPASS: clients/memaslap" rpmtests.log && grep "1 of 21" rpmtests.log
 then
   exit 0
 else
@@ -185,6 +174,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Aug  5 2013 Remi Collet <remi@fedoraproject.org> - 1.0.16-1
+- revert to 1.0.16 for fedora 20
+
 * Mon Aug  5 2013 Remi Collet <remi@fedoraproject.org> - 1.0.17-2
 - fix BR, libasan don't exist on all arch
 - disable all sanitize options (only for dev)
