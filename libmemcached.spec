@@ -84,7 +84,7 @@ cp -p tests/*.{cc,h} examples/
 
 %build
 # Temporary hack for bug 1164442
-sed -e 's/sanitize=thread/sanitizethreadhack/' \
+sed -e 's/-fsanitize=/sanitizehackforoption/' \
     -i configure
 
 # option --with-memcached=false to disable server binary check (as we don't run test)
@@ -187,6 +187,7 @@ rm -rf %{buildroot}
 %changelog
 * Mon Aug  5 2013 Remi Collet <remi@fedoraproject.org> - 1.0.17-2
 - fix BR, libasan don't exist on all arch
+- disable all sanitize options (only for dev)
 
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.17-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
