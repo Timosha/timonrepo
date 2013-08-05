@@ -30,7 +30,10 @@ BuildRequires: systemtap-sdt-devel
 %endif
 BuildRequires: libevent-devel
 %if 0%{?fedora} >= 19
+# from gcc spec, libasan not build on arm
+%ifarch %{ix86} x86_64 ppc ppc64
 BuildRequires: libasan
+%endif
 %endif
 
 
@@ -182,6 +185,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Aug  5 2013 Remi Collet <remi@fedoraproject.org> - 1.0.17-2
+- fix BR, libasan don't exist on all arch
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.17-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
