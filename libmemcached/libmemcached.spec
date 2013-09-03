@@ -55,7 +55,7 @@ memtouch    Touches a key
 %package devel
 Summary: Header files and development libraries for %{name}
 Group: Development/Libraries
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 Requires: pkgconfig
 Requires: cyrus-sasl-devel%{?_isa}
 
