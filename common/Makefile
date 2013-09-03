@@ -4,7 +4,7 @@ RPMDEFINES := --define "_sourcedir $(SRCDIR)" \
               --define "_rpmdir $(SRCDIR)"
 
 REPODIR := /home/timon/development/repo
-RELEASE := 17
+RELEASE := 19
 ARCH := x86_64
 
 build: prep
@@ -36,7 +36,9 @@ bl:
 mock: clean srpm
 	mock -r fedora-$(RELEASE)-$(ARCH) rebuild $(NAME)*.src.rpm 
 
-repo: clean f18 f17 f16
+repo: clean f19 f18
+
+f19: f19-x86_64
 
 f18: f18-x86_64 f18-i386
 
@@ -51,6 +53,17 @@ f14: f14-x86_64 f14-i386
 f13: f13-x86_64 f13-i386
 
 arch: clean f$(RELEASE)-$(ARCH)
+
+f19-x86_64: srpm
+	mock -r fedora-19-x86_64 rebuild $(NAME)*.src.rpm && \
+        mkdir -p $(REPODIR)/19/{SRPMS,x86_64} && \
+        mkdir -p $(REPODIR)/19/x86_64/{os,debug} && \
+        ( mv /var/lib/mock/fedora-19-x86_64/result/*-debuginfo-*.rpm  $(REPODIR)/19/x86_64/debug || echo noarch ) && \
+        mv /var/lib/mock/fedora-19-x86_64/result/$(NAME)-*.src.rpm  $(REPODIR)/19/SRPMS && \
+        mv /var/lib/mock/fedora-19-x86_64/result/*-*.rpm  $(REPODIR)/19/x86_64/os && \
+        cd $(REPODIR)/19/x86_64/os && createrepo --update . && \
+        cd $(REPODIR)/19/x86_64/debug && createrepo --update . && \
+        cd $(REPODIR)/19/SRPMS && createrepo --update .
 
 f18-x86_64: srpm
 	mock -r fedora-18-x86_64 rebuild $(NAME)*.src.rpm && \
