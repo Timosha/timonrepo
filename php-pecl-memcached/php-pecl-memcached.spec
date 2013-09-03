@@ -7,7 +7,7 @@
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
 Version:      2.1.0
-Release:      7%{?dist}
+Release:      8%{?dist}
 # memcached is PHP, FastLZ is MIT
 License:      PHP and MIT
 Group:        Development/Languages
@@ -102,9 +102,6 @@ cd %{pecl_name}-%{version}
 %{_bindir}/phpize
 %configure --enable-memcached-igbinary \
            --enable-memcached-json \
-%if 0%{?fedora} >= 19
-           --enable-memcached-sasl \
-%endif
            --with-php-config=%{_bindir}/php-config
 make %{?_smp_mflags}
 
@@ -113,9 +110,6 @@ cd ../%{pecl_name}-%{version}-zts
 %{_bindir}/zts-phpize
 %configure --enable-memcached-igbinary \
            --enable-memcached-json \
-%if 0%{?fedora} >= 19
-           --enable-memcached-sasl \
-%endif
            --with-php-config=%{_bindir}/zts-php-config
 make %{?_smp_mflags}
 %endif
@@ -188,6 +182,11 @@ ln -s %{php_ztsextdir}/igbinary.so modules/
 
 
 %changelog
+* Tue Sep 03 2013 Timon <timosha@gmail.com> - 2.1.0-8
+- rebuild old libmemcached
+- disable sasl
+- fix build patch
+
 * Fri Mar 22 2013 Remi Collet <rcollet@redhat.com> - 2.1.0-7
 - rebuild for http://fedoraproject.org/wiki/Features/Php55
 
