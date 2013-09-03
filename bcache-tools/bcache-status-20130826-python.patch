@@ -1,0 +1,8 @@
+--- bcache-status-20130826/bcache-status.orig	2013-08-26 22:21:55.460799451 +0200
++++ bcache-status-20130826/bcache-status	2013-08-26 22:22:03.628792246 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!/usr/bin/env python
+ #
+ # Dumb script to dump (some) of bcache status
+ # Copyright 2013 Darrick J. Wong. All rights reserved.
