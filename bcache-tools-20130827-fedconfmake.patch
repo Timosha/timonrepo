@@ -1,0 +1,26 @@
+diff -ruN bcache-tools-20130827.orig/configure bcache-tools-20130827/configure
+--- bcache-tools-20130827.orig/configure	1970-01-01 01:00:00.000000000 +0100
++++ bcache-tools-20130827/configure	2013-08-31 15:12:41.093218432 +0200
+@@ -0,0 +1 @@
++#!/bin/sh
+diff -ruN bcache-tools-20130827/Makefile.fedconfmake bcache-tools-20130827/Makefile
+--- bcache-tools-20130827/Makefile.fedconfmake	2013-08-26 23:46:19.000000000 +0200
++++ bcache-tools-20130827/Makefile	2013-09-02 22:32:59.474791346 +0200
+@@ -5,12 +5,11 @@
+ all: make-bcache probe-bcache bcache-super-show
+ 
+ install: make-bcache probe-bcache bcache-super-show
+-	install -m0755 make-bcache bcache-super-show	$(DESTDIR)${PREFIX}/sbin/
+-	install -m0755 probe-bcache	$(DESTDIR)/sbin/
+-	install -m0644 61-bcache.rules	$(DESTDIR)/lib/udev/rules.d/
+-	install -m0755 bcache-register	$(DESTDIR)/lib/udev/
+-	-install -m0755 initramfs/hook	$(DESTDIR)/etc/initramfs-tools/hooks/bcache
+-	install -m0644 -- *.8 $(DESTDIR)${PREFIX}/share/man/man8
++	install -p -m0755 make-bcache bcache-super-show	$(DESTDIR)$(SBINDIR)
++	install -p -m0755 probe-bcache	$(DESTDIR)$(SBINDIR)
++	install -p -m0644 61-bcache.rules	$(DESTDIR)$(UDEVRULESDIR)
++	install -p -m0755 bcache-register	$(DESTDIR)$(UDEVLIBDIR)
++	install -p -m0644 -- *.8 $(DESTDIR)${MANDIR}/man8
+ #	install -m0755 bcache-test $(DESTDIR)${PREFIX}/sbin/
+ 
+ clean:
