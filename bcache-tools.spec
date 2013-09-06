@@ -3,7 +3,7 @@
 Summary: Tools for Linux kernel block layer cache
 Name: bcache-tools
 Version: 0
-Release: 0.9.%{gitdate}git%{?dist}
+Release: 0.10.%{gitdate}git%{?dist}
 License: GPLv2
 Group: System Environment/Base
 URL: http://bcache.evilpiepirate.org/
@@ -31,6 +31,9 @@ Patch2: %{name}-20130827-register.patch
 # configure and make install are not "Fedora compliant", do a small step in the
 # right direction
 Patch3: %{name}-20130827-fedconfmake.patch
+# the udev interfacing is broken, but this fix is only temporary until
+# util-linux (blkid) takes care of bcache superblock identification
+Patch4: %{name}-20130827-udevfix.patch
 
 Requires: python
 BuildRequires: libuuid-devel systemd
@@ -51,6 +54,7 @@ tar xzf %{SOURCE1} --strip-components=1
 %patch2 -p1 -b .register
 %patch3 -p1 -b .fedconfmake
 chmod +x configure
+%patch4 -p1 -b .udevfix
 
 %build
 %configure
@@ -82,6 +86,9 @@ install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
 %{_sbindir}/probe-bcache
 
 %changelog
+* Fri Sep 06 2013 Rolf Fokkens <rolf@rolffokkens.nl> - 0-0.10.20130827git
+- fixed some udev related issues (#1004693)
+
 * Mon Sep 02 2013 Rolf Fokkens <rolf@rolffokkens.nl> - 0-0.9.20130827git
 - fedconfmake.spec file renamed to fedconfmake.patch
 - removed libuuid as dependency

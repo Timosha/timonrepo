@@ -1,0 +1,33 @@
+--- bcache-tools-20130827/61-bcache.rules.orig	2013-09-06 08:54:07.656978850 +0200
++++ bcache-tools-20130827/61-bcache.rules	2013-09-06 08:57:09.769768802 +0200
+@@ -5,13 +5,12 @@
+ ACTION=="remove", GOTO="bcache_end"
+ 
+ # Backing devices: scan, symlink, register
+-IMPORT{program}="/sbin/blkid -o udev $tempnode"
+ # blkid and probe-bcache can disagree, in which case don't register
+ ENV{ID_FS_TYPE}=="?*", ENV{ID_FS_TYPE}!="bcache", GOTO="bcache_backing_end"
+ 
+ IMPORT{program}="/sbin/probe-bcache -o udev $tempnode"
+-ENV{ID_FS_UUID_ENC}=="?*", SYMLINK+="disk/by-uuid/$env{ID_FS_UUID_ENC}"
+-SUBSYSTEM=="block", ACTION=="add|change", ENV{ID_FS_TYPE}=="bcache", \
++ENV{BCACHE_ID_FS_UUID_ENC}=="?*", SYMLINK+="disk/by-uuid/$env{BCACHE_ID_FS_UUID_ENC}"
++SUBSYSTEM=="block", ACTION=="add|change", ENV{BCACHE_ID_FS_TYPE}=="bcache", \
+         RUN+="bcache-register $tempnode"
+ LABEL="bcache_backing_end"
+ 
+--- bcache-tools-20130827/probe-bcache.c.orig	2013-09-06 08:52:28.743089432 +0200
++++ bcache-tools-20130827/probe-bcache.c	2013-09-06 08:53:44.046005241 +0200
+@@ -61,9 +61,9 @@
+ 		uuid_unparse(sb.uuid, uuid);
+ 
+ 		if (udev)
+-			printf("ID_FS_UUID=%s\n"
+-			       "ID_FS_UUID_ENC=%s\n"
+-			       "ID_FS_TYPE=bcache\n",
++			printf("BCACHE_ID_FS_UUID=%s\n"
++			       "BCACHE_ID_FS_UUID_ENC=%s\n"
++			       "BCACHE_ID_FS_TYPE=bcache\n",
+ 			       uuid, uuid);
+ 		else
+ 			printf("%s: UUID=\"\" TYPE=\"bcache\"\n", uuid);
