@@ -1,0 +1,150 @@
+diff -Naur ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/cpp/src/Make.sh ./cpp/src/Make.sh
+--- ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/cpp/src/Make.sh	2013-03-31 22:04:42.000000000 +0600
++++ ./cpp/src/Make.sh	2013-04-05 12:23:52.995919320 +0600
+@@ -23,16 +23,19 @@
+ #   yum install libmemcached-devel
+ #
+ 
+-GCC="g++ -std=gnu++0x -static"
++#GCC="g++ -std=gnu++0x -static"
+ #GCC="g++ -std=gnu++0x"
++GCC="g++ -std=c++11"
+ #DEBUG="-g3 -O0"
+ DEBUG="-O3"
+-export INCLUDE=$INCLUDE:libev
+-export LIB=$INCLUDE:libev/.libs
++#export INCLUDE=$INCLUDE:libev
++#export LIB=$INCLUDE:libev/.libs
+ 
+ rm -f ../../dklab_realplexor 2>/dev/null
+ $GCC dklab_realplexor.cpp \
++    -Wno-strict-aliasing \
+     $DEBUG -Wfatal-errors -Wall -Werror \
+-    -pthread -lcrypt -lboost_filesystem -lboost_system -lboost_regex -lev \
++    $(pkg-config --libs --cflags libev) \
++    -pthread -lcrypt -lboost_filesystem -lboost_system -lboost_regex \
+     -o ../../dklab_realplexor
+ exit $?
+diff -Naur ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/cpp/src/Realplexor/Common.h ./cpp/src/Realplexor/Common.h
+--- ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/cpp/src/Realplexor/Common.h	2013-03-31 22:04:42.000000000 +0600
++++ ./cpp/src/Realplexor/Common.h	2013-04-05 12:23:52.995919320 +0600
+@@ -37,7 +37,7 @@
+                 "]";
+         }
+         if (verb >= 2) {
+-            cout << "[" << strftime_std(from_time_t(ev::now())) << "] " << msg << endl;
++            cout << "[" << strftime_std(from_time_t(ev::now(EV_DEFAULT))) << "] " << msg << endl;
+         } else {
+             cout << msg << endl;
+         }
+diff -Naur ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/cpp/src/Realplexor/Config.h ./cpp/src/Realplexor/Config.h
+--- ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/cpp/src/Realplexor/Config.h	2013-03-31 22:04:42.000000000 +0600
++++ ./cpp/src/Realplexor/Config.h	2013-04-05 12:23:52.995919320 +0600
+@@ -15,6 +15,8 @@
+         string time;
+     };
+ 
++    static inline void void_function(const string&) { }
++
+ public:
+     int                          verbosity;
+     checked_map<string, string>  users;
+@@ -42,7 +44,7 @@
+ 
+     Config(): config("config"), users("users list") 
+     {
+-        logger = [](const string&)->void{}; // default
++        logger = (logger_t)Config::void_function; // default
+     }
+ 
+     // Sets another logger routine for this config.
+diff -Naur ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/cpp/src/Realplexor/Tools.h ./cpp/src/Realplexor/Tools.h
+--- ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/cpp/src/Realplexor/Tools.h	2013-03-31 22:04:42.000000000 +0600
++++ ./cpp/src/Realplexor/Tools.h	2013-04-05 12:23:52.995919320 +0600
+@@ -11,7 +11,7 @@
+     // of this function always return different time, second > first.
+     static cursor_t time_hi_res()
+     {
+-        cursor_t time = ev::now();
++        cursor_t time = ev::now(EV_DEFAULT);
+         static int time_counter = 0;
+         const int cycle = 1000;
+         time_counter++;
+diff -Naur ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/cpp/src/Storage/CleanupTimers.h ./cpp/src/Storage/CleanupTimers.h
+--- ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/cpp/src/Storage/CleanupTimers.h	2013-03-31 22:04:42.000000000 +0600
++++ ./cpp/src/Storage/CleanupTimers.h	2013-04-05 12:23:52.995919320 +0600
+@@ -28,9 +28,9 @@
+             storage.erase(id);
+         }
+         // Create new timer.
+-        auto wrapper = [&storage, callback, id](int) { 
+-            auto guard = storage[id];
+-            storage.erase(id); // thanks to guard, the timer is deleted only when we exit this closure
++        auto wrapper = [this, callback, id](int) {
++            auto guard = this->storage[id];
++            this->storage.erase(id); // thanks to guard, the timer is deleted only when we exit this closure
+             callback(); // it is important for logs to call erase() before the callback
+         };
+         storage[id].reset(new Realplexor::Event::Timer<decltype(wrapper)>(wrapper));
+diff -Naur ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/cpp/src/Storage/OnlineTimers.h ./cpp/src/Storage/OnlineTimers.h
+--- ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/cpp/src/Storage/OnlineTimers.h	2013-03-31 22:04:42.000000000 +0600
++++ ./cpp/src/Storage/OnlineTimers.h	2013-04-05 12:23:52.996919302 +0600
+@@ -36,9 +36,9 @@
+             firstTime = false;
+         }
+         // Create new stopped timer.
+-        auto wrapper = [&storage, callback, id](int) {
+-            auto guard = storage[id];
+-            storage.erase(id); // thanks to guard, the timer is deleted only when we exit this closure
++        auto wrapper = [this, callback, id](int) {
++            auto guard = this->storage[id];
++            this->storage.erase(id); // thanks to guard, the timer is deleted only when we exit this closure
+             callback(); // it is important for logs to call erase() before the callback
+         };
+         storage[id].reset(new Realplexor::Event::Timer<decltype(wrapper)>(wrapper));
+diff -Naur ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/cpp/src/utils/Socket.h ./cpp/src/utils/Socket.h
+--- ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/cpp/src/utils/Socket.h	2013-03-31 22:04:42.000000000 +0600
++++ ./cpp/src/utils/Socket.h	2013-04-05 12:23:52.996919302 +0600
+@@ -101,12 +101,18 @@
+     int write(const char* buf, size_t len)
+     {
+         while (true) {
+-            int n = ::write(fh, buf, len);
+-            if (n < 0) return -1;
+-            if (n == (int)len) return 1;
+-            len -= n;
+-            buf += n;
+-        }
++           int n = ::write(fh, buf, len);
++           if (n == (int)len) return 1;
++           if (n<0)
++           {
++               if (errno != EAGAIN) return -1;
++           }
++           else
++           {
++               len -= n;
++               buf += n;
++           }
++       }
+     }
+ 
+     int write(const string& s)
+diff -Naur ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/dklab_realplexor.service ./dklab_realplexor.service
+--- ../DmitryKoterov-dklab_realplexor-0fdae1e-orig/dklab_realplexor.service	1970-01-01 05:00:00.000000000 +0500
++++ ./dklab_realplexor.service	2013-04-05 12:25:45.464949186 +0600
+@@ -0,0 +1,14 @@
++[Unit]
++Description=dklab_realplexor COMET server
++After=syslog.target network.target remote-fs.target nss-lookup.target
++
++[Service]
++Type=simple
++
++ExecStart=-/usr/share/dklab_realplexor/dklab_realplexor /etc/dklab_realplexor.conf
++ExecReload=/bin/kill -HUP $MAINPID
++ExecStop=/bin/kill $MAINPID
++#SuccessExitStatus=1 SIGTERM SIGKILL
++
++[Install]
++WantedBy=multi-user.target

@@ -1,8 +1,7 @@
 #TODO: split into dklab_realplexor-cpp and dklab_realplexor-perl
 
-%global git     2234f5e
-%global gituser Timosha
-%global github  %{gituser}-dklab_realplexor
+%global git 0fdae1e
+%global github DmitryKoterov-dklab_realplexor
 
 Summary:	Comet server which handles 1000000+ parallel browser connections
 Name:		dklab_realplexor
@@ -11,20 +10,21 @@ Release:	0.6.git%{git}%{?dist}
 Group:		Development/Libraries
 License:	GPLv2
 #Source0:	%{name}-%{version}.tar.bz2
-Source0:        https://github.com/%{gituser}/dklab_realplexor/tarball/master/%{github}-%{git}.tar.gz
-Source1:	%{name}.service
+Source0:        https://github.com/DmitryKoterov/dklab_realplexor/tarball/master/%{github}-%{git}.tar.gz
+Source1:	%{name}.sysconfig
 
-Requires:	perl-EV
-Requires:       libev boost-system boost-regex boost-filesystem
+Patch0:         dklab_realplexor-ev++0x.h.patch
+Patch1:         dklab_realplexor-fc18.patch
 
-# pre/post stuff needs systemd too
-Requires(post):   systemd-units
-Requires(preun):  systemd-units
-Requires(postun): systemd-units
+#Requires:	perl-EV 
+Requires:       libev boost-system boost-regex boost-filesystem systemd
 
-Requires(post):   chkconfig
+Requires(post):		/usr/bin/systemctl
+Requires(preun):	/usr/bin/systemctl
+Requires(preun):	/sbin/service
+Requires(postun):	/sbin/service
 
-BuildRequires: boost-devel libev-devel pkgconfig
+BuildRequires: boost-devel libev-devel systemd
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -36,32 +36,35 @@ Summary:	PHP bindings for Dklab Realplexor
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	php
+BuildArch:	noarch
 
 %description -n php-dklab_realplexor
 PHP bindings for Dklab Realplexor
 
 %prep
 %setup -q -n %{github}-%{git}
+%patch0 -p0
+%patch1 -p0
 
 %build
 pushd cpp/src 
-g++ -std=c++11 dklab_realplexor.cpp \
-	-lpthread -lcrypt -lboost_filesystem -lboost_system -lboost_regex \
-	$(pkg-config --libs --cflags libev) \
-        -Wno-strict-aliasing \
+g++ -std=gnu++0x dklab_realplexor.cpp \
+	-lpthread -lcrypt -lboost_filesystem -lboost_system -lboost_regex -lev \
 	-o ../../dklab_realplexor
 popd
 
 %install
 %{__rm} -rf %{buildroot}
+#%{__make} DESTDIR=%{buildroot} install
+#%{__install} -d -m 755 %{buildroot}%{sysconfig}
 %{__install} -Dp -m 644 dklab_realplexor.conf %{buildroot}%{_sysconfdir}/%{name}.conf
-%{__install} -Dp -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
+%{__install} -Dp -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
+%{__install} -Dp -m 755 dklab_realplexor.service %{buildroot}%{_unitdir}/%{name}.service
 
 %{__install} -Dp -d -m 755 %{buildroot}%{_datadir}/%{name}
-%{__cp} -r Connection Storage Tie Realplexor dklab_realplexor.pl %{buildroot}%{_datadir}/%{name}
+#%{__cp} -r Connection Storage Tie Realplexor dklab_realplexor.pl %{buildroot}%{_datadir}/%{name}
 %{__install} -Dp -m 644 dklab_realplexor.conf %{buildroot}%{_datadir}/%{name}/dklab_realplexor.conf
-%{__install} -Dp -m 755 dklab_realplexor.pl %{buildroot}%{_datadir}/%{name}/dklab_realplexor.pl
-
+#%{__install} -Dp -m 755 dklab_realplexor.pl %{buildroot}%{_datadir}/%{name}/dklab_realplexor.pl
 #TODO: copy to bindir
 %{__install} -Dp -m 755 dklab_realplexor %{buildroot}%{_datadir}/%{name}/dklab_realplexor
 
@@ -72,9 +75,13 @@ popd
 %{__install} -Dp -d -m 755 %{buildroot}%{_datadir}/php
 %{__cp} -r api/php/Dklab %{buildroot}%{_datadir}/php
 
+
 #TODO
 #%check 
 #%{__make} test
+
+%clean
+%{__rm} -rf %{buildroot}
 
 %post
 if [ $1 -eq 1 ] ; then
@@ -89,6 +96,7 @@ if [ $1 -eq 0 ] ; then
     /bin/systemctl stop %{name}.service >/dev/null 2>&1 || :
 fi
 
+
 %postun
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 if [ $1 -ge 1 ] ; then
@@ -96,13 +104,13 @@ if [ $1 -ge 1 ] ; then
     /bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
 fi
 
-%clean
-%{__rm} -rf %{buildroot}
+
 
 %files
 %defattr(-,root,root)
 %doc dklab_realplexor.license-gpl-2.0.txt dklab_realplexor.license-additional.txt
 %config(noreplace) %{_sysconfdir}/%{name}.conf
+%config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %{_unitdir}/%{name}.service
 %{_datadir}/%{name}
 
@@ -111,16 +119,14 @@ fi
 %{_datadir}/php/Dklab/Realplexor.php
 
 %changelog
-* Wed Jan 9 2013 Timon <timosha@gmail.com> - 1.41-0.6.git6e97dc5
-- switch to systemd
+* Fri Apr 05 2013 Degtyaryov Dmitriy <degtyaryov@gmail.com> - 1.41-0.6.git0fdae1e
+- c++ only version
+- systemd
+- php-api noarch
 
-* Tue Dec 25 2012 Timon <timosha@gmail.com> - 1.41-0.5.git6e97dc5
-- fix build for gcc 4.7
-- using Timosha repo
-- remove ev++ patch
-
-* Thu Jan 26 2012 Timon <timosha@gmail.com> - 1.41-0.4.git0b59237
-- rebuild new version
+* Tue Mar 05 2013 Degtyaryov Dmitriy <degtyaryov@gmail.com> - 1.41-0.6.git0b59237
+- fedora 18
+- Socket.cpp fix EAGAIN in function write
 
 * Thu Jan 26 2012 Timon <timosha@gmail.com> - 1.41-0.3.gitb9f4277
 - default config
@@ -129,7 +135,7 @@ fi
 - git version
 - cpp version of server
 
-* Thu Oct 10 2011 Timon <timosha@gmail.com> - 1.40-1
+* Mon Oct 10 2011 Timon <timosha@gmail.com> - 1.40-1
 - new version
 
 * Thu Oct 28 2010 Timon <timosha@gmail.com> - 1.32-2
