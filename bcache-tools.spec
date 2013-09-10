@@ -1,9 +1,9 @@
-%global gitdate 20130827
+%global gitdate 20130909
 
 Summary: Tools for Linux kernel block layer cache
 Name: bcache-tools
 Version: 0
-Release: 0.10.%{gitdate}git%{?dist}
+Release: 0.11.%{gitdate}git%{?dist}
 License: GPLv2
 Group: System Environment/Base
 URL: http://bcache.evilpiepirate.org/
@@ -11,19 +11,17 @@ VCS: http://evilpiepirate.org/git/bcache-tools.git
 # For now I am using a prerelease version obtained by:
 # git clone http://evilpiepirate.org/git/bcache-tools.git
 # cd bcache-tools/
-# git archive --format=tar --prefix=bcache-tools-20130827/ 8327108eeaf3e0491b17d803da164c0827aae622 | gzip > ../bcache-tools-20130827.tar.bz
+# git archive --format=tar --prefix=bcache-tools-20130909/ b15fb776c99fcab56fbbe295629749d307e2018d | gzip > ../bcache-tools-20130909.tar.bz
 Source0: %{name}-%{gitdate}.tar.bz
 # This part is also a prerelease version obtained by https://gist.github.com/djwong/6343451:
 # git clone https://gist.github.com/6343451.git
 # cd 6343451/
-# git archive --format=tar --prefix=bcache-status-20130826/ 95fe51dd30e579d5786a8cbf54ee47df0b347250 | gzip > ../bcache-status-20130826.tar.gz
+# git archive --format=tar --prefix=bcache-status-20130909/ 10282160ab880eab0d9b8d1e1590e477f1e76da2 | gzip > ../bcache-status-20130909.tar.gz
 # see also http://article.gmane.org/gmane.linux.kernel.bcache.devel/1951
-Source1: bcache-status-20130826.tar.gz
+Source1: bcache-status-20130909.tar.gz
 # bcache status not provided as a true package, so this is a self maintained man page for it
 # http://article.gmane.org/gmane.linux.kernel.bcache.devel/1946
 Patch0: %{name}-status-20130826-man.patch
-# Sent upstream: http://article.gmane.org/gmane.linux.kernel.bcache.devel/1946
-Patch1: bcache-status-20130826-python.patch
 # Sent upstream: http://article.gmane.org/gmane.linux.kernel.bcache.devel/1947
 # This one can be left out when this is processed:
 # http://article.gmane.org/gmane.linux.kernel.bcache.devel/1953
@@ -36,7 +34,7 @@ Patch3: %{name}-20130827-fedconfmake.patch
 Patch4: %{name}-20130827-udevfix.patch
 
 Requires: python
-BuildRequires: libuuid-devel systemd
+BuildRequires: libuuid-devel libblkid-devel systemd
 
 %description
 Bcache is a Linux kernel block layer cache. It allows one or more fast disk
@@ -50,7 +48,6 @@ This package contains the utilities for manipulating bcache.
 %setup -q -n bcache-tools-%{gitdate}
 tar xzf %{SOURCE1} --strip-components=1
 %patch0 -p1 -b .man
-%patch1 -p1 -b .python
 %patch2 -p1 -b .register
 %patch3 -p1 -b .fedconfmake
 chmod +x configure
@@ -86,6 +83,11 @@ install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
 %{_sbindir}/probe-bcache
 
 %changelog
+* Mon Sep 09 2013 Rolf Fokkens <rolf@rolffokkens.nl> - 0-0.11.20130909git
+- updated to new bcache-status
+- updated to new bcache-tools
+- added libblkid-devel to BuildRequires
+
 * Fri Sep 06 2013 Rolf Fokkens <rolf@rolffokkens.nl> - 0-0.10.20130827git
 - fixed some udev related issues (#1004693)
 
