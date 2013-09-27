@@ -1,9 +1,21 @@
 %global gitdate 20130909
 
+# blkid in util-linux v2.24 will be able to identify bcache superblocks which
+# obsoletes probe-bcache. v2.24 rc is planned for F20:
+# https://bugzilla.redhat.com/show_bug.cgi?id=1001120#c13
+# so for F20 blkid will be used, but not for older Fedora in case someone
+# builds it
+#
+%if 0%{?fedora} > 19
+%global use_blkid 1
+%else
+%global use_blkid 0
+%endif
+
 Summary: Tools for Linux kernel block layer cache
 Name: bcache-tools
 Version: 0
-Release: 0.11.%{gitdate}git%{?dist}
+Release: 0.12.%{gitdate}git%{?dist}
 License: GPLv2
 Group: System Environment/Base
 URL: http://bcache.evilpiepirate.org/
@@ -25,15 +37,25 @@ Patch0: %{name}-status-20130826-man.patch
 # Sent upstream: http://article.gmane.org/gmane.linux.kernel.bcache.devel/1947
 # This one can be left out when this is processed:
 # http://article.gmane.org/gmane.linux.kernel.bcache.devel/1953
-Patch2: %{name}-20130827-register.patch
+Patch1: %{name}-20130827-register.patch
 # configure and make install are not "Fedora compliant", do a small step in the
 # right direction
-Patch3: %{name}-20130827-fedconfmake.patch
-# the udev interfacing is broken, but this fix is only temporary until
-# util-linux (blkid) takes care of bcache superblock identification
-Patch4: %{name}-20130827-udevfix.patch
+Patch2: %{name}-20130827-fedconfmake.patch
+# the udev interfacing is broken
+# As long as util-linux (blkid) doesn't take care of bcache superblock
+# identification we need this (which is temporary for Fedora):
+Patch3: %{name}-20130909-udevfix-old.patch
+# When util-linux does take care of bcache superblock identification we remove
+# the probe-cache call (whichs is Fedora specific):
+Patch4: %{name}-20130909-udevfix.patch
 
 Requires: python
+%if %{use_blkid}
+# This is a kind of soft dependency: because we don't include probe-bcache
+# we have to make sure that libblkid is able to identify bcache. So this
+# is why it requires recent libblkid.
+Requires: libblkid >= 2.24
+%endif
 BuildRequires: libuuid-devel libblkid-devel systemd
 
 %description
@@ -48,10 +70,14 @@ This package contains the utilities for manipulating bcache.
 %setup -q -n bcache-tools-%{gitdate}
 tar xzf %{SOURCE1} --strip-components=1
 %patch0 -p1 -b .man
-%patch2 -p1 -b .register
-%patch3 -p1 -b .fedconfmake
+%patch1 -p1 -b .register
+%patch2 -p1 -b .fedconfmake
 chmod +x configure
+%if %{use_blkid}
 %patch4 -p1 -b .udevfix
+%else
+%patch3 -p1 -b .udevfix-old
+%endif
 
 %build
 %configure
@@ -70,6 +96,11 @@ mkdir -p \
     UDEVLIBDIR=%{_udevlibdir} \
     MANDIR=%{_mandir}
 
+# prevent complaints when checking for unpackaged files
+%if %{use_blkid}
+rm %{buildroot}%{_sbindir}/probe-bcache
+rm %{buildroot}%{_mandir}/man8/probe-bcache.8
+%endif
 install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
 
 %files
@@ -80,9 +111,14 @@ install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
 %{_sbindir}/bcache-super-show
 %{_sbindir}/bcache-status
 %{_sbindir}/make-bcache
+%if !%{use_blkid}
 %{_sbindir}/probe-bcache
+%endif
 
 %changelog
+* Fri Sep 27 2013 Rolf Fokkens <rolf@rolffokkens.nl> - 0-0.12.20130909git
+- obsolete probe-bcache in F20 using use_blkid macro
+
 * Mon Sep 09 2013 Rolf Fokkens <rolf@rolffokkens.nl> - 0-0.11.20130909git
 - updated to new bcache-status
 - updated to new bcache-tools
