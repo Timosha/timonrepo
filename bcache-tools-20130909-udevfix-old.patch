@@ -1,5 +1,5 @@
---- bcache-tools-20130827/61-bcache.rules.orig	2013-09-06 08:54:07.656978850 +0200
-+++ bcache-tools-20130827/61-bcache.rules	2013-09-06 08:57:09.769768802 +0200
+--- bcache-tools-20130909/61-bcache.rules.udevfix	2013-09-11 21:39:09.690473058 +0200
++++ bcache-tools-20130909/61-bcache.rules	2013-09-11 21:38:49.273376220 +0200
 @@ -5,13 +5,12 @@
  ACTION=="remove", GOTO="bcache_end"
  
@@ -16,18 +16,3 @@
          RUN+="bcache-register $tempnode"
  LABEL="bcache_backing_end"
  
---- bcache-tools-20130827/probe-bcache.c.orig	2013-09-06 08:52:28.743089432 +0200
-+++ bcache-tools-20130827/probe-bcache.c	2013-09-06 08:53:44.046005241 +0200
-@@ -61,9 +61,9 @@
- 		uuid_unparse(sb.uuid, uuid);
- 
- 		if (udev)
--			printf("ID_FS_UUID=%s\n"
--			       "ID_FS_UUID_ENC=%s\n"
--			       "ID_FS_TYPE=bcache\n",
-+			printf("BCACHE_ID_FS_UUID=%s\n"
-+			       "BCACHE_ID_FS_UUID_ENC=%s\n"
-+			       "BCACHE_ID_FS_TYPE=bcache\n",
- 			       uuid, uuid);
- 		else
- 			printf("%s: UUID=\"\" TYPE=\"bcache\"\n", uuid);
