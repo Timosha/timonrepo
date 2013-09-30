@@ -1,6 +1,6 @@
---- bcache-tools-20130909/61-bcache.rules.udevfix	2013-09-11 21:39:18.129513289 +0200
-+++ bcache-tools-20130909/61-bcache.rules	2013-09-11 21:52:32.233291340 +0200
-@@ -4,12 +4,8 @@
+--- bcache-tools-20130909/61-bcache.rules.udevfix	2013-09-01 12:38:11.000000000 +0200
++++ bcache-tools-20130909/61-bcache.rules	2013-09-30 18:58:14.914729951 +0200
+@@ -4,12 +4,11 @@
  SUBSYSTEM!="block", GOTO="bcache_end"
  ACTION=="remove", GOTO="bcache_end"
  
@@ -10,6 +10,9 @@
 -ENV{ID_FS_TYPE}=="?*", ENV{ID_FS_TYPE}!="bcache", GOTO="bcache_backing_end"
 -
 -IMPORT{program}="/sbin/probe-bcache -o udev $tempnode"
++# There's no certainty that blkid was executed by any of the earlier rules
++# so to be sure it's executed here too
++IMPORT{builtin}="blkid"
 +# Backing devices: symlink, register
 +ENV{ID_FS_TYPE}!="bcache", GOTO="bcache_backing_end"
  ENV{ID_FS_UUID_ENC}=="?*", SYMLINK+="disk/by-uuid/$env{ID_FS_UUID_ENC}"

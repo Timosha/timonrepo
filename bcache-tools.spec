@@ -15,7 +15,7 @@
 Summary: Tools for Linux kernel block layer cache
 Name: bcache-tools
 Version: 0
-Release: 0.12.%{gitdate}git%{?dist}
+Release: 0.13.%{gitdate}git%{?dist}
 License: GPLv2
 Group: System Environment/Base
 URL: http://bcache.evilpiepirate.org/
@@ -116,8 +116,11 @@ install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
 %endif
 
 %changelog
+* Mon Sep 30 2013 Rolf Fokkens <rolf@rolffokkens.nl> - 0-0.13.20130909git
+- (#1004693) add execute blkid in 61-bcache.rules
+
 * Fri Sep 27 2013 Rolf Fokkens <rolf@rolffokkens.nl> - 0-0.12.20130909git
-- obsolete probe-bcache in F20 using use_blkid macro
+- remove obsoleted probe-bcache in F20 using use_blkid macro
 
 * Mon Sep 09 2013 Rolf Fokkens <rolf@rolffokkens.nl> - 0-0.11.20130909git
 - updated to new bcache-status
