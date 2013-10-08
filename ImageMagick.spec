@@ -1,9 +1,9 @@
-%global VER 6.8.6
-%global Patchlevel 3
+%global VER 6.8.7
+%global Patchlevel 0
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
-Release:		4%{?dist}
+Release:		1%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
@@ -319,6 +319,9 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Mon Oct 7 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 6.8.7.0-1
+- Update to 6.8.7-0 to fix badurl (http://www.mail-archive.com/devel@lists.fedoraproject.org/msg67796.html)
+
 * Sun Sep 08 2013 Rex Dieter <rdieter@fedoraproject.org> - 6.8.6.3-4
 - rebuild (openexr)
 
