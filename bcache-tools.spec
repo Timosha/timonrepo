@@ -1,9 +1,9 @@
-%global gitdate 20130909
+%global gitdate 20131018
 
 Summary: Tools for Linux kernel block layer cache
 Name: bcache-tools
 Version: 0
-Release: 0.14.%{gitdate}git%{?dist}
+Release: 0.15.%{gitdate}git%{?dist}
 License: GPLv2
 Group: System Environment/Base
 URL: http://bcache.evilpiepirate.org/
@@ -11,7 +11,7 @@ VCS: http://evilpiepirate.org/git/bcache-tools.git
 # For now I am using a prerelease version obtained by:
 # git clone http://evilpiepirate.org/git/bcache-tools.git
 # cd bcache-tools/
-# git archive --format=tar --prefix=bcache-tools-20130909/ b15fb776c99fcab56fbbe295629749d307e2018d | gzip > ../bcache-tools-20130909.tar.gz
+# git archive --format=tar --prefix=bcache-tools-20131018/ 89f11b135d1d57a5dbdc3548bfb9bfa0113075c4 | gzip > ../bcache-tools-20131018.tar.gz
 Source0: %{name}-%{gitdate}.tar.gz
 # This part is also a prerelease version obtained by https://gist.github.com/djwong/6343451:
 # git clone https://gist.github.com/6343451.git
@@ -22,19 +22,19 @@ Source1: bcache-status-20130909.tar.gz
 # The dracut module originally resided in dracut, but it's now part of
 # bcache-tools
 Source2: bcache-tools-dracut-module.tgz
-# bcache status not provided as a true package, so this is a self maintained man page for it
+# bcache status not provided as a true package, so this is a self maintained
+# man page for it
 # http://article.gmane.org/gmane.linux.kernel.bcache.devel/1946
 Patch0: %{name}-status-20130826-man.patch
-# Sent upstream: http://article.gmane.org/gmane.linux.kernel.bcache.devel/1947
-# This one can be left out when this is processed:
-# http://article.gmane.org/gmane.linux.kernel.bcache.devel/1953
-Patch1: %{name}-20130827-register.patch
-# configure and make install are not "Fedora compliant", do a small step in the
+# Skip DM devices marked private - will be in git repo later
+# https://github.com/g2p/bcache-tools/commit/15f17ed3e9a8dbe44a0e60cd981f70b7a61d6f7a
+Patch1: %{name}-20131018-udev-dmfix.patch
+# configure is not "Fedora compliant", do a small step in the
 # right direction
-Patch2: %{name}-20130827-fedconfmake.patch
-# When util-linux does take care of bcache superblock identification we remove
-# the probe-cache call (whichs is Fedora specific):
-Patch3: %{name}-20130909-udev-dracut.patch
+Patch2: %{name}-20131018-fedconf.patch
+# util-linux takes care of bcache superblock identification so we remove
+# the probe-cache call (which is Fedora specific):
+Patch3: %{name}-20131018-noprobe.patch
 
 Requires: python
 # This is a kind of soft dependency: because we don't include probe-bcache
@@ -58,10 +58,10 @@ This package contains the utilities for manipulating bcache.
 tar xzf %{SOURCE1} --strip-components=1
 tar xzf %{SOURCE2}
 %patch0 -p1 -b .man
-%patch1 -p1 -b .register
+%patch1 -p1 -b .dmfix
 %patch2 -p1 -b .fedconfmake
 chmod +x configure
-%patch3 -p1 -b .udevfix
+%patch3 -p1 -b .noprobe
 
 %build
 %configure
@@ -76,14 +76,13 @@ mkdir -p \
     %{buildroot}%{dracutlibdir}/modules.d
 
 %make_install \
-    SBINDIR=%{_sbindir} \
-    UDEVRULESDIR=%{_udevrulesdir} \
+    INSTALL="install -p" \
     UDEVLIBDIR=%{_udevlibdir} \
     DRACUTLIBDIR=%{dracutlibdir} \
     MANDIR=%{_mandir}
 
 # prevent complaints when checking for unpackaged files
-rm %{buildroot}%{_sbindir}/probe-bcache
+rm %{buildroot}%{_udevlibdir}/probe-bcache
 rm %{buildroot}%{_mandir}/man8/probe-bcache.8
 
 install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
@@ -99,7 +98,13 @@ install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
 %{dracutlibdir}/modules.d/90bcache
 
 %changelog
-* Fri Oct 04 2013 Rolf Fokkens <rolf@rolffokkens.nl> - 0-0.14.20130909git
+* Fri Oct 18 2013 Rolf Fokkens <rolf@rolffokkens.nl> - 0-0.15.20131018git
+- updated bcache-tools to latest upstream git
+- dracut module is now included upstream
+- bcache-register no longer needs patching
+- Makefile no longer needs patching
+
+* Wed Oct 02 2013 Rolf Fokkens <rolf@rolffokkens.nl> - 0-0.14.20130909git
 - dropped pre F20 support; no use since deps on util-linux and dracut
 - (#1004693) removed execute blkid in 61-bcache.rules
 - (#1004693) moved 61-bcache.rules to 69-bcache.rules

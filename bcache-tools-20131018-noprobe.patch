@@ -1,0 +1,30 @@
+--- bcache-tools-20131018/69-bcache.rules.2	2013-10-18 19:34:38.907431161 +0200
++++ bcache-tools-20131018/69-bcache.rules	2013-10-18 19:41:18.540320493 +0200
+@@ -6,17 +6,10 @@
+ ENV{DM_UDEV_DISABLE_OTHER_RULES_FLAG}=="1", GOTO="bcache_end"
+ 
+ # blkid was run by the standard udev rules
+-# It recognised bcache (util-linux 2.24+)
+-ENV{ID_FS_TYPE}=="bcache", GOTO="bcache_backing_found"
+-# It recognised something else; bail
+-ENV{ID_FS_TYPE}=="?*", GOTO="bcache_backing_end"
+-
+ # Backing devices: scan, symlink, register
+-IMPORT{program}="probe-bcache -o udev $tempnode"
+ ENV{ID_FS_TYPE}!="bcache", GOTO="bcache_backing_end"
+ ENV{ID_FS_UUID_ENC}=="?*", SYMLINK+="disk/by-uuid/$env{ID_FS_UUID_ENC}"
+ 
+-LABEL="bcache_backing_found"
+ RUN+="bcache-register $tempnode"
+ LABEL="bcache_backing_end"
+ 
+--- bcache-tools-20131018/dracut/module-setup.sh.udevfix	2013-10-11 13:21:56.000000000 +0200
++++ bcache-tools-20131018/dracut/module-setup.sh	2013-10-18 19:11:37.596140492 +0200
+@@ -29,6 +29,6 @@
+ }
+ 
+ install() {
+-    inst_multiple ${udevdir}/probe-bcache ${udevdir}/bcache-register
++    inst_multiple ${udevdir}/bcache-register
+     inst_rules 69-bcache.rules
+ }
