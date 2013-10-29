@@ -1,5 +1,17 @@
 %global gitdate 20131018
 
+# blkid in util-linux v2.24 will be able to identify bcache superblocks which
+# obsoletes probe-bcache. v2.24 rc is planned for F20:
+# https://bugzilla.redhat.com/show_bug.cgi?id=1001120#c13
+# so for F20 blkid will be used, but not for older Fedora in case someone
+# builds it
+#
+%if 0%{?fedora} > 19
+%global use_blkid 1
+%else
+%global use_blkid 0
+%endif
+
 Summary: Tools for Linux kernel block layer cache
 Name: bcache-tools
 Version: 0
@@ -19,11 +31,7 @@ Source0: %{name}-%{gitdate}.tar.gz
 # git archive --format=tar --prefix=bcache-status-20130909/ 10282160ab880eab0d9b8d1e1590e477f1e76da2 | gzip > ../bcache-status-20130909.tar.gz
 # see also http://article.gmane.org/gmane.linux.kernel.bcache.devel/1951
 Source1: bcache-status-20130909.tar.gz
-# The dracut module originally resided in dracut, but it's now part of
-# bcache-tools
-Source2: bcache-tools-dracut-module.tgz
-# bcache status not provided as a true package, so this is a self maintained
-# man page for it
+# bcache status not provided as a true package, so this is a self maintained man page for it
 # http://article.gmane.org/gmane.linux.kernel.bcache.devel/1946
 Patch0: %{name}-status-20130826-man.patch
 # Skip DM devices marked private - will be in git repo later
@@ -32,16 +40,14 @@ Patch1: %{name}-20131018-udev-dmfix.patch
 # configure is not "Fedora compliant", do a small step in the
 # right direction
 Patch2: %{name}-20131018-fedconf.patch
-# util-linux takes care of bcache superblock identification so we remove
-# the probe-cache call (which is Fedora specific):
-Patch3: %{name}-20131018-noprobe.patch
 
 Requires: python
+%if %{use_blkid}
 # This is a kind of soft dependency: because we don't include probe-bcache
 # we have to make sure that libblkid is able to identify bcache. So this
 # is why it requires recent libblkid.
 Requires: libblkid >= 2.24
-Conflicts: dracut < 034
+%endif
 BuildRequires: libuuid-devel libblkid-devel systemd
 
 %description
@@ -51,17 +57,14 @@ one or more slower hard disk drives.
 This package contains the utilities for manipulating bcache.
 
 %global _udevlibdir %{_prefix}/lib/udev
-%global dracutlibdir %{_prefix}/lib/dracut
 
 %prep
 %setup -q -n bcache-tools-%{gitdate}
 tar xzf %{SOURCE1} --strip-components=1
-tar xzf %{SOURCE2}
 %patch0 -p1 -b .man
 %patch1 -p1 -b .dmfix
 %patch2 -p1 -b .fedconfmake
 chmod +x configure
-%patch3 -p1 -b .noprobe
 
 %build
 %configure
@@ -72,19 +75,18 @@ mkdir -p \
     %{buildroot}%{_sbindir} \
     %{buildroot}%{_mandir}/man8 \
     %{buildroot}%{_udevlibdir} \
-    %{buildroot}%{_udevrulesdir} \
-    %{buildroot}%{dracutlibdir}/modules.d
+    %{buildroot}%{_udevrulesdir}
 
 %make_install \
     INSTALL="install -p" \
     UDEVLIBDIR=%{_udevlibdir} \
-    DRACUTLIBDIR=%{dracutlibdir} \
     MANDIR=%{_mandir}
 
 # prevent complaints when checking for unpackaged files
-rm %{buildroot}%{_udevlibdir}/probe-bcache
+%if %{use_blkid}
+rm %{buildroot}%{_sbindir}/probe-bcache
 rm %{buildroot}%{_mandir}/man8/probe-bcache.8
-
+%endif
 install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
 
 %files
@@ -95,12 +97,17 @@ install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
 %{_sbindir}/bcache-super-show
 %{_sbindir}/bcache-status
 %{_sbindir}/make-bcache
-%{dracutlibdir}/modules.d/90bcache
+%if !%{use_blkid}
+%{_udevlibdir}/probe-bcache
+%endif
 
 %changelog
+* Mon Oct 28 2013 Timon <timosha@gmail.com> - - 0-0.16.20131018git
+- remove dracut support
+- back F19 support
+
 * Fri Oct 18 2013 Rolf Fokkens <rolf@rolffokkens.nl> - 0-0.15.20131018git
 - updated bcache-tools to latest upstream git
-- dracut module is now included upstream
 - bcache-register no longer needs patching
 - Makefile no longer needs patching
 
