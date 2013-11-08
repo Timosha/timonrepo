@@ -202,14 +202,9 @@ if [ -z perl-pkg-files ] ; then
 fi
 
 # fix multilib issues
-%ifarch x86_64 s390x ia64 ppc64 alpha sparc64 aarch64
-%define wordsize 64
-%else
-%define wordsize 32
-%endif
 
 mv %{buildroot}%{_includedir}/%{name}-6/magick/magick-config.h \
-	%{buildroot}%{_includedir}/%{name}-6/magick/magick-config-%{wordsize}.h
+	%{buildroot}%{_includedir}/%{name}-6/magick/magick-config-%{__isa_bits}.h
 
 cat >%{buildroot}%{_includedir}/%{name}-6/magick/magick-config.h <<EOF
 #ifndef IMAGEMAGICK_MULTILIB
@@ -319,6 +314,9 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Fri Nov 08 2013 Kyle McMartin <kyle@fedoraproject.org>
+- Use %__isa_bits instead of hardcoding the list of 64-bit architectures.
+
 * Mon Oct 7 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 6.8.7.0-1
 - Update to 6.8.7-0 to fix badurl (http://www.mail-archive.com/devel@lists.fedoraproject.org/msg67796.html)
 
