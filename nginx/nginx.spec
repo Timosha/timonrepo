@@ -7,6 +7,7 @@
 %global  nginx_datadir       %{_datadir}/nginx
 %global  nginx_logdir        %{_localstatedir}/log/nginx
 %global  nginx_webroot       %{nginx_datadir}/html
+%global  nginx_rtmp_version  1.0.6
 
 # gperftools exist only on selected arches
 %ifarch %{ix86} x86_64 ppc ppc64 %{arm}
@@ -16,7 +17,7 @@
 Name:              nginx
 Epoch:             1
 Version:           1.4.4
-Release:           1%{?dist}
+Release:           2%{?dist}
 
 Summary:           A high performance web server and reverse proxy server
 Group:             System Environment/Daemons
@@ -37,6 +38,7 @@ Source101:         poweredby.png
 Source102:         nginx-logo.png
 Source103:         404.html
 Source104:         50x.html
+Source2:           https://github.com/arut/nginx-rtmp-module/archive/v%{nginx_rtmp_version}.tar.gz
 
 # removes -Werror in upstream build scripts.  -Werror conflicts with
 # -D_FORTIFY_SOURCE=2 causing warnings to turn into errors.
@@ -70,9 +72,15 @@ Nginx is a web server and a reverse proxy server for HTTP, SMTP, POP3 and
 IMAP protocols, with a strong focus on high concurrency, performance and low
 memory usage.
 
+This version is build with the nginx-rtmp-module [1] %{nginx_rtmp_version},                                                                                                                   
+giving you the ability to enable live streaming of video/audio and video on                                                                                                                   
+demand FLV/MP4, playing from local filesystem or HTTP as well as many other                                                                                                                   
+features related to streaming.                                                                                                                                                                
+                                                                                                                                                                                              
+[1] https://github.com/arut/nginx-rtmp-module
 
 %prep
-%setup -q
+%setup -q -a 2 -n nginx-%{version} 
 %patch0 -p0
 
 
@@ -124,6 +132,7 @@ export DESTDIR=%{buildroot}
     --with-google_perftools_module \
 %endif
     --with-debug \
+    --add-module=nginx-rtmp-module-%{nginx_rtmp_version} \
     --with-cc-opt="%{optflags} $(pcre-config --cflags)" \
     --with-ld-opt="$RPM_LD_FLAGS -Wl,-E" # so the perl module finds its symbols
 
@@ -222,6 +231,9 @@ fi
 
 
 %changelog
+* Fri Nov 22 2013 Timon <timosha@gmail.org> - 1:1.4.4-2
+- Add rtmp module 1.0.6
+
 * Wed Nov 20 2013 Peter Borsa <peter.borsa@gmail.com> - 1:1.4.4-1
 - Update to upstream release 1.4.4
 - Security fix BZ 1032267
