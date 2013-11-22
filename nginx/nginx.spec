@@ -13,10 +13,9 @@
 %global  with_gperftools     1
 %endif
 
-
 Name:              nginx
 Epoch:             1
-Version:           1.4.1
+Version:           1.4.4
 Release:           1%{?dist}
 
 Summary:           A high performance web server and reverse proxy server
@@ -138,7 +137,6 @@ find %{buildroot} -type f -name .packlist -exec rm -f '{}' \;
 find %{buildroot} -type f -name perllocal.pod -exec rm -f '{}' \;
 find %{buildroot} -type f -empty -exec rm -f '{}' \;
 find %{buildroot} -type f -iname '*.so' -exec chmod 0755 '{}' \;
-
 install -p -D -m 0644 %{SOURCE10} \
     %{buildroot}%{_unitdir}/nginx.service
 install -p -D -m 0644 %{SOURCE11} \
@@ -224,6 +222,28 @@ fi
 
 
 %changelog
+* Wed Nov 20 2013 Peter Borsa <peter.borsa@gmail.com> - 1:1.4.4-1
+- Update to upstream release 1.4.4
+- Security fix BZ 1032267
+
+* Sun Nov 03 2013 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.3-1
+- update to upstream release 1.4.3
+
+* Fri Aug 09 2013 Jonathan Steffan <jsteffan@fedoraproject.org> - 1:1.4.2-3
+- Add in conditionals to build for non-systemd targets
+
+* Sat Aug 03 2013 Petr Pisar <ppisar@redhat.com> - 1:1.4.2-2
+- Perl 5.18 rebuild
+
+* Fri Jul 19 2013 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.2-1
+- update to upstream release 1.4.2
+
+* Wed Jul 17 2013 Petr Pisar <ppisar@redhat.com> - 1:1.4.1-3
+- Perl 5.18 rebuild
+
+* Tue Jun 11 2013 Remi Collet <rcollet@redhat.com> - 1:1.4.1-2
+- rebuild for new GD 2.1.0
+
 * Tue May 07 2013 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.1-1
 - update to upstream release 1.4.1 (#960605, #960606):
   CVE-2013-2028 stack-based buffer overflow when handling certain chunked
