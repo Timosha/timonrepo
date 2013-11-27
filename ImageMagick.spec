@@ -3,7 +3,7 @@
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
-Release:		1%{?dist}
+Release:		2%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
@@ -314,6 +314,9 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Wed Nov 27 2013 Rex Dieter <rdieter@fedoraproject.org> 6.8.7.0-2
+- rebuild (openexr)
+
 * Fri Nov 08 2013 Kyle McMartin <kyle@fedoraproject.org>
 - Use %__isa_bits instead of hardcoding the list of 64-bit architectures.
 
