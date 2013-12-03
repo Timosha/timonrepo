@@ -5,7 +5,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
 Version:   1.0.16
-Release:   1%{?dist}
+Release:   2%{?dist}
 License:   BSD
 Group:     System Environment/Libraries
 URL:       http://libmemcached.org/
@@ -30,6 +30,7 @@ BuildRequires: systemtap-sdt-devel
 %endif
 BuildRequires: libevent-devel
 
+Patch0: libmemcached-fix-linking-with-libpthread.patch
 
 %description
 libmemcached is a C/C++ client library and tools for the memcached server
@@ -71,6 +72,7 @@ you will need to install %{name}-devel.
 
 %prep
 %setup -q
+%patch0 -p1
 
 mkdir examples
 cp -p tests/*.{cc,h} examples/
@@ -174,6 +176,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Dec 03 2013 Ruben Kerkhof <ruben@rubenkerkhof.com> 1.0.16-2
+- Fix linking against libpthread as a workaround for libtool bug #661333
+
 * Mon Aug  5 2013 Remi Collet <remi@fedoraproject.org> - 1.0.16-1
 - revert to 1.0.16 for fedora 20
 
