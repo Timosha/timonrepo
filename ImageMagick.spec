@@ -3,7 +3,7 @@
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
-Release:		3%{?dist}
+Release:		4%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
@@ -314,6 +314,9 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Mon Jan 6 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 6.8.7.0-4
+- Drop BR giflib-devel (bz#1039378)
+
 * Thu Jan 02 2014 Orion Poplawski <orion@cora.nwra.com> - 6.8.7.0-3
 - Rebuild for libwebp soname bump
 
