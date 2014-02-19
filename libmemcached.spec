@@ -1,11 +1,20 @@
+# spec file for libmemcached
+#
+# Copyright (c) 2009-2014 Remi Collet
+# License: CC-BY-SA
+# http://creativecommons.org/licenses/by-sa/3.0/
+#
+# Please, preserve the changelog entries
+#
 # Lot of tests are broken making test suite unusable
 %global with_tests       %{?_witht_tests:1}%{!?_with_tests:0}
 %global with_sasl        1
+%global libname          libmemcached
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
 Version:   1.0.18
-Release:   1%{?dist}
+Release:   2%{?dist}
 License:   BSD
 Group:     Applications/System
 URL:       http://libmemcached.org/
@@ -15,7 +24,7 @@ URL:       http://libmemcached.org/
 # code, since the license is non-free.  When upgrading, download the new
 # source tarball, and run "./strip-hsieh.sh <version>" to produce the
 # "-exhsieh" tarball.
-Source0:   libmemcached-%{version}-exhsieh.tar.gz
+Source0:   %{libname}-%{version}-exhsieh.tar.gz
 
 %if %{with_sasl}
 BuildRequires: cyrus-sasl-devel
@@ -71,16 +80,17 @@ This package contains the header files and development libraries
 for %{name}. If you like to develop programs using %{name}, 
 you will need to install %{name}-devel.
 
+
 %package libs
-Summary:    %{name} libraries
+Summary:    %{libname} libraries
 Group:      System Environment/Libraries
 
 %description libs
-This package contains the %{name} libraries version %{version}.
+This package contains the %{libname} libraries version %{version}.
 
 
 %prep
-%setup -q
+%setup -q -n %{libname}-%{version}
 %patch0 -p1
 
 mkdir examples
@@ -128,15 +138,8 @@ fi
 
 %check
 %if %{with_tests}
-make test 2>&1 | tee rpmtests.log
-# Ignore test result for memaslap (XFAIL but PASS)
-# https://bugs.launchpad.net/libmemcached/+bug/1115357
-if grep "XPASS: clients/memaslap" rpmtests.log && grep "1 of 21" rpmtests.log
-then
-  exit 0
-else
-  exit 1
-fi
+: Run test suite
+make test
 %else
 : Skip test suite
 %endif
@@ -180,6 +183,9 @@ fi
 
 
 %changelog
+* Wed Feb 19 2014 Remi Collet <remi@fedoraproject.org> - 1.0.18-2
+- cleanups
+
 * Wed Feb 19 2014 Remi Collet <remi@fedoraproject.org> - 1.0.18-1
 - update to 1.0.18
 - disable test suite (too much broken tests)
