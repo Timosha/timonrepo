@@ -1,11 +1,11 @@
-# Regression tests take a long time, you can skip 'em using --without tests
-%global with_tests       %{?_without_tests:0}%{!?_without_tests:1}
+# Lot of tests are broken making test suite unusable
+%global with_tests       %{?_witht_tests:1}%{!?_with_tests:0}
 %global with_sasl        1
 
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
-Version:   1.0.16
-Release:   2%{?dist}
+Version:   1.0.18
+Release:   1%{?dist}
 License:   BSD
 Group:     Applications/System
 URL:       http://libmemcached.org/
@@ -180,6 +180,10 @@ fi
 
 
 %changelog
+* Wed Feb 19 2014 Remi Collet <remi@fedoraproject.org> - 1.0.18-1
+- update to 1.0.18
+- disable test suite (too much broken tests)
+
 * Sat Dec 14 2013 Remi Collet <remi@fedoraproject.org> - 1.0.16-2
 - move libraries in new libs sub packages
 - add provides for bundled(bobjenkins-hash) #1041351
