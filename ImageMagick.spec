@@ -1,9 +1,9 @@
-%global VER 6.8.7
-%global Patchlevel 0
+%global VER 6.8.8
+%global Patchlevel 10
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
-Release:		4%{?dist}
+Release:		1%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
@@ -172,7 +172,7 @@ make
 %install
 rm -rf %{buildroot}
 
-make install DESTDIR=%{buildroot} INSTALL="install -p"
+make %{?_smp_mflags} install DESTDIR=%{buildroot} INSTALL="install -p"
 cp -a www/source %{buildroot}%{_datadir}/doc/%{name}-%{VER}
 # Delete *ONLY* _libdir/*.la files! .la files used internally to handle plugins - BUG#185237!!!
 rm %{buildroot}%{_libdir}/*.la
@@ -225,6 +225,11 @@ EOF
 
 # Fonts must be packaged separately. It does nothave matter and demos work without it.
 rm PerlMagick/demo/Generic.ttf
+
+%check
+#export LD_LIBRARY_PATH=%{buildroot}/wand/.libs/:%{buildroot}/Magick++/lib/.libs/
+export LD_LIBRARY_PATH=%{buildroot}/%{_libdir}
+make %{?_smp_mflags} check
 
 %clean
 rm -rf %{buildroot}
@@ -314,6 +319,11 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Sat Mar 29 2014 Pavel Alexeev <Pahan@Hubbitus.info>- 6.8.8.10-1
+- Update to 6.8.8-10 with hope to fix CVE-2014-1958 (bz#1067276, bz#1067277), CVE-2014-1947, CVE-2014-2030 (bz#1064098)
+- Enable %%check by Alexander Todorov suggestion - bz#1076671.
+- Add %%{?_smp_mflags} into make install and check (not main compilation).
+
 * Mon Jan 6 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 6.8.7.0-4
 - Drop BR giflib-devel (bz#1039378)
 
