@@ -320,7 +320,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Sat Mar 29 2014 Pavel Alexeev <Pahan@Hubbitus.info>- 6.8.8.10-1
-- Update to 6.8.8-10 with hope to fix CVE-2014-1958 (bz#1067276, bz#1067277), CVE-2014-1947, CVE-2014-2030 (bz#1064098)
+- Update to 6.8.8-10 with hope to fix CVE-2014-1958 (bz#1067276, bz#1067277, bz#1067278), CVE-2014-1947, CVE-2014-2030 (bz#1064098)
 - Enable %%check by Alexander Todorov suggestion - bz#1076671.
 - Add %%{?_smp_mflags} into make install and check (not main compilation).
 
