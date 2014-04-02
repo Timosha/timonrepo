@@ -3,7 +3,7 @@
 
 Name:		ImageMagick
 Version:		%{VER}.%{Patchlevel}
-Release:		2%{?dist}
+Release:		3%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
@@ -253,8 +253,8 @@ rm -rf %{buildroot}
 %files libs
 %defattr(-,root,root,-)
 %doc LICENSE NOTICE AUTHORS.txt QuickStart.txt
-%{_libdir}/libMagickCore-6.Q16.so.*
-%{_libdir}/libMagickWand-6.Q16.so.*
+%{_libdir}/libMagickCore-6.Q16.so.2*
+%{_libdir}/libMagickWand-6.Q16.so.2*
 %{_libdir}/%{name}-%{VER}
 %{_datadir}/%{name}-6
 %exclude %{_libdir}/%{name}-%{VER}/modules-Q16/coders/djvu.*
@@ -298,7 +298,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %doc Magick++/AUTHORS Magick++/ChangeLog Magick++/NEWS Magick++/README
 %doc www/Magick++/COPYING
-%{_libdir}/libMagick++-6.Q16.so.*
+%{_libdir}/libMagick++-6.Q16.so.3*
 
 %files c++-devel
 %defattr(-,root,root,-)
@@ -319,7 +319,10 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
-* Sat Mar 29 2014 Pavel Alexeev <Pahan@Hubbitus.info>- 6.8.8.10-2
+* Wed Apr 2 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 6.8.8.10-3
+- Concretize soname versions.
+
+* Sat Mar 29 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 6.8.8.10-2
 - Update to 6.8.8-10 with hope to fix CVE-2014-1958 (bz#1067276, bz#1067277, bz#1067278), CVE-2014-1947, CVE-2014-2030 (bz#1064098)
 - Enable %%check by Alexander Todorov suggestion - bz#1076671.
 - Add %%{?_smp_mflags} into make install and check (not main compilation).
