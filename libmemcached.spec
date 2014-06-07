@@ -14,7 +14,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
 Version:   1.0.18
-Release:   2%{?dist}
+Release:   3%{?dist}
 License:   BSD
 Group:     Applications/System
 URL:       http://libmemcached.org/
@@ -183,6 +183,9 @@ make test
 
 
 %changelog
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.18-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
 * Wed Feb 19 2014 Remi Collet <remi@fedoraproject.org> - 1.0.18-2
 - cleanups
 
