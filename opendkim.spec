@@ -5,7 +5,7 @@
 Summary: A DomainKeys Identified Mail (DKIM) milter to sign and/or verify mail
 Name: opendkim
 Version: 2.9.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD and Sendmail
 URL: http://opendkim.org/
 Group: System Environment/Daemons
@@ -367,6 +367,9 @@ rm -rf %{buildroot}
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.9.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
 * Wed Dec 18 2013 Steve Jenkins <steve stevejenkins com> - 2.9.0-2
 - Patch adds user and group to systemd service file (Thx jcosta@redhat.com)
 - Changed default ownership of /etc/opendkim/keys directory to opendkim user
