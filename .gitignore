@@ -13,3 +13,6 @@
 /opendkim-2.9.0.tar.gz
 /opendkim.add-user-group.patch
 /opendkim-2.9.2.tar.gz
+/opendkim.autocreate-keys-no.patch
+/opendkim.keygen-permissions.patch
+/opendkim.systemd-no-default-genkey.patch
