@@ -16,7 +16,7 @@
 Name:              nginx
 Epoch:             1
 Version:           1.4.7
-Release:           1%{?dist}
+Release:           2%{?dist}
 
 Summary:           A high performance web server and reverse proxy server
 Group:             System Environment/Daemons
@@ -43,6 +43,9 @@ Source104:         50x.html
 # removes -Werror in upstream build scripts.  -Werror conflicts with
 # -D_FORTIFY_SOURCE=2 causing warnings to turn into errors.
 Patch0:            nginx-auto-cc-gcc.patch
+
+# CVE-2014-3616 virtual host confusion
+Patch1:            %{name}-1.4.7-fix-CVE-2014-3616.patch
 
 BuildRequires:     GeoIP-devel
 BuildRequires:     gd-devel
@@ -83,6 +86,7 @@ memory usage.
 %prep
 %setup -q
 %patch0 -p0
+%patch1 -p1
 
 
 %build
@@ -268,6 +272,9 @@ fi
 
 
 %changelog
+* Mon Sep 22 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.7-2
+- patch for CVE-2014-3616 virtual host confusion (#1142573, #1142575)
+
 * Tue Mar 18 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.7-1
 - update to upstream release 1.4.7
 
