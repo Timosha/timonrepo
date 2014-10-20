@@ -6,6 +6,7 @@
 
 Summary:      Extension to work with the Memcached caching daemon
 Name:         php-pecl-memcached
+Epoch:        1
 Version:      2.1.0
 Release:      8%{?dist}
 # memcached is PHP, FastLZ is MIT
@@ -182,6 +183,9 @@ ln -s %{php_ztsextdir}/igbinary.so modules/
 
 
 %changelog
+* Mon Oct 20 2014 Timon <timosha@gmail.com> - 1:2.1.0-8
+- rebuild old libmemcached
+
 * Tue Sep 03 2013 Timon <timosha@gmail.com> - 2.1.0-8
 - rebuild old libmemcached
 - disable sasl
