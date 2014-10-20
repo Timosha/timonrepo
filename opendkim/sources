@@ -1,4 +1,0 @@
-80043a5147ae4ff2feb7f8d32ed2ccac  opendkim.autocreate-keys-no.patch
-a6a9c36328a9b4c18f5fca19e3b1aabc  opendkim.keygen-permissions.patch
-4f9d50fcd8428c280b2a4739cf4b8492  opendkim.systemd-no-default-genkey.patch
-08cc80a2aedec62b0444d8d6af24a155  opendkim-2.9.2.tar.gz
