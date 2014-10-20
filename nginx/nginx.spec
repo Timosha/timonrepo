@@ -16,7 +16,7 @@
 
 Name:              nginx
 Epoch:             1
-Version:           1.4.4
+Version:           1.4.7
 Release:           3%{?dist}
 
 Summary:           A high performance web server and reverse proxy server
@@ -33,6 +33,8 @@ Source11:          nginx.logrotate
 Source12:          nginx.conf
 Source13:          nginx-upgrade
 Source14:          nginx-upgrade.8
+Source15:          nginx.init
+Source16:          nginx.sysconfig
 Source100:         index.html
 Source101:         poweredby.png
 Source102:         nginx-logo.png
@@ -43,6 +45,9 @@ Source2:           https://github.com/arut/nginx-rtmp-module/archive/v%{nginx_rt
 # removes -Werror in upstream build scripts.  -Werror conflicts with
 # -D_FORTIFY_SOURCE=2 causing warnings to turn into errors.
 Patch0:            nginx-auto-cc-gcc.patch
+
+# CVE-2014-3616 virtual host confusion
+Patch1:            %{name}-1.4.7-fix-CVE-2014-3616.patch
 
 BuildRequires:     GeoIP-devel
 BuildRequires:     gd-devel
@@ -55,17 +60,26 @@ BuildRequires:     pcre-devel
 BuildRequires:     perl-devel
 BuildRequires:     perl(ExtUtils::Embed)
 BuildRequires:     zlib-devel
-BuildRequires:     systemd
+
+Requires:          nginx-filesystem = %{epoch}:%{version}-%{release}
 Requires:          GeoIP
 Requires:          gd
 Requires:          openssl
 Requires:          pcre
 Requires:          perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-Requires(pre):     shadow-utils
+Requires(pre):     nginx-filesystem
+Provides:          webserver
+
+%if 0%{?fedora} >= 16
+BuildRequires:     systemd
 Requires(post):    systemd
 Requires(preun):   systemd
 Requires(postun):  systemd
-Provides:          webserver
+%else
+Requires(post):    chkconfig
+Requires(preun):   chkconfig, initscripts
+Requires(postun):  initscripts
+%endif
 
 %description
 Nginx is a web server and a reverse proxy server for HTTP, SMTP, POP3 and
@@ -79,9 +93,22 @@ features related to streaming.
                                                                                                                                                                                               
 [1] https://github.com/arut/nginx-rtmp-module
 
+%package filesystem
+Group:             System Environment/Daemons
+Summary:           The basic directory layout for the Nginx server
+BuildArch:         noarch
+Requires(pre):     shadow-utils
+
+%description filesystem
+The nginx-filesystem package contains the basic directory layout
+for the Nginx server including the correct permissions for the
+directories.
+
+
 %prep
 %setup -q -a 2 -n nginx-%{version} 
 %patch0 -p0
+%patch1 -p1
 
 
 %build
@@ -101,8 +128,13 @@ export DESTDIR=%{buildroot}
     --http-fastcgi-temp-path=%{nginx_home_tmp}/fastcgi \
     --http-uwsgi-temp-path=%{nginx_home_tmp}/uwsgi \
     --http-scgi-temp-path=%{nginx_home_tmp}/scgi \
+%if 0%{?fedora} >= 16
     --pid-path=/run/nginx.pid \
     --lock-path=/run/lock/subsys/nginx \
+%else
+    --pid-path=%{_localstatedir}/run/nginx.pid \
+    --lock-path=%{_localstatedir}/lock/subsys/nginx \
+%endif
     --user=%{nginx_user} \
     --group=%{nginx_group} \
     --with-file-aio \
@@ -146,8 +178,16 @@ find %{buildroot} -type f -name .packlist -exec rm -f '{}' \;
 find %{buildroot} -type f -name perllocal.pod -exec rm -f '{}' \;
 find %{buildroot} -type f -empty -exec rm -f '{}' \;
 find %{buildroot} -type f -iname '*.so' -exec chmod 0755 '{}' \;
+%if 0%{?fedora} >= 16
 install -p -D -m 0644 %{SOURCE10} \
     %{buildroot}%{_unitdir}/nginx.service
+%else
+install -p -D -m 0755 %{SOURCE15} \
+    %{buildroot}%{_initrddir}/nginx
+install -p -D -m 0644 %{SOURCE16} \
+    %{buildroot}%{_sysconfdir}/sysconfig/nginx
+%endif
+
 install -p -D -m 0644 %{SOURCE11} \
     %{buildroot}%{_sysconfdir}/logrotate.d/nginx
 
@@ -173,7 +213,7 @@ install -p -D -m 0755 %{SOURCE13} %{buildroot}%{_bindir}/nginx-upgrade
 install -p -D -m 0644 %{SOURCE14} %{buildroot}%{_mandir}/man8/nginx-upgrade.8
 
 
-%pre
+%pre filesystem
 getent group %{nginx_group} > /dev/null || groupadd -r %{nginx_group}
 getent passwd %{nginx_user} > /dev/null || \
     useradd -r -d %{nginx_home} -g %{nginx_group} \
@@ -181,7 +221,13 @@ getent passwd %{nginx_user} > /dev/null || \
 exit 0
 
 %post
+%if 0%{?fedora} >= 16
 %systemd_post nginx.service
+%else
+if [ $1 -eq 1 ]; then
+    /sbin/chkconfig --add %{name}
+fi
+%endif
 if [ $1 -eq 2 ]; then
     # Make sure these directories are not world readable.
     chmod 700 %{nginx_home}
@@ -190,20 +236,38 @@ if [ $1 -eq 2 ]; then
 fi
 
 %preun
+%if 0%{?fedora} >= 16
 %systemd_preun nginx.service
+%else
+if [ $1 -eq 0 ]; then
+    /sbin/service %{name} stop >/dev/null 2>&1
+    /sbin/chkconfig --del %{name}
+fi
+%endif
 
 %postun
+%if 0%{?fedora} >= 16
 %systemd_postun nginx.service
+%else
+if [ $1 -eq 2 ]; then
+    /sbin/service %{name} upgrade || :
+fi
+%endif
 
 %files
 %doc LICENSE CHANGES README
-%{nginx_datadir}/
+%{nginx_datadir}/html/*
 %{_bindir}/nginx-upgrade
 %{_sbindir}/nginx
 %{_mandir}/man3/nginx.3pm*
 %{_mandir}/man8/nginx.8*
 %{_mandir}/man8/nginx-upgrade.8*
+%if 0%{?fedora} >= 16
 %{_unitdir}/nginx.service
+%else
+%{_initrddir}/nginx
+%config(noreplace) %{_sysconfdir}/sysconfig/nginx
+%endif
 %dir %{nginx_confdir}
 %dir %{nginx_confdir}/conf.d
 %config(noreplace) %{nginx_confdir}/fastcgi.conf
@@ -229,8 +293,31 @@ fi
 %attr(700,%{nginx_user},%{nginx_group}) %dir %{nginx_home_tmp}
 %attr(700,%{nginx_user},%{nginx_group}) %dir %{nginx_logdir}
 
+%files filesystem
+%dir %{nginx_datadir}
+%dir %{nginx_datadir}/html
+%dir %{nginx_confdir}
+%dir %{nginx_confdir}/conf.d
 
 %changelog
+* Mon Sep 22 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.7-3
+- create nginx-filesystem subpackage (patch from Remi Collet)
+
+* Mon Sep 22 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.7-2
+- patch for CVE-2014-3616 virtual host confusion (#1142573, #1142575)
+
+* Tue Mar 18 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.7-1
+- update to upstream release 1.4.7
+
+* Wed Mar 05 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.6-1
+- update to upstream release 1.4.6
+
+* Sun Feb 16 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.5-2
+- avoid multiple index directives (#1065488)
+
+* Sun Feb 16 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.5-1
+- update to upstream release 1.4.5
+
 * Fri Nov 22 2013 Timon <timosha@gmail.org> - 1:1.4.4-3
 - Add rtmp module 1.0.6
 
