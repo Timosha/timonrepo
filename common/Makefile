@@ -38,6 +38,8 @@ mock: clean srpm
 
 repo: clean f19 f18
 
+f20: f20-x86_64
+
 f19: f19-x86_64
 
 f18: f18-x86_64 f18-i386
@@ -53,6 +55,17 @@ f14: f14-x86_64 f14-i386
 f13: f13-x86_64 f13-i386
 
 arch: clean f$(RELEASE)-$(ARCH)
+
+f20-x86_64: srpm
+	mock -r fedora-20-x86_64 rebuild $(NAME)*.src.rpm && \
+	mkdir -p $(REPODIR)/20/{SRPMS,x86_64} && \
+	mkdir -p $(REPODIR)/20/x86_64/{os,debug} && \
+	( mv /var/lib/mock/fedora-20-x86_64/result/*-debuginfo-*.rpm  $(REPODIR)/20/x86_64/debug || echo noarch ) && \
+	mv /var/lib/mock/fedora-20-x86_64/result/$(NAME)-*.src.rpm  $(REPODIR)/20/SRPMS && \
+	mv /var/lib/mock/fedora-20-x86_64/result/*-*.rpm  $(REPODIR)/20/x86_64/os && \
+	cd $(REPODIR)/20/x86_64/os && createrepo --update . && \
+	cd $(REPODIR)/20/x86_64/debug && createrepo --update . && \
+	cd $(REPODIR)/20/SRPMS && createrepo --update .
 
 f19-x86_64: srpm
 	mock -r fedora-19-x86_64 rebuild $(NAME)*.src.rpm && \
