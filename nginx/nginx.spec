@@ -17,7 +17,7 @@
 Name:              nginx
 Epoch:             1
 Version:           1.4.4
-Release:           2%{?dist}
+Release:           3%{?dist}
 
 Summary:           A high performance web server and reverse proxy server
 Group:             System Environment/Daemons
@@ -231,7 +231,7 @@ fi
 
 
 %changelog
-* Fri Nov 22 2013 Timon <timosha@gmail.org> - 1:1.4.4-2
+* Fri Nov 22 2013 Timon <timosha@gmail.org> - 1:1.4.4-3
 - Add rtmp module 1.0.6
 
 * Wed Nov 20 2013 Peter Borsa <peter.borsa@gmail.com> - 1:1.4.4-1
