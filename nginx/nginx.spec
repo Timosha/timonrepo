@@ -7,7 +7,7 @@
 %global  nginx_datadir       %{_datadir}/nginx
 %global  nginx_logdir        %{_localstatedir}/log/nginx
 %global  nginx_webroot       %{nginx_datadir}/html
-%global  nginx_rtmp_version  1.0.6
+%global  nginx_rtmp_version  1.1.5
 
 # gperftools exist only on selected arches
 %ifarch %{ix86} x86_64 ppc ppc64 %{arm}
@@ -15,7 +15,7 @@
 %endif
 
 Name:              nginx
-Epoch:             1
+Epoch:             2
 Version:           1.4.7
 Release:           3%{?dist}
 
@@ -300,6 +300,9 @@ fi
 %dir %{nginx_confdir}/conf.d
 
 %changelog
+* Mon Oct 20 2014 Timon <timosha@gmail.com> - 2:1.4.7-3
+- bump rtmp module
+
 * Mon Sep 22 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.7-3
 - create nginx-filesystem subpackage (patch from Remi Collet)
 
