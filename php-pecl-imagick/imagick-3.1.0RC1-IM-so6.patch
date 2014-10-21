@@ -1,0 +1,13 @@
+--- pecl/imagick/trunk/config.m4	2013/03/13 11:40:45	329768
++++ pecl/imagick/trunk/config.m4	2013/03/13 13:14:23	329769
+@@ -52,7 +52,9 @@
+   else	
+     AC_MSG_CHECKING(for MagickWand.h header file)
+ 
+-    if test -r $WAND_DIR/include/ImageMagick/wand/MagickWand.h; then
++    if test -r $WAND_DIR/include/ImageMagick-6/wand/MagickWand.h; then
++      AC_MSG_RESULT(found in $WAND_DIR/include/ImageMagick-6/wand/MagickWand.h)
++    elif test -r $WAND_DIR/include/ImageMagick/wand/MagickWand.h; then
+       AC_MSG_RESULT(found in $WAND_DIR/include/ImageMagick/wand/MagickWand.h)
+     else
+       AC_MSG_ERROR(Cannot locate header file MagickWand.h)
