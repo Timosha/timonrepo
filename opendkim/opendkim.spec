@@ -4,6 +4,7 @@
 
 Summary: A DomainKeys Identified Mail (DKIM) milter to sign and/or verify mail
 Name: opendkim
+Epoch: 1
 Version: 2.9.2
 Release: 2%{?dist}
 License: BSD and Sendmail
@@ -369,6 +370,9 @@ rm -rf %{buildroot}
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Oct 20 2014 Timon <timosha@gmail.com> - 1:2.9.2-2
+- rebuild for libmemcached 1:1.0.8
+
 * Mon Aug 4 2014 Steve Jenkins <steve@stevejenkins.com> - 2.9.2-2
 - Change file ownerships/permissions to fix https://bugzilla.redhat.com/show_bug.cgi?id=891292
 - Default keys no longer created on startup. Privileged user must run opendkim-default-keygen or create manually (after install)
