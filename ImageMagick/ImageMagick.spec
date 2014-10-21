@@ -2,13 +2,14 @@
 %global Patchlevel 10
 
 Name:		ImageMagick
+Epoch:	1
 Version:		%{VER}.%{Patchlevel}
 Release:		5%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
 Url:			http://www.imagemagick.org/
-Source0:		ftp://ftp.ImageMagick.org/pub/%{name}/%{name}-%{VER}-%{Patchlevel}.tar.xz
+Source0:		http://mirrors-ru.go-parts.com/mirrors/ImageMagick/releases/%{name}-%{VER}-%{Patchlevel}.tar.xz
 
 Requires:		%{name}-libs = %{version}-%{release}
 
@@ -319,6 +320,9 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Tue Oct 21 2014 Timon <timosha@gmail.com> - 1:6.8.8.10-5
+- Rebuild
+
 * Fri Aug 15 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 6.8.8.10-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
