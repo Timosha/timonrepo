@@ -6,11 +6,11 @@ Summary: A DomainKeys Identified Mail (DKIM) milter to sign and/or verify mail
 Name: opendkim
 Epoch: 1
 Version: 2.9.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD and Sendmail
 URL: http://opendkim.org/
 Group: System Environment/Daemons
-Requires: lib%{name} = %{version}-%{release}
+Requires: lib%{name} = %{epoch}:%{version}-%{release}
 Requires (pre): shadow-utils
 
 # Uncomment for systemd version
@@ -19,7 +19,7 @@ Requires (preun): systemd-units
 Requires (postun): systemd-units
 Requires (post): systemd-sysv
 BuildRequires: libdb-devel
-BuildRequires: libmemcached-devel
+#BuildRequires: libmemcached-devel
 
 # Uncomment for SystemV version
 #Requires (post): chkconfig
@@ -59,7 +59,7 @@ using libopendkim.
 %package -n libopendkim-devel
 Summary: Development files for libopendkim
 Group: Development/Libraries
-Requires: libopendkim = %{version}-%{release}
+Requires: libopendkim = %{epoch}:%{version}-%{release}
 
 %description -n libopendkim-devel
 This package contains the static libraries, headers, and other support files
@@ -68,7 +68,7 @@ required for developing applications against libopendkim.
 %package sysvinit
 Summary: The SysV init script to manage the OpenDKIM milter.
 Group: System Environmnt/Daemons
-Requires: %{name} = %{version}-%{release}
+Requires: %{name} = %{epoch}:%{version}-%{release}
 
 %description sysvinit
 OpenDKIM allows signing and/or verification of email through an open source
@@ -87,7 +87,7 @@ It is not required when the init system used is systemd.
 %patch2 -p1
 
 %build
-%configure --with-unbound --with-libmemcached --with-db
+%configure --with-unbound --with-db
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
@@ -370,6 +370,9 @@ rm -rf %{buildroot}
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Nov 20 2014 Timon <timosha@gmail.com> - 1:2.9.2-3
+- disable libmemcache support
+
 * Mon Oct 20 2014 Timon <timosha@gmail.com> - 1:2.9.2-2
 - rebuild for libmemcached 1:1.0.8
 
