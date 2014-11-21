@@ -2,16 +2,16 @@
 %global Patchlevel 10
 
 Name:		ImageMagick
-Epoch:	1
+Epoch:		1
 Version:		%{VER}.%{Patchlevel}
-Release:		5%{?dist}
+Release:		7%{?dist}
 Summary:		An X application for displaying and manipulating images
 Group:		Applications/Multimedia
 License:		ImageMagick
 Url:			http://www.imagemagick.org/
 Source0:		http://mirrors-ru.go-parts.com/mirrors/ImageMagick/releases/%{name}-%{VER}-%{Patchlevel}.tar.xz
 
-Requires:		%{name}-libs = %{version}-%{release}
+Requires:		%{name}-libs = %{epoch}:%{version}-%{release}
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	bzip2-devel, freetype-devel, libjpeg-devel, libpng-devel
@@ -41,11 +41,11 @@ ImageMagick-devel as well.
 %package devel
 Summary:	Library links and header files for ImageMagick app development
 Group:	Development/Libraries
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name} = %{epoch}:%{version}-%{release}
 Requires:	libX11-devel, libXext-devel, libXt-devel, ghostscript-devel
 Requires:	bzip2-devel, freetype-devel, libtiff-devel, libjpeg-devel, lcms2-devel
 Requires:	libwebp-devel, OpenEXR-devel, jasper-devel, pkgconfig
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{name}-libs = %{epoch}:%{version}-%{release}
 
 %description devel
 ImageMagick-devel contains the library links and header files you'll
@@ -69,7 +69,7 @@ This packages contains a shared libraries to use within other applications.
 %package djvu
 Summary: DjVu plugin for ImageMagick
 Group: Applications/Multimedia
-Requires: %{name} = %{version}-%{release}
+Requires: %{name} = %{epoch}:%{version}-%{release}
 
 %description djvu
 This packages contains a plugin for ImageMagick which makes it possible to
@@ -90,7 +90,7 @@ http://www.imagemagick.org/
 %package perl
 Summary: ImageMagick perl bindings
 Group: System Environment/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: %{name} = %{epoch}:%{version}-%{release}
 Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description perl
@@ -103,7 +103,7 @@ ImageMagick.
 %package c++
 Summary: ImageMagick Magick++ library (C++ bindings)
 Group: System Environment/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: %{name} = %{epoch}:%{version}-%{release}
 
 %description c++
 This package contains the Magick++ library, a C++ binding to the ImageMagick
@@ -115,8 +115,8 @@ Install ImageMagick-c++ if you want to use any applications that use Magick++.
 %package c++-devel
 Summary: C++ bindings for the ImageMagick library
 Group: Development/Libraries
-Requires: %{name}-c++ = %{version}-%{release}
-Requires: %{name}-devel = %{version}-%{release}
+Requires: %{name}-c++ = %{epoch}:%{version}-%{release}
+Requires: %{name}-devel = %{epoch}:%{version}-%{release}
 
 %description c++-devel
 ImageMagick-devel contains the static libraries and header files you'll
@@ -146,6 +146,7 @@ cp -p Magick++/demo/*.cpp Magick++/demo/*.miff Magick++/examples
 %configure \
 	--enable-shared \
 	--disable-static \
+	--disable-openmp \
 	--with-modules \
 	--with-perl \
 	--with-x \
@@ -259,7 +260,7 @@ rm -rf %{buildroot}
 %{_libdir}/%{name}-%{VER}
 %{_datadir}/%{name}-6
 %exclude %{_libdir}/%{name}-%{VER}/modules-Q16/coders/djvu.*
-%{_sysconfdir}/%{name}-6
+%config(noreplace) %{_sysconfdir}/%{name}-6
 
 %files devel
 %defattr(-,root,root,-)
@@ -320,6 +321,10 @@ rm -rf %{buildroot}
 %doc PerlMagick/demo/ PerlMagick/Changelog PerlMagick/README.txt
 
 %changelog
+* Fri Nov 14 2014 Timon <timosha@gmail.com> - 1:6.8.8.10-7
+- Disable openMP
+- save config
+
 * Tue Oct 21 2014 Timon <timosha@gmail.com> - 1:6.8.8.10-5
 - Rebuild
 
