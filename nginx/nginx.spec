@@ -14,10 +14,21 @@
 %global  with_gperftools     1
 %endif
 
+# AIO missing on some arches
+%ifnarch aarch64
+%global  with_aio   1
+%endif
+
+%if 0%{?fedora} >= 16 || 0%{?rhel} >= 7
+%global with_systemd 1
+%else
+%global with_systemd 0
+%endif
+
 Name:              nginx
 Epoch:             2
-Version:           1.4.7
-Release:           3%{?dist}
+Version:           1.6.2
+Release:           4%{?dist}
 
 Summary:           A high performance web server and reverse proxy server
 Group:             System Environment/Daemons
@@ -46,9 +57,6 @@ Source2:           https://github.com/arut/nginx-rtmp-module/archive/v%{nginx_rt
 # -D_FORTIFY_SOURCE=2 causing warnings to turn into errors.
 Patch0:            nginx-auto-cc-gcc.patch
 
-# CVE-2014-3616 virtual host confusion
-Patch1:            %{name}-1.4.7-fix-CVE-2014-3616.patch
-
 BuildRequires:     GeoIP-devel
 BuildRequires:     gd-devel
 %if 0%{?with_gperftools}
@@ -70,7 +78,7 @@ Requires:          perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $ve
 Requires(pre):     nginx-filesystem
 Provides:          webserver
 
-%if 0%{?fedora} >= 16
+%if 0%{?with_systemd}
 BuildRequires:     systemd
 Requires(post):    systemd
 Requires(preun):   systemd
@@ -108,7 +116,6 @@ directories.
 %prep
 %setup -q -a 2 -n nginx-%{version} 
 %patch0 -p0
-%patch1 -p1
 
 
 %build
@@ -128,7 +135,7 @@ export DESTDIR=%{buildroot}
     --http-fastcgi-temp-path=%{nginx_home_tmp}/fastcgi \
     --http-uwsgi-temp-path=%{nginx_home_tmp}/uwsgi \
     --http-scgi-temp-path=%{nginx_home_tmp}/scgi \
-%if 0%{?fedora} >= 16
+%if 0%{?with_systemd}
     --pid-path=/run/nginx.pid \
     --lock-path=/run/lock/subsys/nginx \
 %else
@@ -137,7 +144,9 @@ export DESTDIR=%{buildroot}
 %endif
     --user=%{nginx_user} \
     --group=%{nginx_group} \
+%if 0%{?with_aio}
     --with-file-aio \
+%endif
     --with-ipv6 \
     --with-http_ssl_module \
     --with-http_spdy_module \
@@ -178,7 +187,7 @@ find %{buildroot} -type f -name .packlist -exec rm -f '{}' \;
 find %{buildroot} -type f -name perllocal.pod -exec rm -f '{}' \;
 find %{buildroot} -type f -empty -exec rm -f '{}' \;
 find %{buildroot} -type f -iname '*.so' -exec chmod 0755 '{}' \;
-%if 0%{?fedora} >= 16
+%if 0%{?with_systemd}
 install -p -D -m 0644 %{SOURCE10} \
     %{buildroot}%{_unitdir}/nginx.service
 %else
@@ -192,6 +201,7 @@ install -p -D -m 0644 %{SOURCE11} \
     %{buildroot}%{_sysconfdir}/logrotate.d/nginx
 
 install -p -d -m 0755 %{buildroot}%{nginx_confdir}/conf.d
+install -p -d -m 0755 %{buildroot}%{nginx_confdir}/default.d
 install -p -d -m 0700 %{buildroot}%{nginx_home}
 install -p -d -m 0700 %{buildroot}%{nginx_home_tmp}
 install -p -d -m 0700 %{buildroot}%{nginx_logdir}
@@ -212,6 +222,11 @@ install -p -D -m 0644 %{_builddir}/nginx-%{version}/man/nginx.8 \
 install -p -D -m 0755 %{SOURCE13} %{buildroot}%{_bindir}/nginx-upgrade
 install -p -D -m 0644 %{SOURCE14} %{buildroot}%{_mandir}/man8/nginx-upgrade.8
 
+for i in ftdetect indent syntax; do
+    install -p -D -m644 contrib/vim/${i}/nginx.vim \
+        %{buildroot}%{_datadir}/vim/vimfiles/${i}/nginx.vim
+done
+
 
 %pre filesystem
 getent group %{nginx_group} > /dev/null || groupadd -r %{nginx_group}
@@ -221,7 +236,7 @@ getent passwd %{nginx_user} > /dev/null || \
 exit 0
 
 %post
-%if 0%{?fedora} >= 16
+%if 0%{?with_systemd}
 %systemd_post nginx.service
 %else
 if [ $1 -eq 1 ]; then
@@ -236,7 +251,7 @@ if [ $1 -eq 2 ]; then
 fi
 
 %preun
-%if 0%{?fedora} >= 16
+%if 0%{?with_systemd}
 %systemd_preun nginx.service
 %else
 if [ $1 -eq 0 ]; then
@@ -246,7 +261,7 @@ fi
 %endif
 
 %postun
-%if 0%{?fedora} >= 16
+%if 0%{?with_systemd}
 %systemd_postun nginx.service
 %else
 if [ $1 -eq 2 ]; then
@@ -259,17 +274,18 @@ fi
 %{nginx_datadir}/html/*
 %{_bindir}/nginx-upgrade
 %{_sbindir}/nginx
+%{_datadir}/vim/vimfiles/ftdetect/nginx.vim
+%{_datadir}/vim/vimfiles/syntax/nginx.vim
+%{_datadir}/vim/vimfiles/indent/nginx.vim
 %{_mandir}/man3/nginx.3pm*
 %{_mandir}/man8/nginx.8*
 %{_mandir}/man8/nginx-upgrade.8*
-%if 0%{?fedora} >= 16
+%if 0%{?with_systemd}
 %{_unitdir}/nginx.service
 %else
 %{_initrddir}/nginx
 %config(noreplace) %{_sysconfdir}/sysconfig/nginx
 %endif
-%dir %{nginx_confdir}
-%dir %{nginx_confdir}/conf.d
 %config(noreplace) %{nginx_confdir}/fastcgi.conf
 %config(noreplace) %{nginx_confdir}/fastcgi.conf.default
 %config(noreplace) %{nginx_confdir}/fastcgi_params
@@ -298,16 +314,50 @@ fi
 %dir %{nginx_datadir}/html
 %dir %{nginx_confdir}
 %dir %{nginx_confdir}/conf.d
+%dir %{nginx_confdir}/default.d
+
 
 %changelog
-* Mon Oct 20 2014 Timon <timosha@gmail.com> - 2:1.4.7-3
-- bump rtmp module
+* Fri Nov 21 2014 Timon <timosha@gmail.com> - 2:1.6.2-4
+- rebuild with rtmp
 
-* Mon Sep 22 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.7-3
+* Wed Oct 22 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.6.2-4
+- fix package ownership of directories
+
+* Wed Oct 22 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.6.2-3
+- add vim files (#1142849)
+
+* Mon Sep 22 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.6.2-2
 - create nginx-filesystem subpackage (patch from Remi Collet)
+- create /etc/nginx/default.d as a drop-in directory for configuration files
+  for the default server block
+- clean up nginx.conf
 
-* Mon Sep 22 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.7-2
-- patch for CVE-2014-3616 virtual host confusion (#1142573, #1142575)
+* Wed Sep 17 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.6.2-1
+- update to upstream release 1.6.2
+- CVE-2014-3616 nginx: virtual host confusion (#1142573)
+
+* Wed Aug 27 2014 Jitka Plesnikova <jplesnik@redhat.com> - 1:1.6.1-4
+- Perl 5.20 rebuild
+
+* Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:1.6.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
+* Tue Aug 05 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.6.1-2
+- add logic for EPEL 7
+
+* Tue Aug 05 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.6.1-1
+- update to upstream release 1.6.1
+- (#1126891) CVE-2014-3556: SMTP STARTTLS plaintext injection flaw
+
+* Wed Jul 02 2014 Yaakov Selkowitz <yselkowi@redhat.com> - 1:1.6.0-3
+- Fix FTBFS on aarch64 (#1115559)
+
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:1.6.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Sat Apr 26 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.6.0-1
+- update to upstream release 1.6.0
 
 * Tue Mar 18 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.4.7-1
 - update to upstream release 1.4.7
