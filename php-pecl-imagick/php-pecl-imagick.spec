@@ -7,6 +7,7 @@
 
 Summary:		Provides a wrapper to the ImageMagick library
 Name:		php-pecl-%peclName
+Epoch:			1
 Version:		3.1.0
 Release:		0.7.%{prever}%{?dist}
 License:		PHP
@@ -105,6 +106,9 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/php.d/%peclName.ini
 
 %changelog
+* Thu Oct 23 2014 Timon <timosha@gmail.com> - 1:3.1.0-0.7.RC2
+- Rebuilt for new ImageMagick
+
 * Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1.0-0.7.RC2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
