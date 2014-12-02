@@ -7,7 +7,9 @@
 %global  nginx_datadir       %{_datadir}/nginx
 %global  nginx_logdir        %{_localstatedir}/log/nginx
 %global  nginx_webroot       %{nginx_datadir}/html
-%global  nginx_rtmp_version  1.1.5
+%global  nginx_rtmp_version  1.1.6
+%global  nginx_upload_version 2.2.0
+%global  nginx_upload_progress_version 0.9.1
 
 # gperftools exist only on selected arches
 %ifarch %{ix86} x86_64 ppc ppc64 %{arm}
@@ -28,7 +30,7 @@
 Name:              nginx
 Epoch:             2
 Version:           1.6.2
-Release:           4%{?dist}
+Release:           8%{?dist}
 
 Summary:           A high performance web server and reverse proxy server
 Group:             System Environment/Daemons
@@ -52,10 +54,14 @@ Source102:         nginx-logo.png
 Source103:         404.html
 Source104:         50x.html
 Source2:           https://github.com/arut/nginx-rtmp-module/archive/v%{nginx_rtmp_version}.tar.gz
+Source3:           https://github.com/cloudvm/nginx-upload-module/archive/%{nginx_upload_version}.tar.gz
+Source4:           https://github.com/masterzen/nginx-upload-progress-module/archive/v%{nginx_upload_progress_version}.tar.gz
+
 
 # removes -Werror in upstream build scripts.  -Werror conflicts with
 # -D_FORTIFY_SOURCE=2 causing warnings to turn into errors.
 Patch0:            nginx-auto-cc-gcc.patch
+Patch1:            nginx-upload-module-%{nginx_upload_version}.patch
 
 BuildRequires:     GeoIP-devel
 BuildRequires:     gd-devel
@@ -94,12 +100,15 @@ Nginx is a web server and a reverse proxy server for HTTP, SMTP, POP3 and
 IMAP protocols, with a strong focus on high concurrency, performance and low
 memory usage.
 
-This version is build with the nginx-rtmp-module [1] %{nginx_rtmp_version},                                                                                                                   
-giving you the ability to enable live streaming of video/audio and video on                                                                                                                   
-demand FLV/MP4, playing from local filesystem or HTTP as well as many other                                                                                                                   
-features related to streaming.                                                                                                                                                                
-                                                                                                                                                                                              
+This version is build with the nginx-rtmp-module [1] %{nginx_rtmp_version},
+giving you the ability to enable live streaming of video/audio and video on
+demand FLV/MP4, playing from local filesystem or HTTP as well as many other
+features related to streaming.
+
+This version is build with the nginx-upload-module [2]
+
 [1] https://github.com/arut/nginx-rtmp-module
+[2] https://github.com/cloudvm/nginx-upload-module
 
 %package filesystem
 Group:             System Environment/Daemons
@@ -114,8 +123,9 @@ directories.
 
 
 %prep
-%setup -q -a 2 -n nginx-%{version} 
+%setup -q -a 2 -a 3 -a 4 -n nginx-%{version} 
 %patch0 -p0
+%patch1 -p0
 
 
 %build
@@ -174,6 +184,7 @@ export DESTDIR=%{buildroot}
 %endif
     --with-debug \
     --add-module=nginx-rtmp-module-%{nginx_rtmp_version} \
+    --add-module=nginx-upload-module-%{nginx_upload_version} \
     --with-cc-opt="%{optflags} $(pcre-config --cflags)" \
     --with-ld-opt="$RPM_LD_FLAGS -Wl,-E" # so the perl module finds its symbols
 
@@ -318,8 +329,10 @@ fi
 
 
 %changelog
-* Fri Nov 21 2014 Timon <timosha@gmail.com> - 2:1.6.2-4
-- rebuild with rtmp
+* Tue Dec 02 2014 Timon <timosha@gmail.com> - 2:1.6.2-8
+- rebuild with rtmp 1.1.6
+- add upload module
+- add upload progress module
 
 * Wed Oct 22 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 1:1.6.2-4
 - fix package ownership of directories
