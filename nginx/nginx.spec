@@ -30,7 +30,7 @@
 Name:              nginx
 Epoch:             2
 Version:           1.6.2
-Release:           8%{?dist}
+Release:           9%{?dist}
 
 Summary:           A high performance web server and reverse proxy server
 Group:             System Environment/Daemons
@@ -185,6 +185,7 @@ export DESTDIR=%{buildroot}
     --with-debug \
     --add-module=nginx-rtmp-module-%{nginx_rtmp_version} \
     --add-module=nginx-upload-module-%{nginx_upload_version} \
+    --add-module=nginx-upload-progress-module-%{nginx_upload_progress_version} \
     --with-cc-opt="%{optflags} $(pcre-config --cflags)" \
     --with-ld-opt="$RPM_LD_FLAGS -Wl,-E" # so the perl module finds its symbols
 
@@ -329,6 +330,9 @@ fi
 
 
 %changelog
+* Tue Jan 20 2015 Timon <timosha@gmail.com> - 2:1.6.2-9
+- fix upload progress module
+
 * Tue Dec 02 2014 Timon <timosha@gmail.com> - 2:1.6.2-8
 - rebuild with rtmp 1.1.6
 - add upload module
