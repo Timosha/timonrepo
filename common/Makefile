@@ -4,7 +4,7 @@ RPMDEFINES := --define "_sourcedir $(SRCDIR)" \
               --define "_rpmdir $(SRCDIR)"
 
 REPODIR := /home/timon/development/repo
-RELEASE := 19
+RELEASE := 20
 ARCH := x86_64
 
 build: prep
@@ -38,6 +38,8 @@ mock: clean srpm
 
 repo: clean f19 f18
 
+f21: f21-x86_64
+
 f20: f20-x86_64
 
 f19: f19-x86_64
@@ -55,6 +57,17 @@ f14: f14-x86_64 f14-i386
 f13: f13-x86_64 f13-i386
 
 arch: clean f$(RELEASE)-$(ARCH)
+
+f21-x86_64: srpm
+	mock -r fedora-21-x86_64 rebuild $(NAME)*.src.rpm && \
+	mkdir -p $(REPODIR)/21/{SRPMS,x86_64} && \
+	mkdir -p $(REPODIR)/21/x86_64/{os,debug} && \
+	( mv /var/lib/mock/fedora-21-x86_64/result/*-debuginfo-*.rpm  $(REPODIR)/21/x86_64/debug || echo noarch ) && \
+	mv /var/lib/mock/fedora-21-x86_64/result/$(NAME)-*.src.rpm  $(REPODIR)/21/SRPMS && \
+	mv /var/lib/mock/fedora-21-x86_64/result/*-*.rpm  $(REPODIR)/21/x86_64/os && \
+	cd $(REPODIR)/21/x86_64/os && createrepo --update . && \
+	cd $(REPODIR)/21/x86_64/debug && createrepo --update . && \
+	cd $(REPODIR)/21/SRPMS && createrepo --update .
 
 f20-x86_64: srpm
 	mock -r fedora-20-x86_64 rebuild $(NAME)*.src.rpm && \
