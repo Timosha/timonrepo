@@ -14,7 +14,7 @@
 Name:      libmemcached
 Summary:   Client library and command line tools for memcached server
 Version:   1.0.18
-Release:   4%{?dist}
+Release:   5%{?dist}
 License:   BSD
 Group:     Applications/System
 URL:       http://libmemcached.org/
@@ -42,6 +42,10 @@ Provides:      bundled(bobjenkins-hash)
 Requires:      %{name}-libs%{?_isa} = %{version}-%{release}
 
 Patch0: libmemcached-fix-linking-with-libpthread.patch
+
+# https://bugs.launchpad.net/libmemcached/+bug/1154159
+Patch1: %{libname}-fix-continuum.patch
+
 
 %description
 libmemcached is a C/C++ client library and tools for the memcached server
@@ -92,6 +96,7 @@ This package contains the %{libname} libraries version %{version}.
 %prep
 %setup -q -n %{libname}-%{version}
 %patch0 -p1
+%patch1 -p0
 
 mkdir examples
 cp -p tests/*.{cc,h} examples/
@@ -183,6 +188,9 @@ make test
 
 
 %changelog
+* Tue Jan 20 2015 Timon <timosha@gmail.com> - 1.0.18-5
+- fix https://bugs.launchpad.net/libmemcached/+bug/1154159
+
 * Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.18-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
